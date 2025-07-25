@@ -1,0 +1,41 @@
+/* app.component.css */
+
+.social-sidebar {
+  position: fixed;
+  bottom: 0;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+}
+
+.social-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-sidebar li {
+  margin: 10px 0;
+}
+
+.social-sidebar a {
+  color: #8892b0;
+  font-size: 20px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.social-sidebar a:hover {
+  color: #64ffda;
+}
+
+.social-sidebar::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 100px;
+  background-color: #8892b0;
+  margin-top: 10px;
+}

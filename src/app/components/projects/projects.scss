@@ -1,0 +1,125 @@
+.projects-section {
+  padding: 100px 20px;
+  background-color: #fff;
+  max-width: 1300px;
+  margin: auto;
+
+  .section-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .section-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 70px;
+    text-align: center;
+  }
+
+  .project-card {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 120px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    @media (max-width: 900px) {
+      flex-direction: column;
+    }
+
+    .project-image {
+      flex: 1;
+      img {
+        width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+      }
+    }
+
+    .project-content {
+      flex: 1;
+
+      h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+
+      .description {
+        font-size: 1.1rem;
+        color: #444;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+
+        li {
+          background-color: #f3f3f3;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #555;
+        }
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+
+        .btn {
+          padding: 10px 18px;
+          border-radius: 8px;
+          font-weight: bold;
+          font-size: 0.95rem;
+          text-decoration: none;
+          transition: all 0.3s ease;
+
+          &.primary {
+            background-color: #7e3af2;
+            color: white;
+
+            &:hover {
+              background-color: #5a2db7;
+            }
+          }
+
+          &.secondary {
+            background-color: #f3f3f3;
+            color: #333;
+
+            &:hover {
+              background-color: #ddd;
+            }
+          }
+
+          &.github {
+            background-color: #24292e;
+            color: white;
+
+            &:hover {
+              background-color: #000;
+            }
+          }
+        }
+      }
+    }
+  }
+}

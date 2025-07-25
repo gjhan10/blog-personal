@@ -1,0 +1,33 @@
+<section class="about-section">
+  <div class="about-header">
+    <h2>Sobre mí</h2>
+    <p>
+      Aquí encontrarás más información sobre mí, lo que hago y mis habilidades actuales, principalmente en programación y tecnología.
+    </p>
+  </div>
+
+  <div class="about-body">
+    <div class="about-left">
+      <h3>¡Conóceme!</h3>
+      <p>
+        Soy un <strong>Desarrollador Backend especializado en Java y Spring Boot</strong>, con experiencia construyendo APIs REST robustas y soluciones empresariales escalables.
+      </p>
+      <p>
+        También tengo experiencia desarrollando interfaces usando <strong>Angular</strong>, lo que me permite trabajar en aplicaciones fullstack.
+      </p>
+      <p>
+        Me apasiona compartir lo que aprendo, especialmente sobre desarrollo backend, microservicios, arquitectura limpia y buenas prácticas.
+      </p>
+      <p>
+        Estoy abierto a oportunidades donde pueda aportar, seguir aprendiendo y crecer profesionalmente. Si tienes alguna oferta interesante, ¡no dudes en contactarme!
+      </p>
+    </div>
+
+    <div class="about-right">
+      <h3>Mis habilidades</h3>
+       <ul class="skills-grid">
+         <li *ngFor="let skill of skills" #skillItem>{{ skill }}</li>
+       </ul>
+    </div>
+  </div>
+</section>

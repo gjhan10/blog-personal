@@ -1,0 +1,56 @@
+.social-sidebar {
+  position: fixed;
+  bottom: 0;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+}
+
+.social-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-sidebar li {
+  margin: 10px 0;
+}
+
+.social-sidebar a {
+  color: #8892b0;
+  font-size: 25px;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-sidebar a:hover {
+  transform: scale(1.2);
+}
+
+/* Hover con colores oficiales */
+.social-sidebar a[aria-label="Email"]:hover {
+  color: #D14836; /* Gmail */
+}
+
+.social-sidebar a[aria-label="WhatsApp"]:hover {
+  color: #25D366;
+}
+
+.social-sidebar a[aria-label="LinkedIn"]:hover {
+  color: #0A66C2;
+}
+
+.social-sidebar a[aria-label="GitHub"]:hover {
+  color: #333;
+}
+
+.social-sidebar::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 100px;
+  background-color: #8892b0;
+  margin-top: 10px;
+}

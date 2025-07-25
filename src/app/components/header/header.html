@@ -1,0 +1,21 @@
+<header class="header">
+  <nav class="navbar">
+    <div class="logo-container">
+      <img src="assets/avatar.jpg" alt="Avatar" class="avatar" />
+      <a class="logo" href="#inicio">Jhan Gutierrez</a>
+    </div>
+
+    <ul class="nav-menu" [class.active]="menuOpen">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#proyectos">Proyectos</a></li>
+      <li><a href="#sobre-mi">Sobre mí</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+
+    <div class="hamburger" (click)="toggleMenu()">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </div>
+  </nav>
+</header>
