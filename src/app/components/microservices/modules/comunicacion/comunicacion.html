@@ -1,0 +1,499 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===6">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">07</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">REST entre microservicios</h2>
+      <p class="lesson-sub">Spring 6 introdujo <code>RestClient</code> como sucesor de <code>RestTemplate</code>. Para microservicios con Eureka, Spring Cloud LoadBalancer enruta las peticiones automáticamente.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">RestClient (Spring 6)</div>
+        <div class="tc-body">API fluida y síncrona, sucesor directo de RestTemplate. Ideal para llamadas puntuales entre servicios. Compatible con interceptores, error handlers y exchange functions.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">WebClient (reactivo)</div>
+        <div class="tc-body">Para stacks reactivos (WebFlux). No bloqueante, permite composición de flujos y manejo reactivo de errores. Preferible cuando el throughput importa.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cloud" aria-hidden="true"></i></div>
+        <div class="tc-title">Feign Client</div>
+        <div class="tc-body">Declara la interfaz del cliente HTTP como una anotación Java. Spring Cloud OpenFeign genera la implementación. Simple, legible y integrado con Resilience4j.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-scale" aria-hidden="true"></i></div>
+        <div class="tc-title">Load Balancer</div>
+        <div class="tc-body">Spring Cloud LoadBalancer distribuye las llamadas entre instancias del servicio obtenidas de Eureka. Sin configuración extra con <code>@LoadBalanced</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Feign Client con Resilience4j fallback</span></div>
+      <div class="anatomy-line">@FeignClient(name = <span class="a-str">"inventory-service"</span>, fallback = <span class="a-type">InventoryFallback</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">public interface</span> <span class="a-type">InventoryClient</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;@GetMapping(<span class="a-str">"/inventory/{{ '{' }}productId{{ '}' }}"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">InventoryDto</span> getStock(@PathVariable <span class="a-type">String</span> productId);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">@Component</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">InventoryFallback</span> <span class="a-kw">implements</span> <span class="a-type">InventoryClient</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">InventoryDto</span> getStock(<span class="a-type">String</span> id) {{ '{' }} <span class="a-kw">return</span> <span class="a-type">InventoryDto</span>.empty(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===7">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">08</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">gRPC & Protocol Buffers</h2>
+      <p class="lesson-sub">gRPC es un framework RPC de alto rendimiento de Google. Usa Protocol Buffers como formato binario de serialización, siendo hasta 10x más eficiente que JSON/REST para comunicación interna.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Eficiencia binaria</div>
+        <div class="tc-body">Protocol Buffers serializa datos en formato binario compacto, reduciendo el tamaño de los mensajes y aumentando la velocidad de serialización/deserialización vs JSON.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">Schema-first (.proto)</div>
+        <div class="tc-body">El contrato se define en un archivo <code>.proto</code>. Se generan stubs de cliente y servidor en múltiples lenguajes. Evolutivo: campos opcionales mantienen compatibilidad.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Streaming bidireccional</div>
+        <div class="tc-body">gRPC soporta unary, server streaming, client streaming y bidirectional streaming usando HTTP/2. Ideal para observabilidad en tiempo real y feeds de datos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Comunicación interna entre microservicios de alta frecuencia. No recomendado para APIs públicas (formato binario dificulta debug) o clientes browser sin grpc-web.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// orders.proto</span></div>
+      <div class="anatomy-line">syntax = <span class="a-str">"proto3"</span>;</div>
+      <div class="anatomy-line"><span class="a-kw">service</span> <span class="a-type">OrderService</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;rpc GetOrder (<span class="a-type">OrderRequest</span>) <span class="a-kw">returns</span> (<span class="a-type">OrderResponse</span>);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">message</span> <span class="a-type">OrderRequest</span> {{ '{' }} <span class="a-kw">string</span> order_id = 1; {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">message</span> <span class="a-type">OrderResponse</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">string</span> id = 1;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">double</span> total = 2;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">OrderStatus</span> status = 3;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===8">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">09</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">Apache Kafka & Mensajería</h2>
+      <p class="lesson-sub">Kafka es un log distribuido y tolerante a fallos para comunicación asíncrona entre microservicios. Spring for Apache Kafka simplifica la producción y consumo de mensajes.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-folder" aria-hidden="true"></i></div>
+        <div class="tc-title">Topics & Partitions</div>
+        <div class="tc-body">Los mensajes se publican en topics divididos en particiones. Cada partición es un log ordenado. El orden está garantizado dentro de una partición, no entre particiones.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">Consumer Groups</div>
+        <div class="tc-body">Múltiples instancias del mismo servicio forman un Consumer Group. Kafka asigna particiones a cada instancia, distribuyendo la carga automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Retention & Replay</div>
+        <div class="tc-body">Kafka retiene mensajes según tiempo o tamaño. Permite re-consumir eventos históricos para reconstruir estado (Event Sourcing) o backfill de nuevos servicios.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">Idempotencia</div>
+        <div class="tc-body">Habilitar exactly-once semantics en Kafka con <code>enable.idempotence=true</code> y <code>acks=all</code>. El consumidor debe ser idempotente: procesar el mismo mensaje dos veces debe dar el mismo resultado.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Producer con Spring Kafka</span></div>
+      <div class="anatomy-line">@Service</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">OrderEventPublisher</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">KafkaTemplate</span>&lt;<span class="a-type">String</span>, <span class="a-type">OrderEvent</span>&gt; kafka;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> publish(<span class="a-type">OrderEvent</span> event) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;kafka.send(<span class="a-str">"orders"</span>, event.orderId(), event);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Consumer</span></div>
+      <div class="anatomy-line">@KafkaListener(topics = <span class="a-str">"orders"</span>, groupId = <span class="a-str">"inventory-svc"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public void</span> onOrderCreated(@Payload <span class="a-type">OrderEvent</span> event) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;inventoryService.reserveStock(event.items());</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===9">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">10</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">Event-Driven Architecture</h2>
+      <p class="lesson-sub">En EDA, los servicios publican eventos cuando algo ocurre en su dominio. Otros servicios reaccionan a esos eventos de forma asíncrona, sin acoplamiento directo.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-megaphone" aria-hidden="true"></i></div>
+        <div class="tc-title">Domain Events</div>
+        <div class="tc-body">Hechos que ocurrieron en el dominio: <code>OrderPlaced</code>, <code>PaymentProcessed</code>, <code>ItemShipped</code>. Son inmutables y describen el pasado (tiempo pasado en el nombre).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bell" aria-hidden="true"></i></div>
+        <div class="tc-title">Event Notification vs Event-Carried State</div>
+        <div class="tc-body"><strong>Notification</strong>: el evento solo avisa ("OrderPlaced"). El consumidor consulta el estado. <strong>State Transfer</strong>: el evento lleva todos los datos necesarios, reduciendo llamadas.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Outbox Pattern</div>
+        <div class="tc-body">Garantiza que se persiste el estado Y se publica el evento atómicamente. Se escribe el evento en una tabla "outbox" en la misma transacción DB, y un proceso separado lo publica en Kafka.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-puzzle" aria-hidden="true"></i></div>
+        <div class="tc-title">Schema Registry</div>
+        <div class="tc-body">Confluent Schema Registry garantiza compatibilidad de schemas (Avro/JSON Schema) entre productor y consumidor, previniendo roturas de contrato en producción.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Outbox Pattern — persistir y publicar atómicamente</span></div>
+      <div class="anatomy-line">@Transactional</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Order</span> placeOrder(<span class="a-type">OrderRequest</span> req) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Order</span> order = orderRepo.save(<span class="a-kw">new</span> <span class="a-type">Order</span>(req));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;outboxRepo.save(<span class="a-kw">new</span> <span class="a-type">OutboxEvent</span>(<span class="a-str">"OrderPlaced"</span>, order.getId(), toJson(order)));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> order;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Scheduler publica eventos pendientes en Kafka</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===10">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">11</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">Service Discovery (Eureka)</h2>
+      <p class="lesson-sub">En entornos dinámicos (containers, autoscaling), las IPs cambian constantemente. Service Discovery permite que los servicios se encuentren por nombre en lugar de dirección física.</p>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>El <strong>Eureka Server</strong> actúa como registro central. Los servicios se registran al arrancar.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Cada servicio envía <strong>heartbeats</strong> cada 30s. Si falla, Eureka lo elimina del registro tras 90s.</div></div>
+      <div class="step"><span class="step-n">3</span><div><strong>Spring Cloud LoadBalancer</strong> obtiene la lista de instancias de Eureka y distribuye las peticiones.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Alternativas cloud-native: <strong>Kubernetes DNS</strong> (kube-dns) y <strong>Consul</strong> para entornos multi-cloud.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Eureka Server</span></div>
+      <div class="anatomy-line">@EnableEurekaServer</div>
+      <div class="anatomy-line">@SpringBootApplication</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">DiscoveryServer</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Eureka Client (microservicio)</span></div>
+      <div class="anatomy-line"><span class="a-cm"># application.yml</span></div>
+      <div class="anatomy-line">eureka.client.service-url.defaultZone: http://eureka:8761/eureka</div>
+      <div class="anatomy-line">spring.application.name: inventory-service</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Llamada con nombre lógico, no IP</span></div>
+      <div class="anatomy-line">@LoadBalanced</div>
+      <div class="anatomy-line"><span class="a-type">RestClient</span> client = <span class="a-type">RestClient</span>.create(<span class="a-str">"http://inventory-service"</span>);</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===11">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">12</span><span class="lesson-mod">M2 · Comunicación</span></div>
+      <h2 class="lesson-title">Load Balancing con Spring Cloud</h2>
+      <p class="lesson-sub">Spring Cloud LoadBalancer reemplaza a Ribbon (deprecado). Permite distribución client-side de carga entre instancias, con algoritmos Round Robin, Random o personalizados.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-scale" aria-hidden="true"></i></div>
+        <div class="tc-title">Client-side LB</div>
+        <div class="tc-body">El cliente obtiene la lista de instancias del registro y selecciona una localmente. Elimina el single point of failure de un load balancer centralizado y reduce latencia.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">Round Robin (default)</div>
+        <div class="tc-body">Distribuye peticiones de forma equitativa entre instancias. Funciona bien cuando todas las instancias tienen la misma capacidad y las peticiones tienen duración similar.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">Health-aware LB</div>
+        <div class="tc-body">Spring Cloud LB puede excluir instancias no saludables usando el endpoint de Actuator. Evita enrutar peticiones a instancias en proceso de arranque o con problemas.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cloud" aria-hidden="true"></i></div>
+        <div class="tc-title">Kubernetes LB</div>
+        <div class="tc-body">En Kubernetes, el service DNS y kube-proxy reemplazan a Eureka + Spring Cloud LB. Los Services de K8s proveen balanceo automático sin configuración adicional.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> En entornos Kubernetes, considera deshabilitar Eureka y usar el DNS de K8s directamente. Spring Cloud Kubernetes proporciona integración nativa con la API de K8s.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m2" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 2 — Comunicación entre Servicios</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Por qué gRPC es más eficiente que REST/JSON para comunicación interna entre microservicios?</div>
+      <div class="quiz-options" id="msm2q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q01',false)"><div class="quiz-letter">A</div> Porque usa HTTP/1.1 que es más rápido que HTTP/2</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q01',true)"><div class="quiz-letter">B</div> Usa serialización binaria (Protocol Buffers) sobre HTTP/2 con multiplexing, reduciendo tamaño y latencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q01',false)"><div class="quiz-letter">C</div> No requiere TCP/IP para la comunicación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q01',false)"><div class="quiz-letter">D</div> Comprime automáticamente todos los datos con gzip</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q01-ok">✓ gRPC usa Protocol Buffers (binario, compacto) sobre HTTP/2 con multiplexing de streams, reduciendo el overhead vs JSON/REST sobre HTTP/1.1.</div>
+      <div class="quiz-feedback fail" id="msm2q01-fail">✗ gRPC es más eficiente por: serialización binaria de Protobuf (vs JSON textual), HTTP/2 multiplexing (múltiples streams en una conexión) y compresión de headers.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué garantiza el Outbox Pattern en Event-Driven Architecture?</div>
+      <div class="quiz-options" id="msm2q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q02',false)"><div class="quiz-letter">A</div> Que los mensajes se publiquen exactamente una vez en Kafka</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q02',true)"><div class="quiz-letter">B</div> Que la persistencia del estado y la publicación del evento ocurran atómicamente, sin pérdida de eventos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q02',false)"><div class="quiz-letter">C</div> Que los mensajes se ordenen cronológicamente en todos los topics</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q02',false)"><div class="quiz-letter">D</div> Que el consumidor procese los mensajes en el mismo orden que el productor</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q02-ok">✓ El Outbox Pattern escribe el evento en la misma transacción DB que el cambio de estado, eliminando la condición de carrera entre persistir y publicar.</div>
+      <div class="quiz-feedback fail" id="msm2q02-fail">✗ Sin Outbox Pattern: si la DB se guarda pero Kafka falla, el evento se pierde. El Outbox escribe en una tabla outbox en la misma transacción, y un proceso separado lo publica.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Qué es un Consumer Group en Kafka y para qué sirve?</div>
+      <div class="quiz-options" id="msm2q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q03',false)"><div class="quiz-letter">A</div> Un grupo de brokers de Kafka que replican datos entre sí</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q03',true)"><div class="quiz-letter">B</div> Un grupo de instancias del mismo servicio que comparten el consumo de un topic, distribuyendo particiones entre ellas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q03',false)"><div class="quiz-letter">C</div> Un conjunto de topics relacionados en el mismo namespace</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q03',false)"><div class="quiz-letter">D</div> Los administradores que pueden crear topics en Kafka</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q03-ok">✓ Un Consumer Group permite escalar el consumo horizontalmente: Kafka asigna particiones a cada instancia del grupo. N instancias ≤ N particiones para máximo paralelismo.</div>
+      <div class="quiz-feedback fail" id="msm2q03-fail">✗ El Consumer Group es el mecanismo de escalado en Kafka. Las instancias del grupo se reparten las particiones del topic. Más instancias = más paralelismo (hasta el número de particiones).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Cuándo usarías gRPC en lugar de REST en una arquitectura de microservicios?</div>
+      <div class="quiz-options" id="msm2q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q04',false)"><div class="quiz-letter">A</div> Para APIs públicas expuestas a clientes web en el navegador</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q04',true)"><div class="quiz-letter">B</div> Para comunicación interna de alta frecuencia entre servicios donde la latencia y el throughput son críticos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q04',false)"><div class="quiz-letter">C</div> Cuando necesitas APIs explorables con Swagger UI</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q04',false)"><div class="quiz-letter">D</div> Solo cuando todos los servicios están en el mismo datacenter</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q04-ok">✓ gRPC brilla en comunicación interna de alto volumen. Para APIs públicas, REST es preferible por su exploratbilidad y soporte universal en navegadores.</div>
+      <div class="quiz-feedback fail" id="msm2q04-fail">✗ gRPC es ideal para comunicación interna de alta frecuencia. Evita usarlo en APIs públicas (formato binario no explorable) o con clientes web sin grpc-web proxy.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Qué es la idempotencia en el contexto de consumidores Kafka y por qué es esencial?</div>
+      <div class="quiz-options" id="msm2q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q05',false)"><div class="quiz-letter">A</div> La capacidad de publicar el mismo mensaje múltiples veces sin duplicados</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q05',true)"><div class="quiz-letter">B</div> Procesar el mismo mensaje más de una vez produce el mismo resultado; esencial porque Kafka garantiza at-least-once delivery</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q05',false)"><div class="quiz-letter">C</div> Que el consumidor solo procesa mensajes de su partición asignada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q05',false)"><div class="quiz-letter">D</div> La verificación de que el offset del consumidor es correcto</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q05-ok">✓ Kafka garantiza at-least-once delivery por defecto: un mensaje puede entregarse más de una vez. El consumidor debe ser idempotente para manejar duplicados sin efectos secundarios.</div>
+      <div class="quiz-feedback fail" id="msm2q05-fail">✗ Con at-least-once delivery, un mensaje puede procesarse dos veces (rebalanceo, retry). Si el consumidor no es idempotente, puede cobrar dos veces, crear duplicados, etc.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué hace <code>@LoadBalanced</code> en Spring Cloud sobre un RestClient o WebClient?</div>
+      <div class="quiz-options" id="msm2q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q06',false)"><div class="quiz-letter">A</div> Añade reintentos automáticos ante fallos de red</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q06',true)"><div class="quiz-letter">B</div> Intercepta la URL con nombre lógico del servicio y la resuelve a una dirección física usando el registro (Eureka)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q06',false)"><div class="quiz-letter">C</div> Distribuye la carga entre los threads del servicio actual</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q06',false)"><div class="quiz-letter">D</div> Habilita compresión de los cuerpos de las peticiones HTTP</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q06-ok">✓ @LoadBalanced añade un interceptor que resuelve <code>http://inventory-service</code> a una instancia real (IP:puerto) obtenida del registro de servicios.</div>
+      <div class="quiz-feedback fail" id="msm2q06-fail">✗ @LoadBalanced intercepta la URL con nombre lógico y la reemplaza por una instancia real del registro. Permite usar nombres en lugar de IPs hardcodeadas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Event Notification y Event-Carried State Transfer?</div>
+      <div class="quiz-options" id="msm2q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q07',false)"><div class="quiz-letter">A</div> Son el mismo patrón con distinto nombre</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q07',true)"><div class="quiz-letter">B</div> La notificación solo avisa que algo ocurrió; el State Transfer incluye todos los datos en el evento, evitando llamadas adicionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q07',false)"><div class="quiz-letter">C</div> El State Transfer se usa solo con bases de datos relacionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q07',false)"><div class="quiz-letter">D</div> La notificación es síncrona y el State Transfer es asíncrono</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q07-ok">✓ Notification: evento pequeño, el consumidor necesita hacer otra llamada. State Transfer: evento completo, el consumidor tiene todo lo necesario, reduciendo acoplamiento temporal.</div>
+      <div class="quiz-feedback fail" id="msm2q07-fail">✗ Notification solo avisa (el consumidor consulta más datos si los necesita). State Transfer incluye todos los datos en el evento (mayor tamaño pero menos llamadas adicionales).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Qué ventaja tiene el Service Discovery client-side sobre el server-side load balancing?</div>
+      <div class="quiz-options" id="msm2q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q08',false)"><div class="quiz-letter">A</div> Es más fácil de configurar que los load balancers tradicionales</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q08',true)"><div class="quiz-letter">B</div> Elimina el single point of failure del load balancer centralizado y reduce la latencia al decidir localmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q08',false)"><div class="quiz-letter">C</div> No requiere ningún registro de servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q08',false)"><div class="quiz-letter">D</div> Funciona sin necesidad de Eureka o Consul</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q08-ok">✓ Client-side LB: cada cliente tiene el listado de instancias y decide localmente. Sin punto único de fallo. Server-side LB centraliza el enrutamiento pero introduce un SPOF.</div>
+      <div class="quiz-feedback fail" id="msm2q08-fail">✗ Client-side LB elimina el SPOF del load balancer centralizado. Cada instancia client obtiene la lista del registro y selecciona localmente, reduciendo la latencia de routing.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Por qué Kafka garantiza orden de mensajes solo dentro de una partición?</div>
+      <div class="quiz-options" id="msm2q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q09',false)"><div class="quiz-letter">A</div> Porque usa round robin al asignar mensajes a particiones</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q09',true)"><div class="quiz-letter">B</div> Cada partición es un log ordenado e inmutable; entre particiones no hay sincronización de orden</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q09',false)"><div class="quiz-letter">C</div> Solo el líder de la partición puede garantizar el orden</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q09',false)"><div class="quiz-letter">D</div> Porque el broker ordena los mensajes por timestamp antes de publicarlos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q09-ok">✓ Cada partición es un log append-only con offset creciente: el orden dentro de la partición es garantizado. Para garantizar orden total, usa un solo consumidor por topic o una partición.</div>
+      <div class="quiz-feedback fail" id="msm2q09-fail">✗ La partición de Kafka es un log ordenado. Mensajes de distintas particiones pueden llegar desordenados. Para orden garantizado: usa la misma partition key (ej: orderId) para mensajes relacionados.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué es Protocol Buffers y cuál es su principal ventaja sobre JSON?</div>
+      <div class="quiz-options" id="msm2q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q10',false)"><div class="quiz-letter">A</div> Un formato XML binario creado por Microsoft</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q10',true)"><div class="quiz-letter">B</div> Un mecanismo de serialización binario de Google: mensajes más pequeños, deserialización más rápida y schema con evolución controlada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q10',false)"><div class="quiz-letter">C</div> Un protocolo de comunicación que reemplaza TCP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q10',false)"><div class="quiz-letter">D</div> Un sistema de cache distribuido para microservicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q10-ok">✓ Protobuf genera mensajes ~3-10x más pequeños que JSON y deserialización ~5-10x más rápida. El schema versionado en .proto garantiza compatibilidad hacia adelante y atrás.</div>
+      <div class="quiz-feedback fail" id="msm2q10-fail">✗ Protocol Buffers usa codificación binaria eficiente: datos más pequeños, serialización más rápida y schema explícito para evolución controlada. Desventaja: no es legible por humanos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué estrategia usarías para que un nuevo microservicio consuma eventos históricos de Kafka desde el inicio?</div>
+      <div class="quiz-options" id="msm2q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q11',false)"><div class="quiz-letter">A</div> Reiniciar el broker de Kafka para que reenvíe todos los mensajes</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q11',true)"><div class="quiz-letter">B</div> Configurar el nuevo consumer group con <code>auto.offset.reset=earliest</code> para consumir desde el inicio del log</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q11',false)"><div class="quiz-letter">C</div> Clonar el consumer group de un servicio existente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q11',false)"><div class="quiz-letter">D</div> No es posible consumir mensajes históricos en Kafka</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q11-ok">✓ Kafka retiene mensajes según la retention policy. Un nuevo consumer group con <code>auto.offset.reset=earliest</code> consume desde el offset 0, procesando todo el historial disponible.</div>
+      <div class="quiz-feedback fail" id="msm2q11-fail">✗ Kafka permite replay: configura el consumer con <code>auto.offset.reset=earliest</code> o usa <code>kafka-consumer-groups --reset-offsets --to-earliest</code> para reprocesar el historial.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Qué es un Dead Letter Topic (DLT) en Spring Kafka?</div>
+      <div class="quiz-options" id="msm2q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q12',false)"><div class="quiz-letter">A</div> Un topic de baja prioridad para mensajes de logging</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q12',true)"><div class="quiz-letter">B</div> Un topic donde se envían mensajes que fallaron tras todos los reintentos, para análisis y reprocesamiento posterior</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q12',false)"><div class="quiz-letter">C</div> Un topic que se elimina automáticamente después de 24 horas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q12',false)"><div class="quiz-letter">D</div> El topic principal de un servicio que ha sido deprecado</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q12-ok">✓ El DLT captura mensajes que no pudieron procesarse correctamente. Spring Kafka configura automáticamente el DLT con <code>@RetryableTopic</code>, enviando los mensajes fallidos para análisis.</div>
+      <div class="quiz-feedback fail" id="msm2q12-fail">✗ El Dead Letter Topic es el destino de mensajes que fallaron todos los reintentos. Permite analizar errores sin bloquear el processing y reprocesar cuando se solucione el problema.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Cuál es la ventaja principal de usar Feign Client sobre RestTemplate/RestClient para llamadas entre servicios?</div>
+      <div class="quiz-options" id="msm2q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q13',false)"><div class="quiz-letter">A</div> Feign Client siempre es más rápido que RestTemplate</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q13',true)"><div class="quiz-letter">B</div> Define el cliente HTTP de forma declarativa como una interfaz Java, reduciendo el boilerplate y facilitando la integración con Resilience4j y Spring Cloud</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q13',false)"><div class="quiz-letter">C</div> Feign soporta streaming de datos, RestTemplate no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q13',false)"><div class="quiz-letter">D</div> Feign es el único que funciona con Eureka</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q13-ok">✓ Feign elimina el boilerplate de construir URLs y parsear respuestas. La interfaz Java actúa como documentación del contrato del cliente y se integra automáticamente con LB, circuit breaker y retry.</div>
+      <div class="quiz-feedback fail" id="msm2q13-fail">✗ Feign Client declara el cliente HTTP como interfaz anotada, eliminando boilerplate. Se integra automáticamente con LoadBalancer, Resilience4j y logging sin configuración extra.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Qué es un Schema Registry en el contexto de Kafka y por qué es importante?</div>
+      <div class="quiz-options" id="msm2q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q14',false)"><div class="quiz-letter">A</div> Un servicio que almacena las configuraciones de los topics de Kafka</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q14',true)"><div class="quiz-letter">B</div> Un repositorio central que gestiona schemas (Avro/JSON) garantizando compatibilidad entre productores y consumidores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q14',false)"><div class="quiz-letter">C</div> La base de datos interna donde Kafka almacena los offsets</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q14',false)"><div class="quiz-letter">D</div> Un proxy HTTP que valida el formato de los mensajes Kafka</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q14-ok">✓ El Schema Registry (Confluent) garantiza que un productor no publique un schema incompatible. Previene que un cambio de campo rompa a todos los consumidores en producción.</div>
+      <div class="quiz-feedback fail" id="msm2q14-fail">✗ El Schema Registry centraliza y versiona los schemas. Define reglas de compatibilidad (BACKWARD, FORWARD, FULL) para evitar breaking changes entre servicios sin coordinación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué problema resuelve el patrón Saga que las transacciones distribuidas (2PC) no resuelven bien en microservicios?</div>
+      <div class="quiz-options" id="msm2q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q15',false)"><div class="quiz-letter">A</div> La encriptación de datos entre servicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q15',true)"><div class="quiz-letter">B</div> Mantener la consistencia eventual en transacciones que abarcan múltiples servicios sin bloqueos distribuidos ni coordinador central</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q15',false)"><div class="quiz-letter">C</div> La autenticación entre servicios sin tokens JWT</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q15',false)"><div class="quiz-letter">D</div> El logging distribuido en múltiples servicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q15-ok">✓ 2PC requiere bloqueos distribuidos y un coordinador que si falla detiene todo. Saga usa transacciones locales y eventos compensatorios, siendo resiliente y sin bloqueos.</div>
+      <div class="quiz-feedback fail" id="msm2q15-fail">✗ 2PC es inadecuado en microservicios: bloquea recursos durante la transacción y el coordinador es SPOF. Saga divide en transacciones locales con compensación ante fallos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Cuándo sería más apropiado usar RabbitMQ en lugar de Kafka?</div>
+      <div class="quiz-options" id="msm2q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q16',false)"><div class="quiz-letter">A</div> Cuando necesitas retener mensajes durante meses para replay</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q16',true)"><div class="quiz-letter">B</div> Para cola de tareas con routing flexible, TTL por mensaje y cuando no necesitas replay de eventos históricos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q16',false)"><div class="quiz-letter">C</div> Cuando tienes millones de mensajes por segundo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q16',false)"><div class="quiz-letter">D</div> Cuando todos los servicios son en Java Spring Boot</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q16-ok">✓ RabbitMQ es excelente para colas de tareas con routing complejo (exchanges, bindings), prioridades y TTL. Kafka brilla en event streaming, replay y alto throughput.</div>
+      <div class="quiz-feedback fail" id="msm2q16-fail">✗ RabbitMQ es preferible para: colas de trabajo con routing flexible, mensajes con TTL, fanout a múltiples queues y cuando el replay histórico no es necesario. Kafka para event streaming.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué significa "at-least-once delivery" en sistemas de mensajería?</div>
+      <div class="quiz-options" id="msm2q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q17',false)"><div class="quiz-letter">A</div> Cada mensaje se entrega exactamente una vez sin posibilidad de duplicados</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q17',true)"><div class="quiz-letter">B</div> El mensaje se entrega al menos una vez, pudiendo entregarse más de una vez; requiere que el consumidor sea idempotente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q17',false)"><div class="quiz-letter">C</div> El mensaje puede perderse si el broker falla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q17',false)"><div class="quiz-letter">D</div> El mensaje se entrega una vez y se descarta automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q17-ok">✓ At-least-once garantiza que el mensaje no se pierde, pero puede duplicarse. Los consumidores deben ser idempotentes. Exactly-once es posible con Kafka Transactions pero tiene mayor overhead.</div>
+      <div class="quiz-feedback fail" id="msm2q17-fail">✗ At-least-once: garantía de entrega pero posibles duplicados. At-most-once: puede perderse mensajes. Exactly-once: sin pérdidas ni duplicados (Kafka Transactions, mayor overhead).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué es el gRPC bidirectional streaming y cuándo es útil?</div>
+      <div class="quiz-options" id="msm2q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q18',false)"><div class="quiz-letter">A</div> Enviar un request y recibir un solo response, como REST normal</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q18',true)"><div class="quiz-letter">B</div> Ambos lados envían una secuencia de mensajes simultáneamente en la misma conexión HTTP/2; útil para chat, feeds en tiempo real y monitorización</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q18',false)"><div class="quiz-letter">C</div> El servidor envía múltiples respuestas a un solo request (como SSE)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q18',false)"><div class="quiz-letter">D</div> El cliente envía múltiples requests y recibe una sola respuesta agregada</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q18-ok">✓ Bidirectional streaming: ambos lados envían streams independientes en paralelo sobre una conexión HTTP/2. Ideal para monitorización en tiempo real, juegos o sistemas de chat.</div>
+      <div class="quiz-feedback fail" id="msm2q18-fail">✗ gRPC bidirectional streaming permite que cliente y servidor envíen streams de mensajes simultáneamente. Útil para sistemas de tiempo real donde ambas partes generan datos continuamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Por qué se recomienda usar la partition key en Kafka para mensajes del mismo aggregate?</div>
+      <div class="quiz-options" id="msm2q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q19',false)"><div class="quiz-letter">A</div> Para reducir el número de particiones necesarias</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q19',true)"><div class="quiz-letter">B</div> Garantiza que todos los eventos del mismo aggregate van a la misma partición, preservando el orden causal de los eventos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q19',false)"><div class="quiz-letter">C</div> Para distribuir la carga de forma más equitativa entre particiones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q19',false)"><div class="quiz-letter">D</div> Para facilitar la compresión de mensajes en el broker</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q19-ok">✓ Usando orderId como partition key, todos los eventos de esa orden (OrderCreated, OrderPaid, OrderShipped) van a la misma partición y se consumen en orden causal.</div>
+      <div class="quiz-feedback fail" id="msm2q19-fail">✗ La partition key dirige mensajes relacionados a la misma partición. Con orderId como key, el consumidor procesa OrderCreated antes que OrderShipped para la misma orden. Sin key: orden no garantizado.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué es la choreography en Event-Driven Architecture y cómo difiere de la orchestration?</div>
+      <div class="quiz-options" id="msm2q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q20',false)"><div class="quiz-letter">A</div> Son sinónimos para describir flujos de microservicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm2q20',true)"><div class="quiz-letter">B</div> Coreografía: cada servicio reacciona a eventos y publica los suyos sin coordinador central. Orquestación: un coordinador dirige explícitamente los pasos del flujo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q20',false)"><div class="quiz-letter">C</div> La orquestación es asíncrona y la coreografía es síncrona</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm2q20',false)"><div class="quiz-letter">D</div> La coreografía requiere un API Gateway; la orquestación no</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm2q20-ok">✓ Coreografía: desacoplado, sin SPOF, pero difícil de rastrear el flujo global. Orquestación (Saga Orchestration): flujo visible y centralizado pero el orquestador puede ser cuello de botella.</div>
+      <div class="quiz-feedback fail" id="msm2q20-fail">✗ Coreografía = eventos como coordinación descentralizada (más resiliente, más difícil de rastrear). Orquestación = un proceso central coordina los pasos (más visible, más acoplado).</div>
+    </div>
+  </div>
+
+</ng-container>

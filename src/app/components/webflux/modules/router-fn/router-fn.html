@@ -1,0 +1,470 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===15">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">16</span><span class="lesson-mod">Módulo 3 · Router Functions</span></div>
+      <h2 class="lesson-title">Configurar Spring WebFlux</h2>
+      <p class="lesson-sub">Setup del proyecto, dependencias, servidor Netty y configuración automática de Spring Boot.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Dependencia</div>
+        <div class="tc-body"><code>spring-boot-starter-webflux</code> incluye: Reactor Core, Reactor Netty, Spring WebFlux, Jackson. Excluye Tomcat y Spring MVC automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">?</div>
+        <div class="tc-title">Netty como servidor</div>
+        <div class="tc-body">Reactor Netty como servidor por defecto. No hay Servlet API. Puerto 8080 por defecto. Cambiable con <code>server.port</code> en application.properties.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">WebFluxConfigurer</div>
+        <div class="tc-body">Implementar <code>WebFluxConfigurer</code> para personalizar: encoders/decoders, CORS, formatters, path matching. Anotación <code>@EnableWebFlux</code> desactiva la auto-config.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Spring MVC vs WebFlux</div>
+        <div class="tc-body">No pueden coexistir en el mismo proyecto. WebFlux en Netty: sin Servlet API, sin HttpServletRequest/Response. Usa ServerHttpRequest/ServerHttpResponse.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">&lt;!-- pom.xml --&gt;</span></div>
+      <div class="anatomy-line">&lt;dependency&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;</div>
+      <div class="anatomy-line">&lt;/dependency&gt;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// application.properties</span></div>
+      <div class="anatomy-line">server.port=8080</div>
+      <div class="anatomy-line">spring.webflux.base-path=/api</div>
+    </div>
+    <div class="info-box">Si tienes <code>spring-boot-starter-web</code> y <code>spring-boot-starter-webflux</code>, Spring MVC ganará. Para WebFlux puro, usa solo webflux.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===16">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">17</span><span class="lesson-mod">Módulo 3 · Router Functions</span></div>
+      <h2 class="lesson-title">@RestController Reactivo</h2>
+      <p class="lesson-sub">El estilo anotado conocido de Spring MVC, ahora con retornos reactivos Mono y Flux.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@RestController</span></div>
+      <div class="anatomy-line"><span class="a-kw">@RequestMapping</span>(<span class="a-str">"/products"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ProductController</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GetMapping</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; all() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> repo.findAll();&nbsp;&nbsp;<span class="a-cm">// Flux reactivo</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GetMapping</span>(<span class="a-str">"/{{ '{' }}id{{ '}' }}"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">ResponseEntity</span>&lt;<span class="a-type">Product</span>&gt;&gt; byId(<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> repo.findById(id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.map(<span class="a-type">ResponseEntity</span>::ok)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.defaultIfEmpty(<span class="a-type">ResponseEntity</span>.notFound().build());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@PostMapping</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">ResponseEntity</span>&lt;<span class="a-type">Product</span>&gt;&gt; create(<span class="a-kw">@RequestBody</span> <span class="a-type">Mono</span>&lt;<span class="a-type">Product</span>&gt; body) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> body.flatMap(repo::save)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.map(p -&gt; <span class="a-type">ResponseEntity</span>.created(uri(p.getId())).body(p));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box">Puedes recibir <code>@RequestBody Mono&lt;T&gt;</code> para streaming de cuerpo reactivo, o el tipo directo <code>@RequestBody T</code> (WebFlux lo wrappea automáticamente).</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===17">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">18</span><span class="lesson-mod">Módulo 3 · Router Functions</span></div>
+      <h2 class="lesson-title">Router Functions</h2>
+      <p class="lesson-sub">El modelo funcional de WebFlux: rutas como funciones puras sin anotaciones.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">???</div>
+        <div class="tc-title">RouterFunction</div>
+        <div class="tc-body">Función que mapea <code>ServerRequest</code> ? <code>Mono&lt;HandlerFunction&gt;</code>. Creada con <code>RouterFunctions.route()</code> builder. Declarada como @Bean.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">HandlerFunction</div>
+        <div class="tc-body">Función <code>ServerRequest ? Mono&lt;ServerResponse&gt;</code>. Es el "controlador" funcional. Normalmente agrupada en una clase Handler separada.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">RequestPredicates</div>
+        <div class="tc-body"><code>GET("/path")</code>, <code>POST("/path")</code>, <code>accept(APPLICATION_JSON)</code>, <code>contentType(APPLICATION_JSON)</code>. Se combinan con <code>.and()</code>, <code>.or()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">???</div>
+        <div class="tc-title">ServerResponse builder</div>
+        <div class="tc-body"><code>ServerResponse.ok().bodyValue(obj)</code>, <code>.body(flux, Type.class)</code>, <code>.build()</code>. Status codes: <code>.status(HttpStatus.CREATED)</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ProductRouter</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">RouterFunction</span>&lt;<span class="a-type">ServerResponse</span>&gt; routes(<span class="a-type">ProductHandler</span> h) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">RouterFunctions</span>.route()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GET(<span class="a-str">"/products"</span>, h::findAll)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.GET(<span class="a-str">"/products/{{ '{' }}id{{ '}' }}"</span>, h::findById)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.POST(<span class="a-str">"/products"</span>, h::create)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===18">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">19</span><span class="lesson-mod">Módulo 3 · Router Functions</span></div>
+      <h2 class="lesson-title">Manejo de Errores Global</h2>
+      <p class="lesson-sub">Captura y transformación de excepciones en endpoints reactivos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">@ExceptionHandler reactivo</div>
+        <div class="tc-body">En <code>@ControllerAdvice</code>: devuelve <code>Mono&lt;ResponseEntity&gt;</code>. Spring WebFlux lo soporta igual que MVC pero con tipos reactivos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">WebExceptionHandler</div>
+        <div class="tc-body">Interfaz de bajo nivel para Router Functions. Implementar y registrar como @Bean con @Order. Recibe ServerWebExchange.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">DefaultErrorWebExceptionHandler</div>
+        <div class="tc-body">Clase base de Spring Boot para manejo de errores global. Extiéndela para personalizar el formato de respuesta de errores.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Problem Details (RFC 7807)</div>
+        <div class="tc-body">Spring 6/Boot 3: <code>spring.mvc.problemdetails.enabled=true</code>. Respuesta estándar: <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>. Compatible con WebFlux.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@RestControllerAdvice</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">GlobalErrorHandler</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ExceptionHandler</span>(<span class="a-type">NotFoundException</span>.class)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">ResponseEntity</span>&lt;<span class="a-type">ErrorDTO</span>&gt;&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;handleNotFound(<span class="a-type">NotFoundException</span> ex) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">Mono</span>.just(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ResponseEntity</span>.status(<span class="a-num">404</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.body(<span class="a-kw">new</span> <span class="a-type">ErrorDTO</span>(ex.getMessage())));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===19">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">20</span><span class="lesson-mod">Módulo 3 · Router Functions</span></div>
+      <h2 class="lesson-title">Server-Sent Events (SSE)</h2>
+      <p class="lesson-sub">Streaming de eventos del servidor al cliente usando <code>text/event-stream</code> con WebFlux.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">¿Qu→ es SSE?</div>
+        <div class="tc-body">Protocolo HTTP unidireccional servidor ? cliente. La conexión permanece abierta. El cliente recibe eventos en tiempo real. Nativo en navegadores via EventSource API.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Flux&lt;ServerSentEvent&gt;</div>
+        <div class="tc-body">Retornar <code>Flux&lt;ServerSentEvent&lt;T&gt;&gt;</code> con media type <code>text/event-stream</code>. Cada SSE tiene id, event, data, retry opcionales.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Hot Flux con Sinks</div>
+        <div class="tc-body">Usar <code>Sinks.many().multicast()</code> como fuente compartida. El endpoint SSE suscribe al Flux del Sink. Los eventos de negocio se emiten al Sink desde cualquier parte.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Keepalive</div>
+        <div class="tc-body">Emitir un comentario (:) periódicamente para mantener la conexión activa. Usar <code>Flux.interval()</code> + <code>mergeWith</code> para combinar eventos reales con heartbeats.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(value = <span class="a-str">"/events"</span>,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;produces = <span class="a-type">MediaType</span>.TEXT_EVENT_STREAM_VALUE)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Flux</span>&lt;<span class="a-type">ServerSentEvent</span>&lt;<span class="a-type">String</span>&gt;&gt; stream() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">Flux</span>.interval(<span class="a-type">Duration</span>.ofSeconds(<span class="a-num">1</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.map(seq -&gt; <span class="a-type">ServerSentEvent</span>.&lt;<span class="a-type">String</span>&gt;builder()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.id(<span class="a-type">String</span>.valueOf(seq))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.event(<span class="a-str">"message"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.data(<span class="a-str">"tick-"</span> + seq)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build());</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación · Módulo 3</div>
+
+    <div class="quiz-box" id="wf3q01">
+      <div class="quiz-label">wf3q01</div>
+      <div class="quiz-q">¿Qu→ ocurre si incluyes <code>spring-boot-starter-web</code> y <code>spring-boot-starter-webflux</code> juntos?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q01',false)"><span class="quiz-letter">A</span> WebFlux toma precedencia sobre Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q01',true)"><span class="quiz-letter">B</span> Spring MVC toma precedencia y se usa el modo servlet</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q01',false)"><span class="quiz-letter">C</span> Ambos coexisten sin problemas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q01',false)"><span class="quiz-letter">D</span> La aplicación falla al arrancar</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q01-ok">Correcto — Spring Boot elige Spring MVC cuando ambas dependencias están presentes. Para usar WebFlux puro, excluye spring-boot-starter-web.</div>
+      <div class="quiz-feedback fail" id="wf3q01-fail">Incorrecto — Spring MVC gana cuando ambas dependencias coexisten. Usa solo webflux para modo reactivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q02">
+      <div class="quiz-label">wf3q02</div>
+      <div class="quiz-q">¿Cul es la firma de un HandlerFunction en el modelo funcional de WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q02',false)"><span class="quiz-letter">A</span> <code>HttpServletRequest ? HttpServletResponse</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q02',true)"><span class="quiz-letter">B</span> <code>ServerRequest ? Mono&lt;ServerResponse&gt;</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q02',false)"><span class="quiz-letter">C</span> <code>ServerRequest ? ServerResponse</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q02',false)"><span class="quiz-letter">D</span> <code>Mono&lt;ServerRequest&gt; ? Mono&lt;ServerResponse&gt;</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q02-ok">Correcto — HandlerFunction es ServerRequest ? Mono&lt;ServerResponse&gt;. Sin Servlet API, todo es funcional y reactivo.</div>
+      <div class="quiz-feedback fail" id="wf3q02-fail">Incorrecto — la firma es ServerRequest ? Mono&lt;ServerResponse&gt;. No hay HttpServletRequest en WebFlux con Netty.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q03">
+      <div class="quiz-label">wf3q03</div>
+      <div class="quiz-q">¿Qu→ anotación desactiva la auto-configuración de WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q03',true)"><span class="quiz-letter">A</span> @EnableWebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q03',false)"><span class="quiz-letter">B</span> @DisableWebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q03',false)"><span class="quiz-letter">C</span> @SpringBootApplication(exclude = WebFluxAutoConfiguration.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q03',false)"><span class="quiz-letter">D</span> @WebFluxManualConfiguration</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q03-ok">Correcto — @EnableWebFlux desactiva la auto-configuración de Spring Boot WebFlux, requiriendo configuración manual completa.</div>
+      <div class="quiz-feedback fail" id="wf3q03-fail">Incorrecto — @EnableWebFlux desactiva la auto-configuración. úsalo solo si necesitas control total sobre la configuración WebFlux.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q04">
+      <div class="quiz-label">wf3q04</div>
+      <div class="quiz-q">¿Cómo retornar 404 reactivamente con @RestController?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q04',false)"><span class="quiz-letter">A</span> Lanzar una excepción NotFoundException dentro del Mono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q04',true)"><span class="quiz-letter">B</span> <code>Mono&lt;ResponseEntity&lt;T&gt;&gt;</code> usando <code>defaultIfEmpty(ResponseEntity.notFound().build())</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q04',false)"><span class="quiz-letter">C</span> <code>response.setStatusCode(404)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q04',false)"><span class="quiz-letter">D</span> Retornar <code>Mono.empty()</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q04-ok">Correcto — defaultIfEmpty con ResponseEntity.notFound().build() es el patrón idiomático para 404 en WebFlux.</div>
+      <div class="quiz-feedback fail" id="wf3q04-fail">Incorrecto — el patrón es retornar Mono&lt;ResponseEntity&lt;T&gt;&gt; con .defaultIfEmpty(ResponseEntity.notFound().build()).</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q05">
+      <div class="quiz-label">wf3q05</div>
+      <div class="quiz-q">¿Cul es el media type correcto para Server-Sent Events?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q05',false)"><span class="quiz-letter">A</span> application/stream+json</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q05',true)"><span class="quiz-letter">B</span> text/event-stream</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q05',false)"><span class="quiz-letter">C</span> application/ndjson</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q05',false)"><span class="quiz-letter">D</span> application/octet-stream</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q05-ok">Correcto — text/event-stream es el media type estándar para SSE, definido en el spec HTML5.</div>
+      <div class="quiz-feedback fail" id="wf3q05-fail">Incorrecto — el media type para SSE es text/event-stream. Usa MediaType.TEXT_EVENT_STREAM_VALUE en Spring.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q06">
+      <div class="quiz-label">wf3q06</div>
+      <div class="quiz-q">¿En qu→ se diferencia el manejo de errores en Router Functions vs @RestController?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q06',true)"><span class="quiz-letter">A</span> Router Functions usa WebExceptionHandler o manejo inline en el handler; @RestController puede usar @ControllerAdvice</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q06',false)"><span class="quiz-letter">B</span> Router Functions lanza excepciones directamente; @RestController no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q06',false)"><span class="quiz-letter">C</span> Son idénticos — @ExceptionHandler funciona igual en ambos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q06',false)"><span class="quiz-letter">D</span> Router Functions no soporta manejo de errores</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q06-ok">Correcto — Router Functions no tiene @ControllerAdvice; usa WebExceptionHandler (global) o onErrorResume() dentro del handler.</div>
+      <div class="quiz-feedback fail" id="wf3q06-fail">Incorrecto — @ControllerAdvice funciona con @RestController. Router Functions usa WebExceptionHandler o manejo inline.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q07">
+      <div class="quiz-label">wf3q07</div>
+      <div class="quiz-q">¿Qu→ clase reemplaza a HttpServletRequest en WebFlux con Netty?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q07',false)"><span class="quiz-letter">A</span> ReactiveHttpRequest</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q07',true)"><span class="quiz-letter">B</span> ServerHttpRequest</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q07',false)"><span class="quiz-letter">C</span> WebRequest</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q07',false)"><span class="quiz-letter">D</span> NioHttpRequest</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q07-ok">Correcto — ServerHttpRequest es la abstracción de WebFlux para la petición HTTP, sin dependencia de Servlet API.</div>
+      <div class="quiz-feedback fail" id="wf3q07-fail">Incorrecto — en WebFlux con Netty, se usa ServerHttpRequest (y ServerWebExchange para el contexto completo).</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q08">
+      <div class="quiz-label">wf3q08</div>
+      <div class="quiz-q">¿Cómo obtener un path variable en un HandlerFunction?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q08',true)"><span class="quiz-letter">A</span> <code>request.pathVariable("id")</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q08',false)"><span class="quiz-letter">B</span> <code>request.getParam("id")</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q08',false)"><span class="quiz-letter">C</span> <code>@PathVariable String id</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q08',false)"><span class="quiz-letter">D</span> <code>request.uri().getPath()</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q08-ok">Correcto — en HandlerFunction, los path variables se obtienen con request.pathVariable("nombre").</div>
+      <div class="quiz-feedback fail" id="wf3q08-fail">Incorrecto — en el estilo funcional, se usa request.pathVariable("id") sin anotaciones.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q09">
+      <div class="quiz-label">wf3q09</div>
+      <div class="quiz-q">¿Para qu→ sirve <code>RequestPredicates.accept(MediaType.APPLICATION_JSON)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q09',true)"><span class="quiz-letter">A</span> Filtra rutas que solo coinciden si el cliente acepta application/json</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q09',false)"><span class="quiz-letter">B</span> Establece el Content-Type de la respuesta</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q09',false)"><span class="quiz-letter">C</span> Convierte automáticamente el body a JSON</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q09',false)"><span class="quiz-letter">D</span> Valida que el cuerpo de la petición sea JSON válido</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q09-ok">Correcto — accept() predicate filtra basándose en el header Accept del cliente. Combina con método+path para rutas más específicas.</div>
+      <div class="quiz-feedback fail" id="wf3q09-fail">Incorrecto — accept() es un predicado que filtra por el header Accept del cliente, no establece el Content-Type.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q10">
+      <div class="quiz-label">wf3q10</div>
+      <div class="quiz-q">¿Qu→ ventaja tiene el modelo de Router Functions sobre @RestController?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q10',false)"><span class="quiz-letter">A</span> Mejor rendimiento por usar menos reflexión</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q10',true)"><span class="quiz-letter">B</span> Las rutas son funciones puras — más fáciles de testear unitariamente sin levantar contexto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q10',false)"><span class="quiz-letter">C</span> Soporta más métodos HTTP que @RestController</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q10',false)"><span class="quiz-letter">D</span> Genera documentación Swagger automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q10-ok">Correcto — al ser funciones puras, las HandlerFunctions se pueden testear directamente con RouterFunctions.toHttpHandler() sin Spring context.</div>
+      <div class="quiz-feedback fail" id="wf3q10-fail">Incorrecto — la ventaja principal es testabilidad: las rutas y handlers son funciones puras, no requieren contexto de Spring para test.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q11">
+      <div class="quiz-label">wf3q11</div>
+      <div class="quiz-q">¿Cómo se combinan múltiples RouterFunctions en una sola?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q11',true)"><span class="quiz-letter">A</span> <code>RouterFunctions.route().add(otherRoute)</code> o inyectar múltiples @Bean de RouterFunction</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q11',false)"><span class="quiz-letter">B</span> No se pueden combinar — solo puede haber un RouterFunction</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q11',false)"><span class="quiz-letter">C</span> Usando @Import de la clase de configuración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q11',false)"><span class="quiz-letter">D</span> Inyectando RouterFunctionRegistry</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q11-ok">Correcto — puedes usar .add() en el builder o declarar múltiples @Bean de RouterFunction&lt;ServerResponse&gt;, Spring los combina automáticamente.</div>
+      <div class="quiz-feedback fail" id="wf3q11-fail">Incorrecto — puedes combinar con .add() o declarar múltiples @Bean de RouterFunction que Spring combina automáticamente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q12">
+      <div class="quiz-label">wf3q12</div>
+      <div class="quiz-q">¿Cul es el objetivo de <code>ServerSentEvent.builder().id("123")</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q12',true)"><span class="quiz-letter">A</span> Asignar un ID al evento para que el cliente pueda reconnectar desde ese punto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q12',false)"><span class="quiz-letter">B</span> Identificar el endpoint SSE</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q12',false)"><span class="quiz-letter">C</span> El ID es obligatorio para que SSE funcione</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q12',false)"><span class="quiz-letter">D</span> Generar un UUID único por cliente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q12-ok">Correcto — el ID se usa en el header Last-Event-ID al reconectar, permitiendo al servidor reenviar eventos perdidos.</div>
+      <div class="quiz-feedback fail" id="wf3q12-fail">Incorrecto — el id del SSE permite al cliente indicar en la reconexión qu→ evento fue el último recibido (Last-Event-ID).</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q13">
+      <div class="quiz-label">wf3q13</div>
+      <div class="quiz-q">¿Cundo usar Sinks para SSE en lugar de Flux.interval()?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q13',true)"><span class="quiz-letter">A</span> Cuando los eventos son generados por el sistema (eventos de negocio) en lugar de a intervalos fijos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q13',false)"><span class="quiz-letter">B</span> Cuando se necesita más rendimiento que Flux.interval()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q13',false)"><span class="quiz-letter">C</span> Sinks es solo para SSE; Flux.interval() para websockets</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q13',false)"><span class="quiz-letter">D</span> Cuando el número de clientes es mayor que 10</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q13-ok">Correcto — Sinks permite emitir eventos bajo demanda desde cualquier parte del sistema (ej. tras guardar una entidad en BD).</div>
+      <div class="quiz-feedback fail" id="wf3q13-fail">Incorrecto — usa Sinks cuando los eventos son impulsados por el sistema, no por tiempo. Flux.interval() es para heartbeats o datos periódicos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q14">
+      <div class="quiz-label">wf3q14</div>
+      <div class="quiz-q">¿Qu→ hace <code>RouterFunctions.route().nest()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q14',true)"><span class="quiz-letter">A</span> Agrupa rutas bajo un prefijo de path común (como @RequestMapping en clase)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q14',false)"><span class="quiz-letter">B</span> Crea rutas anidadas recursivas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q14',false)"><span class="quiz-letter">C</span> Importa rutas de otro módulo Maven</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q14',false)"><span class="quiz-letter">D</span> Define sub-recursos con @Nested</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q14-ok">Correcto — nest() es como @RequestMapping a nivel de clase: agrupa rutas bajo un predicado común (ej. path prefix, accept header).</div>
+      <div class="quiz-feedback fail" id="wf3q14-fail">Incorrecto — nest() agrupa rutas bajo un predicado común como un path prefix, equivalente a @RequestMapping en clase.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q15">
+      <div class="quiz-label">wf3q15</div>
+      <div class="quiz-q">¿Qu→ es <code>ServerWebExchange</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q15',false)"><span class="quiz-letter">A</span> El cliente WebFlux para llamadas salientes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q15',true)"><span class="quiz-letter">B</span> El contenedor de request+response+attributes para una petición HTTP en WebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q15',false)"><span class="quiz-letter">C</span> La interfaz para intercambiar mensajes entre microservicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q15',false)"><span class="quiz-letter">D</span> Un tipo de Flux para SSE</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q15-ok">Correcto — ServerWebExchange es el contexto completo de una petición HTTP reactiva: request, response, session, attributes.</div>
+      <div class="quiz-feedback fail" id="wf3q15-fail">Incorrecto — ServerWebExchange encapsula request+response+contexto para una petición, equivalente a HttpServletRequest+Response juntos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q16">
+      <div class="quiz-label">wf3q16</div>
+      <div class="quiz-q">¿Cómo leer el body de una petición en un HandlerFunction?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q16',true)"><span class="quiz-letter">A</span> <code>request.bodyToMono(MyClass.class)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q16',false)"><span class="quiz-letter">B</span> <code>request.getBody(MyClass.class)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q16',false)"><span class="quiz-letter">C</span> <code>@RequestBody MyClass body</code> como parámetro</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q16',false)"><span class="quiz-letter">D</span> <code>request.readBody()</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q16-ok">Correcto — en HandlerFunction se usa request.bodyToMono() o request.bodyToFlux() para deserializar el cuerpo.</div>
+      <div class="quiz-feedback fail" id="wf3q16-fail">Incorrecto — en el estilo funcional, el body se lee con request.bodyToMono(Class) o request.bodyToFlux(Class).</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q17">
+      <div class="quiz-label">wf3q17</div>
+      <div class="quiz-q">¿Qu→ retorna <code>ServerResponse.ok().bodyValue(obj)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q17',true)"><span class="quiz-letter">A</span> <code>Mono&lt;ServerResponse&gt;</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q17',false)"><span class="quiz-letter">B</span> <code>ServerResponse</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q17',false)"><span class="quiz-letter">C</span> <code>Flux&lt;ServerResponse&gt;</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q17',false)"><span class="quiz-letter">D</span> <code>ResponseEntity&lt;T&gt;</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q17-ok">Correcto — ServerResponse builder siempre retorna Mono&lt;ServerResponse&gt; para que sea composable con el resto del pipeline reactivo.</div>
+      <div class="quiz-feedback fail" id="wf3q17-fail">Incorrecto — ServerResponse.ok().bodyValue() retorna Mono&lt;ServerResponse&gt;, compatible con la firma del HandlerFunction.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q18">
+      <div class="quiz-label">wf3q18</div>
+      <div class="quiz-q">¿Cundo es SSE mejor que WebSockets?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q18',false)"><span class="quiz-letter">A</span> Cuando se necesita comunicación bidireccional en tiempo real</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q18',true)"><span class="quiz-letter">B</span> Cuando solo el servidor necesita enviar datos al cliente (unidireccional)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q18',false)"><span class="quiz-letter">C</span> Cuando se necesita transferir archivos binarios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q18',false)"><span class="quiz-letter">D</span> SSE no funciona bien — WebSockets siempre es mejor</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q18-ok">Correcto — SSE es ideal para comunicación servidor?cliente: notificaciones, live feeds, dashboards. WebSockets para comunicación bidireccional (chat, juegos).</div>
+      <div class="quiz-feedback fail" id="wf3q18-fail">Incorrecto — SSE es perfecto para streaming unidireccional servidor?cliente. Es más simple que WebSockets y funciona sobre HTTP/2.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q19">
+      <div class="quiz-label">wf3q19</div>
+      <div class="quiz-q">¿Qu→ es Problem Details (RFC 7807) en Spring Boot 3?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q19',false)"><span class="quiz-letter">A</span> Una nueva forma de declarar endpoints REST</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q19',true)"><span class="quiz-letter">B</span> Un formato estándar de respuesta de error HTTP con type, title, status, detail</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q19',false)"><span class="quiz-letter">C</span> Un protocolo de logging para aplicaciones reactivas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q19',false)"><span class="quiz-letter">D</span> Una herramienta de diagnóstico de rendimiento</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q19-ok">Correcto — RFC 7807 define un formato JSON estándar para errores HTTP. Spring Boot 3 lo soporta nativamente en MVC y WebFlux.</div>
+      <div class="quiz-feedback fail" id="wf3q19-fail">Incorrecto — Problem Details (RFC 7807) es un estándar para respuestas de error HTTP con campos type, title, status, detail.</div>
+    </div>
+
+    <div class="quiz-box" id="wf3q20">
+      <div class="quiz-label">wf3q20</div>
+      <div class="quiz-q">¿Cul es el servidor embebido por defecto de <code>spring-boot-starter-webflux</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q20',false)"><span class="quiz-letter">A</span> Tomcat</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q20',false)"><span class="quiz-letter">B</span> Jetty</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf3q20',true)"><span class="quiz-letter">C</span> Reactor Netty</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf3q20',false)"><span class="quiz-letter">D</span> Undertow</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf3q20-ok">Correcto — Reactor Netty es el servidor por defecto de WebFlux. Es non-blocking y usa event loop sobre NIO.</div>
+      <div class="quiz-feedback fail" id="wf3q20-fail">Incorrecto — el servidor por defecto de spring-boot-starter-webflux es Reactor Netty, no Tomcat (que es el de spring-boot-starter-web).</div>
+    </div>
+
+  </div>
+
+</ng-container>

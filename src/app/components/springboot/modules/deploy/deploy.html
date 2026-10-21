@@ -1,0 +1,478 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===41">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 42</span><span class="lesson-mod">Módulo 8 · Deploy &amp; Producción</span></div>
+      <h2 class="lesson-title">Profiles</h2>
+      <p class="lesson-sub">Configura comportamientos diferentes según el entorno usando Spring Profiles.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">application-{{ '{' }}profile{{ '}' }}.yml</div>
+        <div class="tc-body">Crea <code>application-dev.yml</code>, <code>application-prod.yml</code>. Las propiedades sobrescriben <code>application.yml</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-play" aria-hidden="true"></i></div>
+        <div class="tc-title">Activar profile</div>
+        <div class="tc-body"><code>spring.profiles.active=prod</code> en properties, variable de entorno <code>SPRING_PROFILES_ACTIVE=prod</code>, o argumento JVM <code>-Dspring.profiles.active=prod</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-tag" aria-hidden="true"></i></div>
+        <div class="tc-title">@Profile en beans</div>
+        <div class="tc-body"><code>@Profile("dev")</code> en una clase <code>@Configuration</code> o <code>@Bean</code> — sólo se carga cuando ese perfil está activo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">@ConditionalOnProperty</div>
+        <div class="tc-body"><code>@ConditionalOnProperty(name="feature.x", havingValue="true")</code> — activa beans según propiedades, independientemente del perfil.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml (base)</span></div>
+      <div class="anatomy-line"><span class="a-kw">spring</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">profiles</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">active</span><span class="a-cm">: </span><span class="a-str">dev</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">config</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">import</span><span class="a-cm">: </span><span class="a-str">optional:file:./config/extra.yml</span></div>
+    </div>
+    <div class="info-box"><code>spring.config.import</code> (Spring Boot 2.4+) permite importar archivos de configuración adicionales, incluyendo Config Server o archivos locales.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===42">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 43</span><span class="lesson-mod">Módulo 8 · Deploy &amp; Producción</span></div>
+      <h2 class="lesson-title">Docker</h2>
+      <p class="lesson-sub">Empaqueta tu aplicación Spring Boot en una imagen Docker optimizada con multi-stage build.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Multi-stage build</div>
+        <div class="tc-body">Fase 1: imagen Maven/JDK para compilar. Fase 2: imagen JRE slim solo con el jar. Resultado: imagen final ligera sin herramientas de build.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">layertools</div>
+        <div class="tc-body"><code>java -Djarmode=layertools -jar app.jar extract</code> — divide el jar en capas (dependencies, spring-boot-loader, application) para mejor cache de Docker.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cpu" aria-hidden="true"></i></div>
+        <div class="tc-title">JVM Memory flags</div>
+        <div class="tc-body"><code>-XX:MaxRAMPercentage=75.0</code> adapta el heap al contenedor automáticamente. Más fiable que <code>-Xmx</code> fijo en Kubernetes.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Distroless</div>
+        <div class="tc-body">Imagen <code>gcr.io/distroless/java21</code> — sin shell, sin package manager. Mínima superficie de ataque. Alternativa segura a <code>eclipse-temurin:21-jre-alpine</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Dockerfile (multi-stage + layertools)</span></div>
+      <div class="anatomy-line"><span class="a-kw">FROM</span> <span class="a-type">eclipse-temurin:21-jdk-alpine</span> <span class="a-kw">AS</span> <span class="a-type">builder</span></div>
+      <div class="anatomy-line"><span class="a-kw">WORKDIR</span> /app</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> target/*.jar app.jar</div>
+      <div class="anatomy-line"><span class="a-kw">RUN</span> java -Djarmode=layertools -jar app.jar extract</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">FROM</span> <span class="a-type">eclipse-temurin:21-jre-alpine</span></div>
+      <div class="anatomy-line"><span class="a-kw">WORKDIR</span> /app</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> --from=builder /app/dependencies/ ./</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> --from=builder /app/spring-boot-loader/ ./</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> --from=builder /app/application/ ./</div>
+      <div class="anatomy-line"><span class="a-kw">EXPOSE</span> <span class="a-num">8080</span></div>
+      <div class="anatomy-line"><span class="a-kw">ENTRYPOINT</span> [<span class="a-str">"java"</span>, <span class="a-str">"-XX:MaxRAMPercentage=75.0"</span>, <span class="a-str">"org.springframework.boot.loader.launch.JarLauncher"</span>]</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===43">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 44</span><span class="lesson-mod">Módulo 8 · Deploy &amp; Producción</span></div>
+      <h2 class="lesson-title">docker-compose</h2>
+      <p class="lesson-sub">Orquesta múltiples contenedores (app + DB + cache) con docker compose.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-folder" aria-hidden="true"></i></div>
+        <div class="tc-title">compose.yml</div>
+        <div class="tc-body">Desde Docker Compose v2: el archivo se llama <code>compose.yml</code> (sin guión). El comando es <code>docker compose</code> (sin guión).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hourglass" aria-hidden="true"></i></div>
+        <div class="tc-title">depends_on + healthcheck</div>
+        <div class="tc-body"><code>depends_on: db: condition: service_healthy</code> — espera a que el healthcheck del servicio <code>db</code> sea exitoso antes de arrancar el app.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">Networks &amp; Volumes</div>
+        <div class="tc-body">Red interna nombrada para que servicios se comuniquen por nombre. Volumen nombrado para persistir datos de PostgreSQL entre reinicios.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Override files</div>
+        <div class="tc-body"><code>compose.override.yml</code> se fusiona automáticamente. Útil para configs locales de dev sin modificar el archivo base.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">services</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">app</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">build</span><span class="a-cm">: </span><span class="a-str">.</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">ports</span><span class="a-cm">: [</span><span class="a-str">"8080:8080"</span><span class="a-cm">]</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">depends_on</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">db</span><span class="a-cm">: {{ '{' }} </span><span class="a-kw">condition</span><span class="a-cm">: </span><span class="a-str">service_healthy</span><span class="a-cm"> {{ '}' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">db</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">image</span><span class="a-cm">: </span><span class="a-str">postgres:16-alpine</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">healthcheck</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">test</span><span class="a-cm">: [</span><span class="a-str">"CMD"</span><span class="a-cm">,</span><span class="a-str">"pg_isready"</span><span class="a-cm">,</span><span class="a-str">"-U"</span><span class="a-cm">,</span><span class="a-str">"postgres"</span><span class="a-cm">]</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">interval</span><span class="a-cm">: </span><span class="a-str">5s</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">retries</span><span class="a-cm">: </span><span class="a-num">5</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===44">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 45</span><span class="lesson-mod">Módulo 8 · Deploy &amp; Producción</span></div>
+      <h2 class="lesson-title">Kubernetes Basics</h2>
+      <p class="lesson-sub">Despliega tu aplicación Spring Boot en Kubernetes con alta disponibilidad.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-rocket" aria-hidden="true"></i></div>
+        <div class="tc-title">Deployment</div>
+        <div class="tc-body">Define replicas, imagen Docker, variables de entorno desde ConfigMap/Secret, y estrategia de update (RollingUpdate vs Recreate).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-activity" aria-hidden="true"></i></div>
+        <div class="tc-title">Probes</div>
+        <div class="tc-body"><code>livenessProbe</code>: <code>/actuator/health/liveness</code>. <code>readinessProbe</code>: <code>/actuator/health/readiness</code>. Configurar <code>initialDelaySeconds</code> apropiado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trend" aria-hidden="true"></i></div>
+        <div class="tc-title">HPA</div>
+        <div class="tc-body">HorizontalPodAutoscaler escala réplicas según CPU/memoria o métricas custom. Requiere metrics-server instalado en el cluster.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">ConfigMap vs Secret</div>
+        <div class="tc-body">ConfigMap para configuración no sensible. Secret para passwords/tokens (base64 en etcd, no encriptado por defecto — usar Sealed Secrets o Vault).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">livenessProbe</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">httpGet</span><span class="a-cm">: {{ '{' }}</span><span class="a-kw">path</span><span class="a-cm">: </span><span class="a-str">/actuator/health/liveness</span><span class="a-cm">, </span><span class="a-kw">port</span><span class="a-cm">: </span><span class="a-num">8080</span><span class="a-cm"> {{ '}' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">initialDelaySeconds</span><span class="a-cm">: </span><span class="a-num">30</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">periodSeconds</span><span class="a-cm">: </span><span class="a-num">10</span></div>
+      <div class="anatomy-line"><span class="a-kw">readinessProbe</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">httpGet</span><span class="a-cm">: {{ '{' }}</span><span class="a-kw">path</span><span class="a-cm">: </span><span class="a-str">/actuator/health/readiness</span><span class="a-cm">, </span><span class="a-kw">port</span><span class="a-cm">: </span><span class="a-num">8080</span><span class="a-cm"> {{ '}' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">initialDelaySeconds</span><span class="a-cm">: </span><span class="a-num">15</span></div>
+    </div>
+    <div class="warn-box">Liveness y Readiness son probes distintas — no uses la misma URL. Un fallo en liveness reinicia el pod; en readiness solo lo saca del servicio.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===45">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 46</span><span class="lesson-mod">Módulo 8 · Deploy &amp; Producción</span></div>
+      <h2 class="lesson-title">CI/CD con GitHub Actions</h2>
+      <p class="lesson-sub">Automatiza build, test, push de imagen y despliegue con pipelines reproducibles.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Workflow triggers</div>
+        <div class="tc-body"><code>on: push: branches: [main]</code> o <code>on: pull_request</code>. Usa <code>workflow_dispatch</code> para ejecución manual.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Cache Maven/Gradle</div>
+        <div class="tc-body"><code>actions/cache@v4</code> con path <code>~/.m2/repository</code> y key basada en hash del pom.xml. Reduce tiempo de build significativamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">Secrets</div>
+        <div class="tc-body">Guarda credentials en <em>Settings → Secrets</em>. Accede con <code>${{ '{{' }} secrets.DOCKER_PASSWORD {{ '}}' }}</code> — sintaxis de expresión de GitHub Actions. Nunca hardcodees credenciales en el workflow.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Rolling update</div>
+        <div class="tc-body"><code>kubectl set image deployment/app app=registry/app:$SHA</code>. Kubernetes reemplaza pods gradualmente sin downtime.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">jobs</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">build-and-push</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">runs-on</span><span class="a-cm">: </span><span class="a-str">ubuntu-latest</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">steps</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">- uses: </span><span class="a-str">actions/checkout@v4</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">- uses: </span><span class="a-str">actions/setup-java@v4</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">with</span><span class="a-cm">: {{ '{' }}</span><span class="a-kw">java-version</span><span class="a-cm">: </span><span class="a-str">'21'</span><span class="a-cm">, </span><span class="a-kw">distribution</span><span class="a-cm">: </span><span class="a-str">'temurin'</span><span class="a-cm">, </span><span class="a-kw">cache</span><span class="a-cm">: </span><span class="a-str">'maven'</span><span class="a-cm"> {{ '}' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">- run: </span><span class="a-str">mvn verify</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">- uses: </span><span class="a-str">docker/build-push-action@v5</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">with</span><span class="a-cm">: {{ '{' }}</span><span class="a-kw">push</span><span class="a-cm">: </span><span class="a-kw">true</span><span class="a-cm">, </span><span class="a-kw">tags</span><span class="a-cm">: </span><span class="a-str">app:{{ '${' + '{' }} github.sha {{ '}' + '}' }}</span><span class="a-cm"> {{ '}' }}</span></div>
+    </div>
+    <div class="info-box">Usa <code>mvn verify</code> en lugar de <code>mvn package</code> para ejecutar los tests de integración también en el pipeline.</div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 8</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q01</div>
+      <div class="quiz-q">¿En qué orden Spring Boot resuelve los profiles activos?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><span class="quiz-letter">A</span> properties → variable de entorno → JVM argument</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q01',true)"><span class="quiz-letter">B</span> JVM argument (-D) > variable de entorno > application.properties (mayor precedencia gana)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><span class="quiz-letter">C</span> Siempre usa el valor en application.properties</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><span class="quiz-letter">D</span> application-{{ '{' }}profile{{ '}' }}.yml tiene máxima precedencia</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q01-ok">Correcto — los argumentos JVM y variables de entorno tienen mayor precedencia que application.properties.</div>
+      <div class="quiz-feedback fail" id="em8q01-fail">Incorrecto — los argumentos JVM (-Dspring.profiles.active) tienen mayor precedencia que las variables de entorno y las properties.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q02</div>
+      <div class="quiz-q">¿Para qué sirve <code>spring.config.import</code> en Spring Boot 2.4+?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q02',true)"><span class="quiz-letter">A</span> Importar configuración adicional desde archivos externos, Config Server o Kubernetes ConfigMap</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><span class="quiz-letter">B</span> Importar beans desde otros contextos Spring</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><span class="quiz-letter">C</span> Reemplaza completamente a <code>spring.profiles.active</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><span class="quiz-letter">D</span> Solo funciona con Spring Cloud Config</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q02-ok">Correcto — permite importar desde archivos locales, classpath, Config Server, o Kubernetes Secrets.</div>
+      <div class="quiz-feedback fail" id="em8q02-fail">Incorrecto — spring.config.import importa configuración de fuentes externas (archivos, Config Server, etc.).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q03</div>
+      <div class="quiz-q">¿Qué ventaja principal ofrece el multi-stage Dockerfile para Spring Boot?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><span class="quiz-letter">A</span> Reduce el tiempo de compilación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q03',true)"><span class="quiz-letter">B</span> La imagen final solo contiene el JRE y el artefacto, sin herramientas de build (Maven, JDK)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><span class="quiz-letter">C</span> Permite ejecutar tests dentro del contenedor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><span class="quiz-letter">D</span> Habilita hot-reload dentro de Docker</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q03-ok">Correcto — la imagen final es mucho más pequeña y tiene menor superficie de ataque al no incluir el JDK.</div>
+      <div class="quiz-feedback fail" id="em8q03-fail">Incorrecto — la ventaja clave es obtener una imagen final pequeña sin herramientas de build innecesarias.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q04</div>
+      <div class="quiz-q">¿Qué hace <code>-XX:MaxRAMPercentage=75.0</code> en un contenedor Docker?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><span class="quiz-letter">A</span> Limita la CPU del contenedor al 75%</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q04',true)"><span class="quiz-letter">B</span> Configura el heap máximo como 75% de la RAM del contenedor (respeta el límite de memory)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><span class="quiz-letter">C</span> Es equivalente a <code>-Xmx75m</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><span class="quiz-letter">D</span> Reserva el 75% para el stack de threads</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q04-ok">Correcto — es preferible a -Xmx fijo porque se adapta automáticamente si cambias el límite del contenedor.</div>
+      <div class="quiz-feedback fail" id="em8q04-fail">Incorrecto — configura el heap máximo como porcentaje de la RAM asignada al contenedor.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q05</div>
+      <div class="quiz-q">¿Qué son las imágenes Distroless y cuál es su principal beneficio?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><span class="quiz-letter">A</span> Imágenes basadas en Alpine con el shell eliminado manualmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q05',true)"><span class="quiz-letter">B</span> Imágenes sin OS shell ni package manager — reducen superficie de ataque al mínimo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><span class="quiz-letter">C</span> Imágenes que no incluyen el JRE</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><span class="quiz-letter">D</span> Imágenes optimizadas para microservicios con GraalVM</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q05-ok">Correcto — sin shell y sin apt/apk, un atacante que rompa la app no puede escalar privilegios fácilmente.</div>
+      <div class="quiz-feedback fail" id="em8q05-fail">Incorrecto — Distroless son imágenes de Google sin shell ni package manager, mínima superficie de ataque.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q06</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>docker-compose</code> (v1) y <code>docker compose</code> (v2)?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><span class="quiz-letter">A</span> No hay diferencia funcional</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q06',true)"><span class="quiz-letter">B</span> v2 es un plugin nativo de Docker CLI (más rápido), reemplaza al binario Python standalone de v1</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><span class="quiz-letter">C</span> v2 solo funciona en Linux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><span class="quiz-letter">D</span> v1 soporta healthcheck y v2 no</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q06-ok">Correcto — Docker Compose v2 es un plugin Go integrado en el CLI de Docker, v1 era un script Python separado.</div>
+      <div class="quiz-feedback fail" id="em8q06-fail">Incorrecto — v2 es un plugin nativo Go del Docker CLI, mucho más rápido que el script Python de v1.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q07</div>
+      <div class="quiz-q">¿Qué hace <code>depends_on: db: condition: service_healthy</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><span class="quiz-letter">A</span> Solo espera a que el contenedor db esté iniciado (running)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q07',true)"><span class="quiz-letter">B</span> Espera a que el healthcheck del servicio db reporte estado healthy antes de arrancar app</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><span class="quiz-letter">C</span> Reinicia el contenedor app si db falla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><span class="quiz-letter">D</span> Es equivalente a <code>depends_on: [db]</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q07-ok">Correcto — la condition service_healthy espera el healthcheck, no solo el inicio del contenedor.</div>
+      <div class="quiz-feedback fail" id="em8q07-fail">Incorrecto — sin condition, depends_on solo espera el inicio del contenedor, no que esté realmente listo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q08</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre RollingUpdate y Recreate en un Deployment de Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q08',true)"><span class="quiz-letter">A</span> RollingUpdate reemplaza pods gradualmente sin downtime; Recreate mata todos y luego crea nuevos (downtime)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><span class="quiz-letter">B</span> Son equivalentes pero Recreate es más seguro</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><span class="quiz-letter">C</span> Recreate hace blue-green automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><span class="quiz-letter">D</span> RollingUpdate requiere ConfigMap adicional</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q08-ok">Correcto — Recreate tiene downtime pero garantiza que no corren dos versiones simultáneamente (útil con migraciones de DB).</div>
+      <div class="quiz-feedback fail" id="em8q08-fail">Incorrecto — RollingUpdate es sin downtime; Recreate tiene downtime (termina todos antes de crear nuevos).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q09</div>
+      <div class="quiz-q">¿Los Kubernetes Secrets están encriptados en etcd por defecto?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><span class="quiz-letter">A</span> Sí, AES-256 por defecto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q09',true)"><span class="quiz-letter">B</span> No, solo están en base64 — se necesita configurar EncryptionConfiguration o usar Sealed Secrets/Vault</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><span class="quiz-letter">C</span> Sí, pero solo en cloud providers (EKS, GKE, AKS)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><span class="quiz-letter">D</span> Solo si habilitas TLS en etcd</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q09-ok">Correcto — base64 no es encriptación. Debes configurar EncryptionConfiguration o usar herramientas externas.</div>
+      <div class="quiz-feedback fail" id="em8q09-fail">Incorrecto — los Secrets solo están en base64 en etcd, no encriptados por defecto.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q10</div>
+      <div class="quiz-q">¿Por qué usar <code>livenessProbe</code> y <code>readinessProbe</code> diferentes en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><span class="quiz-letter">A</span> Es solo una buena práctica pero puede usarse la misma URL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q10',true)"><span class="quiz-letter">B</span> Liveness reinicia el pod al fallar; Readiness solo lo saca del Service — distintas consecuencias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><span class="quiz-letter">C</span> Son para diferentes versiones de Kubernetes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><span class="quiz-letter">D</span> Readiness es para HTTP y Liveness para TCP</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q10-ok">Correcto — mezclarlas puede causar reinicios innecesarios cuando la app está temporalmente sobrecargada.</div>
+      <div class="quiz-feedback fail" id="em8q10-fail">Incorrecto — tienen consecuencias distintas: liveness = reinicio del pod; readiness = exclusión del tráfico.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q11</div>
+      <div class="quiz-q">¿Qué es el HPA en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><span class="quiz-letter">A</span> High Performance Application — etiqueta de calidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q11',true)"><span class="quiz-letter">B</span> HorizontalPodAutoscaler — escala réplicas automáticamente según métricas de CPU/memoria o custom</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><span class="quiz-letter">C</span> Health Pod Aggregator — agrega health checks de todos los pods</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><span class="quiz-letter">D</span> Configura límites de red entre pods</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q11-ok">Correcto — HPA requiere metrics-server en el cluster y escala dentro de los límites minReplicas/maxReplicas configurados.</div>
+      <div class="quiz-feedback fail" id="em8q11-fail">Incorrecto — HPA = HorizontalPodAutoscaler, escala automáticamente el número de réplicas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q12</div>
+      <div class="quiz-q">¿Qué hace <code>server.shutdown=graceful</code> en Spring Boot?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><span class="quiz-letter">A</span> Desactiva el endpoint /actuator/shutdown</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q12',true)"><span class="quiz-letter">B</span> Al recibir SIGTERM, espera a que terminen las requests activas antes de cerrar (configurable con timeout)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><span class="quiz-letter">C</span> Cierra la app inmediatamente al recibir SIGTERM</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><span class="quiz-letter">D</span> Solo afecta a aplicaciones reactive (WebFlux)</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q12-ok">Correcto — el timeout se configura con <code>spring.lifecycle.timeout-per-shutdown-phase</code> (por defecto 30s).</div>
+      <div class="quiz-feedback fail" id="em8q12-fail">Incorrecto — graceful shutdown espera a que las requests en curso finalicen antes de cerrar la app.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q13</div>
+      <div class="quiz-q">¿Para qué sirve la opción <code>cache: 'maven'</code> en <code>actions/setup-java</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q13',true)"><span class="quiz-letter">A</span> Cachea automáticamente <code>~/.m2/repository</code> entre ejecuciones del workflow para builds más rápidos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><span class="quiz-letter">B</span> Instala Maven en el runner</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><span class="quiz-letter">C</span> Descarga el artefacto desde el repositorio remoto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><span class="quiz-letter">D</span> Publica el artefacto en GitHub Packages</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q13-ok">Correcto — evita descargar todas las dependencias en cada ejecución, ahorrando minutos de pipeline.</div>
+      <div class="quiz-feedback fail" id="em8q13-fail">Incorrecto — cachea el repositorio Maven local (~/.m2) entre runs para no re-descargar dependencias.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q14</div>
+      <div class="quiz-q">¿Cuándo usarías la estrategia Recreate en lugar de RollingUpdate en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><span class="quiz-letter">A</span> Siempre que quieras zero-downtime deployment</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q14',true)"><span class="quiz-letter">B</span> Cuando la nueva versión tiene migraciones de DB incompatibles con la versión anterior corriendo en paralelo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><span class="quiz-letter">C</span> En aplicaciones stateless</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><span class="quiz-letter">D</span> Solo en entornos de producción de alta disponibilidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q14-ok">Correcto — cuando v2 y v1 no pueden coexistir (migraciones de esquema), Recreate garantiza una transición limpia.</div>
+      <div class="quiz-feedback fail" id="em8q14-fail">Incorrecto — Recreate se usa cuando dos versiones no pueden coexistir, como con migraciones de DB incompatibles.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q15</div>
+      <div class="quiz-q">¿Qué ventaja tiene Spring Boot Buildpacks (<code>./mvnw spring-boot:build-image</code>) vs Dockerfile manual?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><span class="quiz-letter">A</span> Produce imágenes más pequeñas siempre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q15',true)"><span class="quiz-letter">B</span> No requiere Dockerfile — genera imagen optimizada con layering y BOM automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><span class="quiz-letter">C</span> Solo funciona con JDK 21+</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><span class="quiz-letter">D</span> Añade automáticamente Spring Security a la imagen</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q15-ok">Correcto — Buildpacks aplica best practices automáticamente sin que tengas que escribir ni mantener un Dockerfile.</div>
+      <div class="quiz-feedback fail" id="em8q15-fail">Incorrecto — la ventaja es no necesitar Dockerfile y obtener imágenes bien optimizadas de forma automática.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q16</div>
+      <div class="quiz-q">¿Cómo accedes a un secreto de GitHub Actions en un step del workflow?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><span class="quiz-letter">A</span> <code>env.DOCKER_PASSWORD</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q16',true)"><span class="quiz-letter">B</span> <code>{{ '${' + '{' }} secrets.DOCKER_PASSWORD {{ '}' + '}' }}</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><span class="quiz-letter">C</span> <code>vars.DOCKER_PASSWORD</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><span class="quiz-letter">D</span> <code>config.DOCKER_PASSWORD</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q16-ok">Correcto — los secrets se acceden con el contexto <code>secrets.</code> en expresiones de GitHub Actions.</div>
+      <div class="quiz-feedback fail" id="em8q16-fail">Incorrecto — la sintaxis correcta es <code>${{ '${' + '{' }} secrets.NOMBRE_SECRET {{ '}' + '}' }}</code>.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q17</div>
+      <div class="quiz-q">¿Qué hace GraalVM Native Image para Spring Boot?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><span class="quiz-letter">A</span> Optimiza el bytecode JVM como JIT avanzado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q17',true)"><span class="quiz-letter">B</span> Compila la app a binario nativo — arranque en ms, menos memoria, sin JVM en runtime</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><span class="quiz-letter">C</span> Genera Dockerfiles automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><span class="quiz-letter">D</span> Es una versión de Java 21 con mejoras de performance</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q17-ok">Correcto — Spring Boot 3 tiene soporte nativo para GraalVM vía AOT (Ahead-Of-Time) compilation.</div>
+      <div class="quiz-feedback fail" id="em8q17-fail">Incorrecto — GraalVM Native Image compila a binario nativo: arranque instantáneo y mínimo consumo de memoria.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q18</div>
+      <div class="quiz-q">¿Qué es <code>layertools</code> en el plugin de Spring Boot Maven?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><span class="quiz-letter">A</span> Herramienta para analizar vulnerabilidades en dependencias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q18',true)"><span class="quiz-letter">B</span> Divide el fat jar en capas (dependencies/loader/application) para optimizar capas Docker</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><span class="quiz-letter">C</span> Gestiona perfiles de configuración por capas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><span class="quiz-letter">D</span> Comprime las clases del artefacto para reducir tamaño</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q18-ok">Correcto — las dependencias (cambian poco) quedan en capas Docker diferentes a la app (cambia frecuente) — mejor cache.</div>
+      <div class="quiz-feedback fail" id="em8q18-fail">Incorrecto — layertools extrae el jar en capas para aprovechar el cache de Docker de forma óptima.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q19</div>
+      <div class="quiz-q">¿Qué es <code>@ConditionalOnProperty(havingValue="true")</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><span class="quiz-letter">A</span> Activa el bean solo si la propiedad tiene cualquier valor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q19',true)"><span class="quiz-letter">B</span> Activa el bean solo si la propiedad tiene exactamente el valor "true"</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><span class="quiz-letter">C</span> Es equivalente a <code>@Profile</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><span class="quiz-letter">D</span> Activa el bean si la propiedad no existe</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q19-ok">Correcto — sin <code>matchIfMissing</code>, si la propiedad no existe el bean no se crea.</div>
+      <div class="quiz-feedback fail" id="em8q19-fail">Incorrecto — <code>havingValue="true"</code> requiere que la propiedad tenga exactamente ese valor.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em8q20</div>
+      <div class="quiz-q">¿Cuándo usar <code>mvn verify</code> en lugar de <code>mvn package</code> en CI?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><span class="quiz-letter">A</span> <code>mvn package</code> es siempre preferible en CI por ser más rápido</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q20',true)"><span class="quiz-letter">B</span> <code>mvn verify</code> ejecuta tests de integración (fase integration-test) además de unit tests — esencial en CI</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><span class="quiz-letter">C</span> <code>mvn verify</code> solo verifica el checksum del artefacto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><span class="quiz-letter">D</span> Son equivalentes — eliges según preferencia personal</div>
+      </div>
+      <div class="quiz-feedback ok" id="em8q20-ok">Correcto — verify ejecuta hasta la fase verify del lifecycle, incluyendo integration-test y sus verificaciones.</div>
+      <div class="quiz-feedback fail" id="em8q20-fail">Incorrecto — mvn verify corre las fases integration-test y verify que mvn package omite.</div>
+    </div>
+  </div>
+
+</ng-container>

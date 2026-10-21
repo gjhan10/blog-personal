@@ -1,0 +1,468 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===26">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">27</span><span class="lesson-mod">Recursividad</span></div>
+        <h2 class="lesson-title">Recursividad en Java</h2>
+        <p class="lesson-sub">Un método es <strong>recursivo</strong> cuando se llama a sí mismo para resolver un problema reduciéndolo a subproblemas más pequeños del mismo tipo. Toda función recursiva correcta necesita dos componentes:</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+        <li><strong>Caso base</strong> — condición que devuelve un resultado directo sin más llamadas recursivas.</li>
+        <li><strong>Caso recursivo</strong> — reduce el problema y delega en una llamada más pequeña.</li>
+        <li>Cada llamada ocupa un <em>frame</em> en la <strong>call stack</strong>. Sin caso base → <code>StackOverflowError</code>.</li>
+        <li>La recursión es elegante para problemas de naturaleza recursiva: árboles, grafos, divide y vencerás.</li>
+        <li>Java NO aplica <em>Tail Call Optimization</em> (TCO) — para entradas grandes usa iteración o memoización.</li>
+      </ul>
+
+      <h3 class="var-h3">Anatomía de una función recursiva</h3>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Factorial — la función clásica</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static long</span> <span class="a-fn">factorial</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> <span class="a-body">1</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// ← caso base</span><br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> n * <span class="a-fn">factorial</span>(n - <span class="a-body">1</span>);&nbsp;&nbsp;<span class="a-comment">// ← caso recursivo</span><br>
+            {{ '}' }}<br>
+            <span class="a-comment">// factorial(5) → 5*4*3*2*1 = 120</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Traza de <code>factorial(4)</code>: <code>4 × factorial(3)</code> → <code>4 × 3 × factorial(2)</code> → <code>4 × 3 × 2 × factorial(1)</code> → <code>4 × 3 × 2 × 1 = 24</code>. La pila se <em>desenrolla</em> de abajo hacia arriba.</div>
+
+      <h3 class="var-h3" style="margin-top:18px">Recursión directa vs indirecta</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">Directa — se llama a sí mismo</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static int</span> <span class="a-fn">suma</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n == <span class="a-body">0</span>) <span class="a-kw">return</span> <span class="a-body">0</span>;<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> n + <span class="a-fn">suma</span>(n - <span class="a-body">1</span>);<br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label">Indirecta — A llama a B, B llama a A</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static boolean</span> <span class="a-fn">esPar</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> n == <span class="a-body">0</span> || <span class="a-fn">esImpar</span>(n - <span class="a-body">1</span>);<br>
+            {{ '}' }}<br>
+            <span class="a-kw">static boolean</span> <span class="a-fn">esImpar</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> n != <span class="a-body">0</span> &amp;&amp; <span class="a-fn">esPar</span>(n - <span class="a-body">1</span>);<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Recursión vs Iteración — comparativa</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label bad">Recursivo — riesgo StackOverflow con n grande</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static long</span> <span class="a-fn">fibRec</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> n;<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-fn">fibRec</span>(n-<span class="a-body">1</span>) + <span class="a-fn">fibRec</span>(n-<span class="a-body">2</span>);<br>
+            {{ '}' }}<br>
+            <span class="a-comment">// O(2ⁿ) — exponencial</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Iterativo — O(n) tiempo, O(1) espacio</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static long</span> <span class="a-fn">fibIter</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> n;<br>
+            &nbsp;&nbsp;<span class="a-kw">long</span> a = <span class="a-body">0</span>, b = <span class="a-body">1</span>;<br>
+            &nbsp;&nbsp;<span class="a-kw">for</span> (<span class="a-kw">int</span> i = <span class="a-body">2</span>; i &lt;= n; i++) {{ '{' }}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">long</span> t = a + b; a = b; b = t;<br>
+            &nbsp;&nbsp;{{ '}' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> b;<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Memoización — el mejor de los dos mundos</h3>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Fibonacci con memoización — O(n) tiempo y espacio</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static</span> <span class="a-type">Map</span>&lt;<span class="a-type">Integer</span>, <span class="a-type">Long</span>&gt; memo = <span class="a-kw">new</span> <span class="a-type">HashMap</span>&lt;&gt;();<br><br>
+            <span class="a-kw">static long</span> <span class="a-fn">fib</span>(<span class="a-kw">int</span> n) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> n;<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (memo.<span class="a-fn">containsKey</span>(n)) <span class="a-kw">return</span> memo.<span class="a-fn">get</span>(n);<br>
+            &nbsp;&nbsp;<span class="a-kw">long</span> r = <span class="a-fn">fib</span>(n-<span class="a-body">1</span>) + <span class="a-fn">fib</span>(n-<span class="a-body">2</span>);<br>
+            &nbsp;&nbsp;memo.<span class="a-fn">put</span>(n, r);<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> r;<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Problemas clásicos</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Potencia eficiente — O(log n)</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static long</span> <span class="a-fn">potencia</span>(<span class="a-kw">long</span> base, <span class="a-kw">int</span> exp) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (exp == <span class="a-body">0</span>) <span class="a-kw">return</span> <span class="a-body">1</span>;<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (exp % <span class="a-body">2</span> == <span class="a-body">0</span>) {{ '{' }}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">long</span> half = <span class="a-fn">potencia</span>(base, exp/<span class="a-body">2</span>);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> half * half;<br>
+            &nbsp;&nbsp;{{ '}' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> base * <span class="a-fn">potencia</span>(base, exp-<span class="a-body">1</span>);<br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Torres de Hanói — O(2ⁿ)</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static void</span> <span class="a-fn">hanoi</span>(<span class="a-kw">int</span> n, <span class="a-type">String</span> desde,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">String</span> hasta, <span class="a-type">String</span> aux) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n == <span class="a-body">1</span>) {{ '{' }}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.out.println(desde + <span class="a-str">" → "</span> + hasta);<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span>;<br>
+            &nbsp;&nbsp;{{ '}' }}<br>
+            &nbsp;&nbsp;<span class="a-fn">hanoi</span>(n-<span class="a-body">1</span>, desde, aux, hasta);<br>
+            &nbsp;&nbsp;System.out.println(desde + <span class="a-str">" → "</span> + hasta);<br>
+            &nbsp;&nbsp;<span class="a-fn">hanoi</span>(n-<span class="a-body">1</span>, aux, hasta, desde);<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-grid" style="margin-top:12px">
+        <div class="compare-col">
+          <div class="compare-label good">Búsqueda binaria recursiva — O(log n)</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static int</span> <span class="a-fn">bSearch</span>(<span class="a-kw">int</span>[] arr, <span class="a-kw">int</span> key,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">int</span> lo, <span class="a-kw">int</span> hi) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (lo &gt; hi) <span class="a-kw">return</span> -<span class="a-body">1</span>;<br>
+            &nbsp;&nbsp;<span class="a-kw">int</span> mid = (lo + hi) / <span class="a-body">2</span>;<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (arr[mid] == key) <span class="a-kw">return</span> mid;<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (arr[mid] &lt; key) <span class="a-kw">return</span> <span class="a-fn">bSearch</span>(arr, key, mid+<span class="a-body">1</span>, hi);<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-fn">bSearch</span>(arr, key, lo, mid-<span class="a-body">1</span>);<br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Inversión de String — divide y vencerás</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static</span> <span class="a-type">String</span> <span class="a-fn">invertir</span>(<span class="a-type">String</span> s) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (s.<span class="a-fn">length</span>() &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> s;<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-fn">invertir</span>(s.<span class="a-fn">substring</span>(<span class="a-body">1</span>))<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ s.<span class="a-fn">charAt</span>(<span class="a-body">0</span>);<br>
+            {{ '}' }}<br>
+            <span class="a-comment">// invertir("abc") → "cba"</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Recursión de cola — tail recursion</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label bad">No es tail — hay trabajo pendiente tras la llamada</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">return</span> n * <span class="a-fn">factorial</span>(n-<span class="a-body">1</span>);<br>
+            <span class="a-comment">// "n *" se aplica DESPUÉS de regresar</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Tail recursion — acumulador como parámetro</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">static long</span> <span class="a-fn">factTail</span>(<span class="a-kw">int</span> n, <span class="a-kw">long</span> acc) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (n &lt;= <span class="a-body">1</span>) <span class="a-kw">return</span> acc;<br>
+            &nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-fn">factTail</span>(n-<span class="a-body">1</span>, n*acc);<br>
+            {{ '}' }}<br>
+            <span class="a-comment">// factTail(5, 1) → 120</span><br>
+            <span class="a-comment">// <i class="ico ico-alert" aria-hidden="true"></i> Java NO optimiza TCO; riesgo stack igual</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Java NO aplica <em>Tail Call Optimization</em>. Incluso con tail recursion, cada llamada ocupa un frame. Para recursión profunda (n &gt; ~5000) convierte a iteración manual o usa un <strong>trampolín</strong> (<code>Supplier&lt;T&gt;</code> encadenados).</div>
+
+      <h3 class="var-h3" style="margin-top:18px">Complejidad de problemas recursivos comunes</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:14px">
+        <thead><tr style="background:var(--card-bg,#f8fafc)">
+          <th style="padding:7px 10px;text-align:left;border-bottom:2px solid #e2e8f0">Algoritmo</th>
+          <th style="padding:7px 10px;text-align:center;border-bottom:2px solid #e2e8f0">Tiempo</th>
+          <th style="padding:7px 10px;text-align:center;border-bottom:2px solid #e2e8f0">Espacio (pila)</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0"><code>factorial(n)</code></td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0"><code>fibonacci(n)</code> sin memo</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(2ⁿ)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0"><code>fibonacci(n)</code> con memo</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">Búsqueda binaria recursiva</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(log n)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(log n)</td></tr>
+          <tr><td style="padding:6px 10px;border-bottom:1px solid #e2e8f0">Merge Sort</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n log n)</td><td style="padding:6px 10px;text-align:center;border-bottom:1px solid #e2e8f0">O(n)</td></tr>
+          <tr><td style="padding:6px 10px">Torres de Hanói (n discos)</td><td style="padding:6px 10px;text-align:center">O(2ⁿ)</td><td style="padding:6px 10px;text-align:center">O(n)</td></tr>
+        </tbody>
+      </table>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:26, file:'RecursividadDemo.java', hint:'Implementa fibonacci con memoización y compara tiempos con la versión sin memo'}"></ng-container>
+    </div>
+
+    <div class="quiz-section" id="eval-m4" *ngIf="isEval">
+      <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 4 — Recursividad</div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 1 de 20</div>
+        <div class="quiz-q">¿Cuáles son los dos componentes obligatorios de toda función recursiva correcta?</div>
+        <div class="quiz-options" id="em4q01">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">A</div> Bucle y condición</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q01',true)"><div class="quiz-letter">B</div> Caso base y caso recursivo</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">C</div> Parámetro y valor de retorno</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">D</div> Stack y heap</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q01-ok">✓ El <strong>caso base</strong> detiene la recursión devolviendo un resultado directo. El <strong>caso recursivo</strong> reduce el problema y se llama a sí mismo.</div>
+        <div class="quiz-feedback fail" id="em4q01-fail">✗ Toda recursión necesita caso base (parada) y caso recursivo (reducción). Sin caso base → <code>StackOverflowError</code> infinito.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 2 de 20</div>
+        <div class="quiz-q">¿Qué error lanza la JVM cuando la recursión agota la pila de llamadas?</div>
+        <div class="quiz-options" id="em4q02">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">A</div> OutOfMemoryError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">B</div> RecursionException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q02',true)"><div class="quiz-letter">C</div> StackOverflowError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">D</div> RuntimeException</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q02-ok">✓ <code>StackOverflowError</code> es un <code>Error</code> (subclase de <code>Throwable</code>, no de <code>Exception</code>). Ocurre cuando la pila de frames de llamada se desborda.</div>
+        <div class="quiz-feedback fail" id="em4q02-fail">✗ La JVM lanza <code>StackOverflowError</code> (no <code>OutOfMemoryError</code>, que es del heap). Es un <code>Error</code>, no una <code>Exception</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 3 de 20</div>
+        <div class="quiz-q">¿Cuál es la complejidad temporal de <code>fibonacci(n)</code> sin memoización usando recursión pura?</div>
+        <div class="quiz-options" id="em4q03">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">A</div> O(n)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">B</div> O(n log n)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q03',true)"><div class="quiz-letter">C</div> O(2ⁿ)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">D</div> O(log n)</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q03-ok">✓ Fibonacci recursivo puro tiene O(2ⁿ) porque recalcula los mismos subproblemas repetidamente. Con memoización baja a O(n).</div>
+        <div class="quiz-feedback fail" id="em4q03-fail">✗ Sin memoización el árbol de llamadas crece exponencialmente: <code>fib(n-1)</code> y <code>fib(n-2)</code> se recalculan múltiples veces → O(2ⁿ).</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 4 de 20</div>
+        <div class="quiz-q">¿Qué es la memoización en el contexto de la recursividad?</div>
+        <div class="quiz-options" id="em4q04">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">A</div> Convertir la recursión a iteración</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q04',true)"><div class="quiz-letter">B</div> Almacenar en caché los resultados de subproblemas ya calculados</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">C</div> Añadir un segundo caso base</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">D</div> Usar un acumulador como parámetro extra</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q04-ok">✓ La memoización guarda resultados en un <code>Map</code> o array. Si el subproblema ya fue calculado, devuelve el valor almacenado en O(1) en vez de recalcular.</div>
+        <div class="quiz-feedback fail" id="em4q04-fail">✗ Memoización = caché de resultados. No es lo mismo que iteración ni que tail recursion. Reduce Fibonacci de O(2ⁿ) a O(n).</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 5 de 20</div>
+        <div class="quiz-q">¿Aplica Java la <em>Tail Call Optimization</em> (TCO) automáticamente?</div>
+        <div class="quiz-options" id="em4q05">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">A</div> Sí, siempre que el método sea <code>static</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">B</div> Sí, desde Java 11</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q05',true)"><div class="quiz-letter">C</div> No</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">D</div> Solo para métodos <code>final</code></div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q05-ok">✓ La JVM no implementa TCO. A diferencia de Scala (con <code>@tailrec</code>) o Kotlin, en Java incluso la recursión de cola ocupa un frame por llamada.</div>
+        <div class="quiz-feedback fail" id="em4q05-fail">✗ Java NO hace TCO. Para recursión profunda debes convertirla a iteración manualmente o usar la técnica del trampolín con <code>Supplier</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 6 de 20</div>
+        <div class="quiz-q">En recursión de cola (tail recursion), ¿cuándo se ejecuta la llamada recursiva respecto al resto de operaciones del método?</div>
+        <div class="quiz-options" id="em4q06">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">A</div> Al principio del método</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">B</div> Dentro de un bloque <code>try</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q06',true)"><div class="quiz-letter">C</div> Es la última operación del método — no hay trabajo pendiente después</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">D</div> Dentro de un condicional ternario</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q06-ok">✓ En tail recursion no hay operaciones pendientes tras la llamada: <code>return factTail(n-1, n*acc);</code>. Si Java optimizara TCO reutilizaría el mismo frame.</div>
+        <div class="quiz-feedback fail" id="em4q06-fail">✗ Tail recursion = la llamada recursiva es la <em>última</em> instrucción. <code>return n * f(n-1)</code> no es tail porque la multiplicación ocurre después.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 7 de 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia entre recursión directa e indirecta?</div>
+        <div class="quiz-options" id="em4q07">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">A</div> La directa usa bucles, la indirecta no</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q07',true)"><div class="quiz-letter">B</div> En la directa un método se llama a sí mismo; en la indirecta A llama a B y B llama a A</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">C</div> La indirecta siempre es más eficiente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">D</div> Solo la recursión directa puede causar StackOverflowError</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q07-ok">✓ Directa: <code>f()</code> llama a <code>f()</code>. Indirecta: <code>esPar()</code> llama a <code>esImpar()</code> y viceversa. Ambas requieren caso base y pueden causar desbordamiento.</div>
+        <div class="quiz-feedback fail" id="em4q07-fail">✗ Directa = se llama a sí misma. Indirecta = cadena circular entre 2+ métodos. Ambas formas requieren caso base.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 8 de 20</div>
+        <div class="quiz-q">¿Qué valor devuelve <code>factorial(0)</code> dado que el caso base es <code>if (n &lt;= 1) return 1</code>?</div>
+        <div class="quiz-options" id="em4q08">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">A</div> 0</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q08',true)"><div class="quiz-letter">B</div> 1</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">C</div> StackOverflowError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">D</div> -1</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q08-ok">✓ <code>0 &lt;= 1</code> es <code>true</code>, el caso base se activa y retorna <code>1</code>. Matemáticamente 0! = 1 por definición.</div>
+        <div class="quiz-feedback fail" id="em4q08-fail">✗ <code>factorial(0)</code>: como 0 ≤ 1, alcanza el caso base y retorna 1. No hay llamada recursiva. Matemáticamente 0! = 1.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 9 de 20</div>
+        <div class="quiz-q">Dado <code>fibonacci(n)</code> recursivo sin memoización, ¿cuántas veces se calcula <code>fibonacci(2)</code> al invocar <code>fibonacci(5)</code>?</div>
+        <div class="quiz-options" id="em4q09">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">A</div> 1</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">B</div> 2</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q09',true)"><div class="quiz-letter">C</div> 3</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">D</div> 5</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q09-ok">✓ Expandiendo el árbol: fib(5)→fib(4)+fib(3), fib(4)→fib(3)+fib(2), fib(3)→fib(2)+fib(1). <code>fib(2)</code> aparece 3 veces. Esta redundancia es la causa de O(2ⁿ).</div>
+        <div class="quiz-feedback fail" id="em4q09-fail">✗ Expande el árbol: fib(5)→fib(4)+fib(3), fib(4)→fib(3)+fib(2), fib(3)→fib(2)+fib(1) → <code>fib(2)</code> se calcula 3 veces.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 10 de 20</div>
+        <div class="quiz-q">¿Cuál es la complejidad espacial de la pila de llamadas de una recursión con profundidad máxima N?</div>
+        <div class="quiz-options" id="em4q10">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">A</div> O(1)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">B</div> O(log N)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q10',true)"><div class="quiz-letter">C</div> O(N)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">D</div> O(N²)</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q10-ok">✓ Cada llamada añade un frame a la pila. Con N niveles de profundidad hay N frames activos simultáneamente → O(N) de espacio. Búsqueda binaria recursiva es O(log N).</div>
+        <div class="quiz-feedback fail" id="em4q10-fail">✗ Cada nivel = un frame en la pila. Recursión de profundidad N → O(N) espacio. Factorial: O(N), búsqueda binaria: O(log N), Fibonacci sin memo: O(N).</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 11 de 20</div>
+        <div class="quiz-q">¿Qué técnica de programación dinámica llena una tabla de subproblemas de forma iterativa, de abajo hacia arriba, sin recursión?</div>
+        <div class="quiz-options" id="em4q11">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">A</div> Memoización (top-down)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q11',true)"><div class="quiz-letter">B</div> Tabulación (bottom-up)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">C</div> Trampolín</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">D</div> Backtracking</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q11-ok">✓ Bottom-up DP (tabulación): llena un array iterativamente desde los casos base. Sin recursión, sin riesgo de stack. Memoización es top-down (recursión + caché).</div>
+        <div class="quiz-feedback fail" id="em4q11-fail">✗ Bottom-up = tabulación iterativa. Top-down = memoización recursiva. Ambas son programación dinámica pero en dirección opuesta.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 12 de 20</div>
+        <div class="quiz-q">Dado <code>static int suma(int n) {{ '{' }} return n == 0 ? 0 : n + suma(n-1); {{ '}' }}</code>, ¿qué devuelve <code>suma(4)</code>?</div>
+        <div class="quiz-options" id="em4q12">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">A</div> 4</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">B</div> 6</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q12',true)"><div class="quiz-letter">C</div> 10</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">D</div> 24</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q12-ok">✓ suma(4) = 4+suma(3) = 4+3+suma(2) = 4+3+2+suma(1) = 4+3+2+1+suma(0) = 4+3+2+1+0 = <strong>10</strong>. Equivale a n*(n+1)/2 = 4*5/2 = 10.</div>
+        <div class="quiz-feedback fail" id="em4q12-fail">✗ suma(4) = 4+3+2+1+0 = 10. Es la fórmula de suma de enteros 1..n = n*(n+1)/2 = 10.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 13 de 20</div>
+        <div class="quiz-q">¿Cuántos movimientos mínimos requieren las Torres de Hanói con <strong>n</strong> discos?</div>
+        <div class="quiz-options" id="em4q13">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">A</div> n²</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">B</div> n!</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q13',true)"><div class="quiz-letter">C</div> 2ⁿ − 1</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">D</div> n × log n</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q13-ok">✓ La recurrencia T(n) = 2·T(n-1) + 1 con T(1)=1 se resuelve en T(n) = 2ⁿ − 1. Para 3 discos: 7, para 10: 1023 movimientos.</div>
+        <div class="quiz-feedback fail" id="em4q13-fail">✗ Hanói: T(n) = 2·T(n-1) + 1 → 2ⁿ − 1. Para n=3: 7, n=10: 1023, n=20: más de un millón.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 14 de 20</div>
+        <div class="quiz-q">¿Qué técnica permite simular TCO manualmente en Java encadenando <code>Supplier&lt;T&gt;</code> para evitar el desbordamiento de pila?</div>
+        <div class="quiz-options" id="em4q14">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">A</div> Memoización</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">B</div> Tabulación</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q14',true)"><div class="quiz-letter">C</div> Trampolín (Trampoline pattern)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">D</div> Fork/Join</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q14-ok">✓ El patrón trampolín devuelve un <code>Supplier&lt;T&gt;</code> (paso diferido) en vez de llamarse directamente. Un bucle externo los ejecuta hasta obtener el resultado sin apilar frames.</div>
+        <div class="quiz-feedback fail" id="em4q14-fail">✗ Trampolín: cada paso retorna un <code>Supplier</code>; un bucle externo los ejecuta uno a uno. Evita la pila sin perder el estilo funcional.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 15 de 20</div>
+        <div class="quiz-q">¿Cuál es la complejidad temporal de la búsqueda binaria implementada recursivamente?</div>
+        <div class="quiz-options" id="em4q15">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">A</div> O(n)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q15',true)"><div class="quiz-letter">B</div> O(log n)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">C</div> O(n log n)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">D</div> O(n²)</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q15-ok">✓ Cada llamada descarta la mitad del array → profundidad máxima log₂(n). Igual que la versión iterativa en tiempo, pero con O(log n) extra de espacio en la pila.</div>
+        <div class="quiz-feedback fail" id="em4q15-fail">✗ Búsqueda binaria divide el espacio a la mitad en cada llamada → O(log n) tiempo. La versión iterativa usa O(1) de espacio; la recursiva O(log n) por la pila.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 16 de 20</div>
+        <div class="quiz-q">¿Cuál de estas implementaciones de factorial es <strong>tail-recursive</strong>?</div>
+        <div class="quiz-options" id="em4q16">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">A</div> <code>return n * factorial(n-1);</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q16',true)"><div class="quiz-letter">B</div> <code>return factTail(n-1, n * acc);</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">C</div> <code>return factorial(n-1) * n;</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">D</div> <code>return factorial(n) + factorial(n-2);</code></div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q16-ok">✓ <code>factTail(n-1, n*acc)</code> es tail-recursive: la llamada es la <em>última</em> operación. El acumulador <code>acc</code> transporta el trabajo progresivo. Las otras opciones realizan operaciones después de regresar.</div>
+        <div class="quiz-feedback fail" id="em4q16-fail">✗ Solo <code>factTail(n-1, n*acc)</code> es tail: la llamada es lo último. <code>n * factorial(n-1)</code> no lo es porque la multiplicación ocurre al regresar de la llamada.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 17 de 20</div>
+        <div class="quiz-q">¿Qué estructura de datos interna usa la JVM para gestionar los frames de las llamadas recursivas?</div>
+        <div class="quiz-options" id="em4q17">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">A</div> Heap</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">B</div> Queue (cola FIFO)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q17',true)"><div class="quiz-letter">C</div> Call Stack (pila LIFO)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">D</div> Method Area</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q17-ok">✓ Cada invocación añade un <em>frame</em> a la <strong>call stack</strong> (LIFO) con sus variables locales y punto de retorno. Al retornar, el frame se elimina. El heap almacena objetos, no frames.</div>
+        <div class="quiz-feedback fail" id="em4q17-fail">✗ La JVM usa la <em>call stack</em> (pila LIFO) para frames de activación. El heap almacena objetos. La Method Area almacena bytecode y metadatos de clase.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 18 de 20</div>
+        <div class="quiz-q">¿Cuándo es preferible usar recursión sobre iteración en Java?</div>
+        <div class="quiz-options" id="em4q18">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">A</div> Siempre, es más eficiente en memoria</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">B</div> Nunca, la iteración siempre es mejor</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q18',true)"><div class="quiz-letter">C</div> Cuando el problema tiene estructura recursiva natural (árboles, grafos, divide y vencerás) y la profundidad es acotada</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">D</div> Solo para cálculos matemáticos simples</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q18-ok">✓ Recursión brilla con estructuras jerárquicas (BST, directorios, JSON) y algoritmos divide-and-conquer. Si la profundidad es ilimitada, convierte a iterativa o aplica memoización.</div>
+        <div class="quiz-feedback fail" id="em4q18-fail">✗ Recursión es natural para árboles y grafos. Iteración conviene para secuencias largas donde el stack sería riesgo. Elige según la estructura del problema.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 19 de 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia clave entre memoización (top-down) y tabulación (bottom-up) en programación dinámica?</div>
+        <div class="quiz-options" id="em4q19">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">A</div> La tabulación solo funciona con grafos</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">B</div> La memoización no puede resolver los mismos problemas que la tabulación</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q19',true)"><div class="quiz-letter">C</div> Memoización usa recursión + caché; tabulación usa iteración + tabla, eliminando el riesgo de stack</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">D</div> Son técnicas sin relación entre sí</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q19-ok">✓ Memoización = top-down (recursión + caché). Tabulación = bottom-up (iteración + tabla). Misma idea de evitar recálculos, distinta dirección e implementación.</div>
+        <div class="quiz-feedback fail" id="em4q19-fail">✗ Memoización ES programación dinámica top-down (con recursión). Tabulación es bottom-up (sin recursión). Ambas evitan recalcular; difieren en implementación.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 20 de 20</div>
+        <div class="quiz-q">¿Cuál es el número de Fibonacci en la posición 6 (<code>fib(6)</code>) dado que <code>fib(0)=0, fib(1)=1</code>?</div>
+        <div class="quiz-options" id="em4q20">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">A</div> 5</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q20',true)"><div class="quiz-letter">B</div> 8</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">C</div> 13</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">D</div> 6</div>
+        </div>
+        <div class="quiz-feedback ok" id="em4q20-ok">✓ Secuencia: fib(0)=0, fib(1)=1, fib(2)=1, fib(3)=2, fib(4)=3, fib(5)=5, <strong>fib(6)=8</strong>. Cada número es la suma de los dos anteriores.</div>
+        <div class="quiz-feedback fail" id="em4q20-fail">✗ Traza: 0, 1, 1, 2, 3, 5, 8 → fib(6) = 8. Recuerda: fib(n) = fib(n-1) + fib(n-2), con fib(0)=0 y fib(1)=1.</div>
+      </div>
+
+    </div>
+</ng-container>

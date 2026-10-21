@@ -1,0 +1,426 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===32">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">33</span><span class="lesson-mod">Módulo 6 · WebClient</span></div>
+      <h2 class="lesson-title">WebClient Setup</h2>
+      <p class="lesson-sub">El cliente HTTP reactivo de Spring — reemplaza a RestTemplate en aplicaciones WebFlux.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">WebClient.Builder</div>
+        <div class="tc-body">Configura baseUrl, headers por defecto, codecs, filtros. Cada instancia es inmutable y thread-safe. Reutiliza la instancia — no crees una por petición.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Connection Pool</div>
+        <div class="tc-body">WebClient usa Reactor Netty internamente con connection pool. Configurable via <code>HttpClient.create()</code> + <code>ConnectionProvider</code>. Comparte conexiones entre peticiones.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Headers por defecto</div>
+        <div class="tc-body"><code>.defaultHeader("Accept", "application/json")</code>, <code>.defaultHeaders(h -&gt; h.setBearerAuth(token))</code>. Se aplican a todas las peticiones del cliente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">@Bean WebClient</div>
+        <div class="tc-body">Declara WebClient como @Bean con baseUrl configurada. Inyecta en servicios. Usa WebClient.Builder (auto-configurado por Spring Boot) para personalizar.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">WebClient</span> webClient(<span class="a-type">WebClient</span>.<span class="a-type">Builder</span> builder) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> builder</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.baseUrl(<span class="a-str">"https://api.example.com"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.defaultHeader(<span class="a-type">HttpHeaders</span>.CONTENT_TYPE, <span class="a-str">"application/json"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.defaultHeader(<span class="a-type">HttpHeaders</span>.ACCEPT, <span class="a-str">"application/json"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.build();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===33">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">34</span><span class="lesson-mod">Módulo 6 · WebClient</span></div>
+      <h2 class="lesson-title">GET y POST Reactivos</h2>
+      <p class="lesson-sub">Peticiones HTTP reactivas: retrieve, bodyToMono, bodyToFlux, bodyValue.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// GET ? Mono</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">Product</span>&gt; getProduct(<span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> webClient.get()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.uri(<span class="a-str">"/products/{{ '{' }}id{{ '}' }}"</span>, id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.retrieve()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.bodyToMono(<span class="a-type">Product</span>.class);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// GET ? Flux (colección)</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; getAll() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> webClient.get()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.uri(<span class="a-str">"/products"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.retrieve()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.bodyToFlux(<span class="a-type">Product</span>.class);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// POST con body</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">Product</span>&gt; create(<span class="a-type">ProductDTO</span> dto) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> webClient.post()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.uri(<span class="a-str">"/products"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.bodyValue(dto)&nbsp;&nbsp;<span class="a-cm">// serializa a JSON</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.retrieve()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.bodyToMono(<span class="a-type">Product</span>.class);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><code>retrieve()</code> es el método simplificado. <code>exchangeToMono()</code> da acceso completo al ClientResponse (status code, headers, body).</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===34">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">35</span><span class="lesson-mod">Módulo 6 · WebClient</span></div>
+      <h2 class="lesson-title">Manejo de Errores HTTP</h2>
+      <p class="lesson-sub">Gestionar respuestas 4xx y 5xx reactivamente con onStatus y excepciones personalizadas.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Comportamiento por defecto</div>
+        <div class="tc-body"><code>retrieve()</code> lanza <code>WebClientResponseException</code> para 4xx y 5xx. Las subclases incluyen: <code>WebClientResponseException.NotFound</code>, <code>.BadRequest</code>, etc.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">onStatus()</div>
+        <div class="tc-body">Personaliza el manejo por status code: <code>.onStatus(HttpStatus::is4xxClientError, response -&gt; ...)</code>. El callback retorna <code>Mono&lt;Throwable&gt;</code> para propagar la excepción.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">exchangeToMono</div>
+        <div class="tc-body">Acceso completo al ClientResponse: <code>.exchangeToMono(resp -&gt; resp.statusCode().is2xxSuccessful() ? resp.bodyToMono(T.class) : resp.createException().flatMap(Mono::error))</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">ParameterizedTypeReference</div>
+        <div class="tc-body">Para tipos genéricos: <code>bodyToMono(new ParameterizedTypeReference&lt;List&lt;Product&gt;&gt;(){{ '{' }}{{ '}' }})</code>. Mantiene la información de tipo en tiempo de ejecución.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line">webClient.get().uri(<span class="a-str">"/products/{{ '{' }}id{{ '}' }}"</span>, id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.retrieve()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.onStatus(<span class="a-type">HttpStatus</span>::is4xxClientError, resp -&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;resp.bodyToMono(<span class="a-type">ErrorDTO</span>.class)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.map(err -&gt; <span class="a-kw">new</span> <span class="a-type">ProductNotFoundException</span>(err.message())))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.onStatus(<span class="a-type">HttpStatus</span>::is5xxServerError, resp -&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Mono</span>.error(<span class="a-kw">new</span> <span class="a-type">ServiceUnavailableException</span>()))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.bodyToMono(<span class="a-type">Product</span>.class);</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===35">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">36</span><span class="lesson-mod">Módulo 6 · WebClient</span></div>
+      <h2 class="lesson-title">Timeouts, Retry y ExchangeFilterFunction</h2>
+      <p class="lesson-sub">Resiliencia en llamadas externas: timeouts, reintentos con backoff y filtros transversales.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">timeout()</div>
+        <div class="tc-body"><code>.bodyToMono(T.class).timeout(Duration.ofSeconds(5))</code>. Emite TimeoutException si no hay respuesta en el tiempo dado. Combina con onErrorResume para fallback.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">retryWhen</div>
+        <div class="tc-body"><code>.retryWhen(Retry.backoff(3, Duration.ofMillis(500)).filter(t -&gt; t instanceof ServiceUnavailableException))</code>. Solo reintenta errores de servidor, no de cliente (4xx).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">ExchangeFilterFunction</div>
+        <div class="tc-body">Middleware para WebClient: intercepta cada petición/respuesta. útil para logging, autenticación automática (agregar token), métricas, tracing. Se añade con <code>.filter()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">??</div>
+        <div class="tc-title">Logging filter</div>
+        <div class="tc-body"><code>ExchangeFilterFunction.ofRequestProcessor(req -&gt; {{ '{' }} log(req); return Mono.just(req); {{ '}' }})</code>. Para respuestas: <code>ofResponseProcessor()</code>. No bloquea el pipeline.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// ExchangeFilterFunction para añadir Bearer token</span></div>
+      <div class="anatomy-line"><span class="a-type">ExchangeFilterFunction</span> authFilter =</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">ExchangeFilterFunction</span>.ofRequestProcessor(req -&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Mono</span>.just(<span class="a-type">ClientRequest</span>.from(req)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.header(<span class="a-str">"Authorization"</span>, <span class="a-str">"Bearer "</span> + getToken())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build()));</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Aplicar filter al builder</span></div>
+      <div class="anatomy-line"><span class="a-type">WebClient</span> client = <span class="a-type">WebClient</span>.builder()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.filter(authFilter)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.build();</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación · Módulo 6</div>
+
+    <div class="quiz-box" id="wf6q01">
+      <div class="quiz-label">wf6q01</div>
+      <div class="quiz-q">¿Por qu→ no se debe crear una nueva instancia de WebClient por cada petición?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q01',false)"><span class="quiz-letter">A</span> WebClient no es thread-safe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q01',true)"><span class="quiz-letter">B</span> Cada instancia crea su propio connection pool — desperdiciaría recursos y conexiones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q01',false)"><span class="quiz-letter">C</span> WebClient solo permite una petición simultánea</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q01',false)"><span class="quiz-letter">D</span> El GC no puede recuperar las instancias de WebClient</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q01-ok">Correcto — WebClient es thread-safe e inmutable. Crear uno por petición crearía pools de conexión innecesarios, desperdiciando recursos.</div>
+      <div class="quiz-feedback fail" id="wf6q01-fail">Incorrecto — WebClient es thread-safe. No crear uno por petición porque cada instancia crea su propio connection pool de Reactor Netty.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q02">
+      <div class="quiz-label">wf6q02</div>
+      <div class="quiz-q">¿Cul es la diferencia entre <code>bodyValue(obj)</code> y <code>body(Publisher)</code> en WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q02',true)"><span class="quiz-letter">A</span> bodyValue acepta un objeto POJO; body acepta un Publisher (Mono/Flux) para streaming</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q02',false)"><span class="quiz-letter">B</span> Son equivalentes con diferente nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q02',false)"><span class="quiz-letter">C</span> bodyValue es para GET; body es para POST</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q02',false)"><span class="quiz-letter">D</span> body acepta solo String; bodyValue acepta cualquier tipo</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q02-ok">Correcto — bodyValue() para un objeto POJO (serializa inmediatamente); body() para streaming reactivo desde un Publisher.</div>
+      <div class="quiz-feedback fail" id="wf6q02-fail">Incorrecto — bodyValue(T) para POJO; body(Publisher, Class) para streaming reactivo como Flux.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q03">
+      <div class="quiz-label">wf6q03</div>
+      <div class="quiz-q">¿Qu→ excepción lanza <code>retrieve()</code> por defecto para un error 404?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q03',false)"><span class="quiz-letter">A</span> HttpClientErrorException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q03',true)"><span class="quiz-letter">B</span> WebClientResponseException (subclase NotFound o 404)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q03',false)"><span class="quiz-letter">C</span> NoSuchElementException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q03',false)"><span class="quiz-letter">D</span> No lanza excepción — retorna Mono.empty()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q03-ok">Correcto — retrieve() lanza WebClientResponseException para cualquier respuesta no 2xx. Para 404 hay WebClientResponseException.NotFound.</div>
+      <div class="quiz-feedback fail" id="wf6q03-fail">Incorrecto — retrieve() lanza WebClientResponseException (o su subclase) para errores HTTP. Usa onStatus() para personalizar.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q04">
+      <div class="quiz-label">wf6q04</div>
+      <div class="quiz-q">¿Para qu→ se usa <code>ParameterizedTypeReference</code> con WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q04',true)"><span class="quiz-letter">A</span> Deserializar tipos genéricos como List&lt;T&gt; preservando la información de tipo en runtime</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q04',false)"><span class="quiz-letter">B</span> Referenciar beans de Spring desde el cliente HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q04',false)"><span class="quiz-letter">C</span> Configurar headers de tipo en la petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q04',false)"><span class="quiz-letter">D</span> Especificar el formato de serialización (XML vs JSON)</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q04-ok">Correcto — Java borra los genéricos en runtime, por eso bodyToMono(List&lt;T&gt;.class) no funciona. ParameterizedTypeReference captura el tipo genérico.</div>
+      <div class="quiz-feedback fail" id="wf6q04-fail">Incorrecto — ParameterizedTypeReference preserva información de tipos genéricos en runtime, necesario para deserializar List&lt;T&gt;, Map&lt;K,V&gt;, etc.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q05">
+      <div class="quiz-label">wf6q05</div>
+      <div class="quiz-q">¿Qu→ retorna el callback de <code>onStatus()</code> en WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q05',false)"><span class="quiz-letter">A</span> ResponseEntity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q05',true)"><span class="quiz-letter">B</span> Mono&lt;Throwable&gt; — la excepción a propagar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q05',false)"><span class="quiz-letter">C</span> Mono&lt;Boolean&gt; indicando si manej→ el error</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q05',false)"><span class="quiz-letter">D</span> HttpStatus del código de respuesta</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q05-ok">Correcto — onStatus() recibe la respuesta y debe retornar Mono&lt;Throwable&gt; con la excepción que se propagar→ en el stream.</div>
+      <div class="quiz-feedback fail" id="wf6q05-fail">Incorrecto — el callback de onStatus() debe retornar Mono&lt;Throwable&gt; con la excepción a propagar.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q06">
+      <div class="quiz-label">wf6q06</div>
+      <div class="quiz-q">¿Cundo es preferible <code>exchangeToMono()</code> sobre <code>retrieve()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q06',true)"><span class="quiz-letter">A</span> Cuando necesitas acceso al status code, headers de respuesta y el body simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q06',false)"><span class="quiz-letter">B</span> Para mayor rendimiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q06',false)"><span class="quiz-letter">C</span> retrieve() solo funciona con JSON; exchangeToMono() con cualquier formato</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q06',false)"><span class="quiz-letter">D</span> exchangeToMono() aplica backpressure; retrieve() no</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q06-ok">Correcto — exchangeToMono da acceso completo al ClientResponse (status, headers, body) para lógica condicional compleja.</div>
+      <div class="quiz-feedback fail" id="wf6q06-fail">Incorrecto — exchangeToMono() da acceso completo a la respuesta, útil cuando necesitas inspeccionar status y headers antes de procesar el body.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q07">
+      <div class="quiz-label">wf6q07</div>
+      <div class="quiz-q">¿Qu→ hace <code>ExchangeFilterFunction.ofRequestProcessor()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q07',true)"><span class="quiz-letter">A</span> Intercepta y puede modificar la petición antes de enviarla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q07',false)"><span class="quiz-letter">B</span> Procesa la respuesta después de recibirla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q07',false)"><span class="quiz-letter">C</span> Serializa el body de la petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q07',false)"><span class="quiz-letter">D</span> Añade un Scheduler dedicado para el exchange</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q07-ok">Correcto — ofRequestProcessor intercepta la petición saliente para modificar headers, URL, body, etc. Para respuestas usa ofResponseProcessor.</div>
+      <div class="quiz-feedback fail" id="wf6q07-fail">Incorrecto — ofRequestProcessor() intercepta la petición ANTES de enviarla. ofResponseProcessor() intercepta la respuesta DESPUS de recibirla.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q08">
+      <div class="quiz-label">wf6q08</div>
+      <div class="quiz-q">¿Qu→ filtro NO se debe incluir en producción con WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q08',false)"><span class="quiz-letter">A</span> Filtro de autenticación Bearer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q08',true)"><span class="quiz-letter">B</span> Filtro que loguea el body completo de la respuesta (puede exponer datos sensibles)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q08',false)"><span class="quiz-letter">C</span> Filtro de métricas de latencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q08',false)"><span class="quiz-letter">D</span> Filtro de correlación de tracing</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q08-ok">Correcto — loguear el body completo puede exponer datos sensibles (PII, tokens). En producción, loguea solo metadata (status, URL, latencia).</div>
+      <div class="quiz-feedback fail" id="wf6q08-fail">Incorrecto — loguear el body de respuesta en producción puede exponer datos sensibles. Loguea solo metadata en producción.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q09">
+      <div class="quiz-label">wf6q09</div>
+      <div class="quiz-q">¿Cul es la forma correcta de configurar un timeout de conexión en WebClient con Reactor Netty?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q09',true)"><span class="quiz-letter">A</span> Usando HttpClient.create().option(ChannelOption.CONNECT_TIMEOUT_MILLIS, ...) en el builder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q09',false)"><span class="quiz-letter">B</span> .timeout(Duration.ofSeconds(5)) antes de retrieve()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q09',false)"><span class="quiz-letter">C</span> webClient.connectTimeout(5000)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q09',false)"><span class="quiz-letter">D</span> spring.webclient.connect-timeout=5000 en properties</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q09-ok">Correcto — el timeout de conexión se configura en HttpClient (Reactor Netty) que se pasa al WebClient.Builder via ReactorClientHttpConnector.</div>
+      <div class="quiz-feedback fail" id="wf6q09-fail">Incorrecto — el timeout de conexión se configura en HttpClient con ChannelOption.CONNECT_TIMEOUT_MILLIS, no en el Mono/Flux.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q10">
+      <div class="quiz-label">wf6q10</div>
+      <div class="quiz-q">¿Qu→ diferencia hay entre el timeout de respuesta y el timeout de lectura en WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q10',true)"><span class="quiz-letter">A</span> Respuesta: tiempo hasta recibir los primeros bytes; lectura: tiempo entre bytes durante el streaming</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q10',false)"><span class="quiz-letter">B</span> Son lo mismo con diferente nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q10',false)"><span class="quiz-letter">C</span> Respuesta es para WebFlux; lectura es para Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q10',false)"><span class="quiz-letter">D</span> El timeout de lectura es el timeout total de la petición</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q10-ok">Correcto — response timeout: tiempo hasta los primeros bytes de respuesta. Read timeout: inactividad máxima durante la transferencia de datos.</div>
+      <div class="quiz-feedback fail" id="wf6q10-fail">Incorrecto — response timeout es hasta el primer byte; read timeout es la inactividad máxima durante la transferencia de datos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q11">
+      <div class="quiz-label">wf6q11</div>
+      <div class="quiz-q">¿Qu→ hace <code>Retry.backoff().filter(Throwable::class)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q11',true)"><span class="quiz-letter">A</span> Solo reintenta cuando el error es del tipo especificado — evita reintentar errores de cliente (4xx)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q11',false)"><span class="quiz-letter">B</span> Filtra los elementos del stream antes de reintentar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q11',false)"><span class="quiz-letter">C</span> Convierte el error al tipo especificado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q11',false)"><span class="quiz-letter">D</span> Registra el error antes de reintentar</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q11-ok">Correcto — filter() en Retry especifica qu→ tipos de errores deben desencadenar el reintento. No tiene sentido reintentar un 400 Bad Request.</div>
+      <div class="quiz-feedback fail" id="wf6q11-fail">Incorrecto — Retry.filter() define qu→ excepciones deben desencadenar el reintento. Filtra por tipo de error.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q12">
+      <div class="quiz-label">wf6q12</div>
+      <div class="quiz-q">¿Cundo se aplican los <code>defaultHeader()</code> configurados en el WebClient.Builder?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q12',true)"><span class="quiz-letter">A</span> En todas las peticiones realizadas por esa instancia de WebClient</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q12',false)"><span class="quiz-letter">B</span> Solo en la primera petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q12',false)"><span class="quiz-letter">C</span> Solo en peticiones POST y PUT</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q12',false)"><span class="quiz-letter">D</span> Solo si no se especifica header en la petición individual</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q12-ok">Correcto — defaultHeader() se aplica a todas las peticiones del WebClient. Puede ser sobreescrito por headers específicos de la petición.</div>
+      <div class="quiz-feedback fail" id="wf6q12-fail">Incorrecto — defaultHeader() se aplica a todas las peticiones del WebClient. Un header en la petición individual puede sobreescribirlo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q13">
+      <div class="quiz-label">wf6q13</div>
+      <div class="quiz-q">¿Cómo enviar query parameters en WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q13',true)"><span class="quiz-letter">A</span> <code>.uri(b -&gt; b.path("/products").queryParam("size", 10).build())</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q13',false)"><span class="quiz-letter">B</span> <code>.queryParam("size", 10)</code> directamente en el request</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q13',false)"><span class="quiz-letter">C</span> <code>.header("Query-Params", "size=10")</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q13',false)"><span class="quiz-letter">D</span> <code>.param("size", 10)</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q13-ok">Correcto — el UriBuilder en .uri() permite construir la URL con queryParam(), garantizando la codificación correcta.</div>
+      <div class="quiz-feedback fail" id="wf6q13-fail">Incorrecto — los query parameters se añaden via UriBuilder: .uri(b -&gt; b.path("/endpoint").queryParam("key", value).build()).</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q14">
+      <div class="quiz-label">wf6q14</div>
+      <div class="quiz-q">¿Qu→ retorna <code>bodyToMono(Void.class)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q14',false)"><span class="quiz-letter">A</span> Mono con null</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q14',true)"><span class="quiz-letter">B</span> Mono&lt;Void&gt; que completa cuando el body es consumido (ideal para DELETE)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q14',false)"><span class="quiz-letter">C</span> Mono que lanza VoidResponseException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q14',false)"><span class="quiz-letter">D</span> Solo aplica para respuestas 204 No Content</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q14-ok">Correcto — bodyToMono(Void.class) consume el body y completa el Mono. Ideal para DELETE u operaciones donde no necesitas el body.</div>
+      <div class="quiz-feedback fail" id="wf6q14-fail">Incorrecto — bodyToMono(Void.class) completa el Mono cuando el body es consumido, útil para DELETE o cuando no se necesita el body.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q15">
+      <div class="quiz-label">wf6q15</div>
+      <div class="quiz-q">¿Cul es el reemplazo reactivo de RestTemplate en Spring 5+?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q15',false)"><span class="quiz-letter">A</span> ReactiveRestTemplate</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q15',true)"><span class="quiz-letter">B</span> WebClient</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q15',false)"><span class="quiz-letter">C</span> AsyncRestTemplate (deprecated)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q15',false)"><span class="quiz-letter">D</span> HttpClient de Java 11</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q15-ok">Correcto — WebClient es el reemplazo oficial de RestTemplate para aplicaciones reactivas y también puede usarse en modo síncrono.</div>
+      <div class="quiz-feedback fail" id="wf6q15-fail">Incorrecto — WebClient es el reemplazo oficial de RestTemplate. RestTemplate est→ en modo mantenimiento desde Spring 5.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q16">
+      <div class="quiz-label">wf6q16</div>
+      <div class="quiz-q">¿Cómo puedes usar WebClient de forma bloqueante (en tests o código legacy)?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q16',false)"><span class="quiz-letter">A</span> No se puede — WebClient es siempre asíncrono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q16',true)"><span class="quiz-letter">B</span> Llamando <code>.block()</code> al final del pipeline (nunca en producción reactiva)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q16',false)"><span class="quiz-letter">C</span> Usando WebClient.blocking() factory method</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q16',false)"><span class="quiz-letter">D</span> Configurando Schedulers.immediate()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q16-ok">Correcto — .block() es la salida de escape para código bloqueante. Nunca lo llames dentro de un pipeline reactivo en producción.</div>
+      <div class="quiz-feedback fail" id="wf6q16-fail">Incorrecto — .block() convierte el Mono/Flux en bloqueante. Válido en tests o código legacy, nunca en un pipeline reactivo de producción.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q17">
+      <div class="quiz-label">wf6q17</div>
+      <div class="quiz-q">¿Cul es la forma de hacer una petición con body de tipo <code>Mono&lt;Product&gt;</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q17',false)"><span class="quiz-letter">A</span> .bodyValue(monoProduct)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q17',true)"><span class="quiz-letter">B</span> .body(monoProduct, Product.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q17',false)"><span class="quiz-letter">C</span> .bodyPublisher(monoProduct)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q17',false)"><span class="quiz-letter">D</span> .monoBody(monoProduct)</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q17-ok">Correcto — .body(Publisher, Class) acepta Mono/Flux. .bodyValue() acepta solo objetos POJO, no publishers.</div>
+      <div class="quiz-feedback fail" id="wf6q17-fail">Incorrecto — para enviar un Mono como body usa .body(monoProduct, Product.class). bodyValue() es solo para POJOs.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q18">
+      <div class="quiz-label">wf6q18</div>
+      <div class="quiz-q">¿Qu→ pasa si llamas <code>.block()</code> dentro del thread del event loop de Netty?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q18',false)"><span class="quiz-letter">A</span> block() es siempre seguro en cualquier contexto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q18',true)"><span class="quiz-letter">B</span> Lanza BlockingOperationException o causa un deadlock del event loop</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q18',false)"><span class="quiz-letter">C</span> Automáticamente delega al boundedElastic()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q18',false)"><span class="quiz-letter">D</span> Solo falla en Netty versión 4, no en versión 5</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q18-ok">Correcto — bloquear el event loop de Netty con block() puede causar deadlock o BlockingOperationException detectada por BlockHound.</div>
+      <div class="quiz-feedback fail" id="wf6q18-fail">Incorrecto — block() en el thread del event loop de Netty causa deadlock. El event loop se bloquea esperando su propio resultado.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q19">
+      <div class="quiz-label">wf6q19</div>
+      <div class="quiz-q">¿Cómo registrar múltiples ExchangeFilterFunction en un WebClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q19',true)"><span class="quiz-letter">A</span> Encadenando múltiples llamadas a <code>.filter(fn)</code> en el builder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q19',false)"><span class="quiz-letter">B</span> Solo se puede registrar un filter por WebClient</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q19',false)"><span class="quiz-letter">C</span> Usando <code>.filters(List&lt;ExchangeFilterFunction&gt;)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q19',false)"><span class="quiz-letter">D</span> Los filtros se componen con <code>filter1.andThen(filter2)</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q19-ok">Correcto — puedes encadenar múltiples .filter(fn) en el builder. Se ejecutan en orden de registro para la petición, inverso para la respuesta.</div>
+      <div class="quiz-feedback fail" id="wf6q19-fail">Incorrecto — se encadenan múltiples .filter(fn) en el builder. Cada llamada a filter añade un filtro a la cadena.</div>
+    </div>
+
+    <div class="quiz-box" id="wf6q20">
+      <div class="quiz-label">wf6q20</div>
+      <div class="quiz-q">¿Qu→ es <code>Retry.backoff(3, Duration.ofSeconds(1)).jitter(0.5)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q20',false)"><span class="quiz-letter">A</span> Añade 0.5 segundos fijos entre reintentos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf6q20',true)"><span class="quiz-letter">B</span> Añade aleatoriedad de hasta 50% al delay para evitar thundering herd</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q20',false)"><span class="quiz-letter">C</span> Reduce el número de reintentos en un 50%</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf6q20',false)"><span class="quiz-letter">D</span> Configura el timeout máximo total en 0.5 segundos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf6q20-ok">Correcto — jitter añade aleatoriedad al delay de backoff para evitar que múltiples instancias reintenten al mismo tiempo (thundering herd problem).</div>
+      <div class="quiz-feedback fail" id="wf6q20-fail">Incorrecto — jitter añade aleatoriedad al backoff delay para prevenir que muchos clientes reintenten simultáneamente (thundering herd).</div>
+    </div>
+
+  </div>
+
+</ng-container>

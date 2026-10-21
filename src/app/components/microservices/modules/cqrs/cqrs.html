@@ -1,0 +1,472 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===18">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">19</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">CQRS Fundamentos</h2>
+      <p class="lesson-sub">Command Query Responsibility Segregation (CQRS) separa el modelo de escritura (Commands) del modelo de lectura (Queries). Cada lado puede escalar, optimizarse y desplegarse de forma independiente.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-pencil" aria-hidden="true"></i> Command Side</div>
+        <ul>
+          <li>Modifica el estado del sistema</li>
+          <li>Valida reglas de negocio</li>
+          <li>Modelo rico en comportamiento (Domain Model)</li>
+          <li>Optimizado para consistencia</li>
+          <li>Generalmente normalizado (relacional)</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-search" aria-hidden="true"></i> Query Side</div>
+        <ul>
+          <li>Solo lectura, nunca escribe</li>
+          <li>Modelo aplanado, desnormalizado</li>
+          <li>Optimizado para velocidad de consulta</li>
+          <li>Puede usar proyecciones en Redis, Elasticsearch</li>
+          <li>Consistencia eventual desde el Command side</li>
+        </ul>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-upload" aria-hidden="true"></i></div>
+        <div class="tc-title">Command</div>
+        <div class="tc-body">Intención de cambiar el estado: <code>CreateOrderCommand</code>, <code>ShipOrderCommand</code>. Son inmutables, validados en el command handler. Pueden ser aceptados o rechazados.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-send" aria-hidden="true"></i></div>
+        <div class="tc-title">Query</div>
+        <div class="tc-body">Solicitud de datos sin efectos secundarios: <code>GetOrderByIdQuery</code>, <code>FindOrdersByUserQuery</code>. Retornan DTOs optimizados para la vista, no entidades de dominio.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Escalado independiente</div>
+        <div class="tc-body">En la mayoría de sistemas, las lecturas superan a las escrituras 10:1 o más. Con CQRS, puedes escalar el query side horizontalmente sin afectar el command side.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hourglass" aria-hidden="true"></i></div>
+        <div class="tc-title">Consistencia eventual</div>
+        <div class="tc-body">El query side se actualiza asíncronamente tras un comando. Hay un pequeño lag entre escritura y lectura. El sistema diseña en torno a esta realidad, no contra ella.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===19">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">20</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">Command Side con Spring</h2>
+      <p class="lesson-sub">El command side implementa el modelo de dominio rico. Los command handlers son el punto de entrada, validan el comando, interactúan con el agregado y publican eventos de dominio.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Command inmutable</span></div>
+      <div class="anatomy-line"><span class="a-kw">public record</span> <span class="a-type">CreateOrderCommand</span>(<span class="a-type">UUID</span> orderId, <span class="a-type">UUID</span> userId, <span class="a-type">List</span>&lt;<span class="a-type">OrderItemDto</span>&gt; items) {{ '{' }}{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Command Handler</span></div>
+      <div class="anatomy-line">@Service</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">CreateOrderCommandHandler</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">OrderRepository</span> repo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">ApplicationEventPublisher</span> events;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;@Transactional</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> handle(<span class="a-type">CreateOrderCommand</span> cmd) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Order</span> order = <span class="a-type">Order</span>.create(cmd.orderId(), cmd.userId(), cmd.items());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;repo.save(order);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;events.publishEvent(<span class="a-kw">new</span> <span class="a-type">OrderCreatedEvent</span>(order));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Los command handlers deben ser transaccionales. El evento se publica dentro de la transacción para garantizar que si el guardado falla, el evento no se propaga.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===20">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">21</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">Query Side y Proyecciones</h2>
+      <p class="lesson-sub">Las proyecciones son vistas materializadas del estado actual, construidas escuchando eventos de dominio. Pueden almacenarse en cualquier store optimizado para el caso de uso: Redis para caching, Elasticsearch para búsqueda full-text, bases de datos SQL desnormalizadas para reportes.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Proyección: escucha OrderCreatedEvent y actualiza la vista de lectura</span></div>
+      <div class="anatomy-line">@Component</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">OrderProjection</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">OrderReadRepository</span> readRepo;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;@EventListener</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> on(<span class="a-type">OrderCreatedEvent</span> event) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">OrderReadModel</span> view = <span class="a-kw">new</span> <span class="a-type">OrderReadModel</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;view.setId(event.getOrderId());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;view.setStatus(<span class="a-str">"CREATED"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;view.setTotalAmount(event.getTotal());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;readRepo.save(view);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Query Service — solo lectura del read model</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">OrderReadModel</span> getOrder(<span class="a-type">UUID</span> orderId) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> readRepo.findById(orderId).orElseThrow();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===21">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">22</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">Event Sourcing</h2>
+      <p class="lesson-sub">En lugar de guardar el estado actual, Event Sourcing guarda la secuencia de eventos que llevaron a ese estado. El estado se reconstruye reproduciéndolos. Proporciona un audit log completo, capacidad de "viajar en el tiempo" y reconstrucción de proyecciones.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-clipboard" aria-hidden="true"></i> Base de datos tradicional</div>
+        <ul>
+          <li>Guarda el estado actual</li>
+          <li>UPDATE sobrescribe datos anteriores</li>
+          <li>Sin historial de cambios</li>
+          <li>Difícil auditoría</li>
+          <li>Consultas simples</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-file" aria-hidden="true"></i> Event Sourcing</div>
+        <ul>
+          <li>Guarda cada cambio como evento inmutable</li>
+          <li>APPEND-only, nunca sobrescribe</li>
+          <li>Historial completo siempre disponible</li>
+          <li>Auditoría gratuita</li>
+          <li>Reconstrucción de estado en cualquier punto temporal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Reconstruir estado aplicando eventos</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Order</span> reconstitute(<span class="a-type">List</span>&lt;<span class="a-type">DomainEvent</span>&gt; events) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Order</span> order = <span class="a-kw">new</span> <span class="a-type">Order</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;events.forEach(order::apply);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> order;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===22">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">23</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">Saga Pattern</h2>
+      <p class="lesson-sub">Una Saga coordina transacciones distribuidas a través de múltiples microservicios. Dado que las transacciones ACID no existen entre servicios, una Saga es una secuencia de transacciones locales con compensaciones en caso de fallo.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">Choreography</div>
+        <div class="tc-body">Cada servicio escucha eventos y reacciona publicando sus propios eventos. Sin coordinador central. Más desacoplado pero difícil de visualizar el flujo completo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-sliders" aria-hidden="true"></i></div>
+        <div class="tc-title">Orchestration</div>
+        <div class="tc-body">Un orquestador central (Saga Orchestrator) dirige el flujo enviando comandos a cada servicio y reaccionando a sus respuestas. Más visible y controlable.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-undo" aria-hidden="true"></i></div>
+        <div class="tc-title">Transacciones compensadoras</div>
+        <div class="tc-body">Si el paso N falla, se ejecutan las transacciones compensadoras de los pasos N-1 a 1. No son rollbacks; son operaciones de negocio inversas que devuelven el sistema a un estado coherente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Saga de creación de orden</div>
+        <div class="tc-body">1. Crear orden → 2. Reservar inventario → 3. Procesar pago → 4. Confirmar envío. Si pago falla → cancelar reserva → cancelar orden.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-alert" aria-hidden="true"></i> Las Sagas solo garantizan consistencia eventual, no ACID. El diseño debe asumir que los pasos son visibles en estados intermedios. El sistema debe manejar idempotencia en cada paso.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===23">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">24</span><span class="lesson-mod">M4 · CQRS & Event Sourcing</span></div>
+      <h2 class="lesson-title">Axon Framework</h2>
+      <p class="lesson-sub">Axon Framework es la implementación Java más completa de CQRS + Event Sourcing + Saga Pattern. Proporciona anotaciones que mapean directamente a los conceptos del dominio: @Aggregate, @CommandHandler, @EventSourcingHandler, @SagaEventHandler.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Agregado con Event Sourcing en Axon</span></div>
+      <div class="anatomy-line">@Aggregate</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">OrderAggregate</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;@AggregateIdentifier <span class="a-kw">private</span> <span class="a-type">UUID</span> orderId;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">OrderStatus</span> status;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;@CommandHandler</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> OrderAggregate(<span class="a-type">CreateOrderCommand</span> cmd) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;AggregateLifecycle.apply(<span class="a-kw">new</span> <span class="a-type">OrderCreatedEvent</span>(cmd.getOrderId()));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;@EventSourcingHandler</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> on(<span class="a-type">OrderCreatedEvent</span> event) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.orderId = event.getOrderId();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.status = <span class="a-type">OrderStatus</span>.CREATED;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Axon Server actúa como Event Store y Message Router. En producción, Axon Server EE ofrece clustering, multi-tenancy y contextos segregados por bounded context.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m4" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 4 — CQRS & Event Sourcing</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuál es el principal beneficio de separar el modelo de escritura del modelo de lectura en CQRS?</div>
+      <div class="quiz-options" id="msm4q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q01',false)"><div class="quiz-letter">A</div> Eliminar la necesidad de base de datos en el query side</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q01',true)"><div class="quiz-letter">B</div> Optimizar y escalar cada lado independientemente según sus requisitos, usando diferentes modelos y almacenes de datos para escritura y lectura</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q01',false)"><div class="quiz-letter">C</div> Garantizar transacciones ACID distribuidas entre servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q01',false)"><div class="quiz-letter">D</div> Eliminar la necesidad de eventos de dominio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q01-ok">✓ Las lecturas suelen superar 10:1 a las escrituras. El query side puede usar Redis/Elasticsearch optimizados para consulta; el command side usa un modelo rico de dominio. Cada uno escala solo.</div>
+      <div class="quiz-feedback fail" id="msm4q01-fail">✗ CQRS permite: optimizar el write side para consistencia (normalizado, con lógica de negocio) y el read side para velocidad (desnormalizado, Redis, Elasticsearch). Escalado independiente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre un Command y un Query en CQRS?</div>
+      <div class="quiz-options" id="msm4q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q02',false)"><div class="quiz-letter">A</div> Los Commands son asíncronos; los Queries siempre son síncronos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q02',true)"><div class="quiz-letter">B</div> Un Command expresa intención de cambiar estado y puede ser rechazado; un Query solicita datos sin efectos secundarios y siempre retorna una respuesta</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q02',false)"><div class="quiz-letter">C</div> Los Commands usan REST; los Queries usan GraphQL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q02',false)"><div class="quiz-letter">D</div> No hay diferencia funcional, solo semántica</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q02-ok">✓ Command: intención de cambio (CreateOrderCommand), puede fallar/rechazarse, tiene efectos secundarios, retorna void o ID. Query: solicitud de datos pura, siempre retorna datos, sin side effects.</div>
+      <div class="quiz-feedback fail" id="msm4q02-fail">✗ Command → intención de cambio de estado, puede ser rechazado, tiene side effects. Query → solicitud de lectura, sin side effects, siempre retorna datos. Principio CQS de Bertrand Meyer.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Qué es una proyección en CQRS y cómo se actualiza?</div>
+      <div class="quiz-options" id="msm4q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q03',false)"><div class="quiz-letter">A</div> Una vista SQL creada con CREATE VIEW que se actualiza automáticamente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q03',true)"><div class="quiz-letter">B</div> Un modelo de lectura desnormalizado y optimizado para consultas, construido escuchando eventos de dominio del command side</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q03',false)"><div class="quiz-letter">C</div> Una copia de seguridad del estado de la base de datos principal</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q03',false)"><div class="quiz-letter">D</div> Un caché de Redis que expira automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q03-ok">✓ La proyección escucha eventos (OrderCreatedEvent, OrderShippedEvent) y actualiza su read model. Puede ser una tabla SQL desnormalizada, un documento en MongoDB o un índice en Elasticsearch.</div>
+      <div class="quiz-feedback fail" id="msm4q03-fail">✗ Proyección: modelo de lectura actualizado asíncronamente por eventos de dominio. Está optimizado para la consulta (desnormalizado, con datos precalculados). No es una vista SQL directa.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿En qué se diferencia fundamentalmente Event Sourcing de una base de datos tradicional?</div>
+      <div class="quiz-options" id="msm4q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q04',false)"><div class="quiz-letter">A</div> Event Sourcing usa XML para guardar los datos; la BD tradicional usa JSON</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q04',true)"><div class="quiz-letter">B</div> Event Sourcing persiste la secuencia de eventos inmutables; la BD tradicional persiste el estado actual y lo sobreescribe con cada UPDATE</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q04',false)"><div class="quiz-letter">C</div> Event Sourcing no necesita persistencia; todos los datos están en memoria</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q04',false)"><div class="quiz-letter">D</div> Son equivalentes; Event Sourcing es solo otro nombre para CDC (Change Data Capture)</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q04-ok">✓ BD tradicional: guarda solo el estado actual, UPDATE sobrescribe. Event Sourcing: guarda todos los eventos (append-only). El estado se reconstruye reproduciendo eventos. Historial completo e inmutable.</div>
+      <div class="quiz-feedback fail" id="msm4q04-fail">✗ Event Sourcing: secuencia inmutable de eventos. Estado actual = resultado de reproducir todos los eventos. BD tradicional: solo el estado actual, sin historial. Event Sourcing ≠ CDC.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es la ventaja de Event Sourcing para sistemas de auditoría?</div>
+      <div class="quiz-options" id="msm4q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q05',false)"><div class="quiz-letter">A</div> Comprime los datos de auditoría automáticamente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q05',true)"><div class="quiz-letter">B</div> La auditoría es inherente: cada evento registra qué cambió, cuándo y quién lo solicitó. No hay que implementar audit logging por separado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q05',false)"><div class="quiz-letter">C</div> Permite cifrar los logs de auditoría automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q03',false)"><div class="quiz-letter">D</div> Reduce el tamaño del almacenamiento de auditoría</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q05-ok">✓ Con Event Sourcing puedes responder: ¿Qué pasó con esta orden? ¿Cuándo cambió el precio? ¿Quién aprobó este descuento? La secuencia de eventos es el audit log.</div>
+      <div class="quiz-feedback fail" id="msm4q05-fail">✗ Cada evento tiene: tipo, timestamp, aggregate ID, datos del cambio y metadata (usuario, correlación). La auditoría completa está gratuita sin código adicional.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué son las transacciones compensadoras en el patrón Saga?</div>
+      <div class="quiz-options" id="msm4q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q06',false)"><div class="quiz-letter">A</div> Transacciones SQL que hacen ROLLBACK automáticamente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q06',true)"><div class="quiz-letter">B</div> Operaciones de negocio inversas que deshacen semánticamente el efecto de un paso anterior cuando la Saga falla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q06',false)"><div class="quiz-letter">C</div> Transacciones de base de datos distribuidas con 2-phase commit</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q06',false)"><div class="quiz-letter">D</div> Refunds automáticos en el sistema de pagos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q06-ok">✓ Si la Saga falla en el paso 3 (pago), debe compensar: CancelInventoryReservationCommand (invierte paso 2) y CancelOrderCommand (invierte paso 1). Son operaciones de negocio, no rollbacks SQL.</div>
+      <div class="quiz-feedback fail" id="msm4q06-fail">✗ Las compensaciones son operaciones de negocio inversas: ReserveInventory → CancelInventoryReservation. No son rollbacks ACID; el estado intermedio fue visible. Cada paso debe ser idempotente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Saga por Choreography y por Orchestration?</div>
+      <div class="quiz-options" id="msm4q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q07',false)"><div class="quiz-letter">A</div> Choreography es síncrono; Orchestration es asíncrono</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q07',true)"><div class="quiz-letter">B</div> Choreography: cada servicio reacciona a eventos sin coordinador central. Orchestration: un servicio central dirige el flujo enviando comandos explícitos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q07',false)"><div class="quiz-letter">C</div> Choreography usa Kafka; Orchestration usa RabbitMQ</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q07',false)"><div class="quiz-letter">D</div> Son equivalentes con diferente nombre según el vendor</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q07-ok">✓ Choreography: desacoplado pero difícil de rastrear el flujo. Orchestration: el orquestador es el punto central, el flujo es más visible y manejable pero crea un servicio central de mayor responsabilidad.</div>
+      <div class="quiz-feedback fail" id="msm4q07-fail">✗ Choreography: sin coordinador, servicios reaccionan a eventos (menor acoplamiento, mayor dificultad de observabilidad). Orchestration: orquestador central envía comandos (más claro pero punto único de responsabilidad).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Por qué la idempotencia es crítica en las Sagas?</div>
+      <div class="quiz-options" id="msm4q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q08',false)"><div class="quiz-letter">A</div> Para mejorar el rendimiento de las consultas SQL</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q08',true)"><div class="quiz-letter">B</div> Los mensajes pueden entregarse más de una vez en sistemas distribuidos. Un paso idempotente produce el mismo resultado si se ejecuta una o múltiples veces</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q08',false)"><div class="quiz-letter">C</div> Para garantizar la consistencia ACID en la Saga</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q08',false)"><div class="quiz-letter">D</div> Para reducir el número de eventos publicados por la Saga</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q08-ok">✓ Si reservar inventario se ejecuta dos veces (por un retry), sin idempotencia se reservaría el doble. Con idempotencia (deduplicated by messageId), la segunda ejecución es un no-op.</div>
+      <div class="quiz-feedback fail" id="msm4q08-fail">✗ En sistemas distribuidos: at-least-once delivery, crashes, retries. Sin idempotencia: cargo doble al cliente, doble reserva. Cada paso debe detectar ejecuciones duplicadas y ser un no-op.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Para qué sirve la anotación @EventSourcingHandler en Axon Framework?</div>
+      <div class="quiz-options" id="msm4q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q09',false)"><div class="quiz-letter">A</div> Para publicar eventos al event store de Axon Server</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q09',true)"><div class="quiz-letter">B</div> Para aplicar un evento al estado interno del agregado durante la reconstrucción desde el event store</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q09',false)"><div class="quiz-letter">C</div> Para escuchar eventos de otros servicios vía Kafka</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q09',false)"><div class="quiz-letter">D</div> Para crear proyecciones en el query side</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q09-ok">✓ @EventSourcingHandler reconstruye el estado del agregado aplicando los eventos almacenados en orden. Axon llama a estos métodos cuando carga el agregado desde el event store.</div>
+      <div class="quiz-feedback fail" id="msm4q09-fail">✗ @EventSourcingHandler actualiza el estado interno del agregado cuando se reproduce un evento (tanto al aplicar nuevos eventos como al reconstruir desde el event store). Es el "mutator" del agregado.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué es el "event store" en Event Sourcing?</div>
+      <div class="quiz-options" id="msm4q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q10',false)"><div class="quiz-letter">A</div> Un caché en memoria que almacena los últimos 100 eventos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q10',true)"><div class="quiz-letter">B</div> Una base de datos append-only que persiste todos los eventos de dominio en orden, organizada por streams de agregado (aggregate ID)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q10',false)"><div class="quiz-letter">C</div> El topic de Kafka donde se publican los eventos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q10',false)"><div class="quiz-letter">D</div> Un sistema de ficheros donde se guardan los logs de la aplicación</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q10-ok">✓ El event store guarda eventos por aggregate stream (e.g., Order-123). Para cargar el agregado, lee todos los eventos del stream y los aplica en orden. EventStoreDB y Axon Server son event stores especializados.</div>
+      <div class="quiz-feedback fail" id="msm4q10-fail">✗ Event store: BD append-only organizada en streams por aggregate ID. Operaciones: AppendToStream, ReadStreamEvents. Garantiza orden y atomicidad dentro de un stream. No es Kafka (que es message broker).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué problema resuelve el "snapshot" en Event Sourcing?</div>
+      <div class="quiz-options" id="msm4q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q11',false)"><div class="quiz-letter">A</div> La pérdida de eventos cuando el event store cae</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q11',true)"><div class="quiz-letter">B</div> El tiempo creciente de reconstrucción del estado cuando un agregado tiene miles de eventos; el snapshot guarda el estado en un punto temporal para no reproducir todos los eventos anteriores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q11',false)"><div class="quiz-letter">C</div> La sincronización entre múltiples instancias del event store</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q11',false)"><div class="quiz-letter">D</div> La compresión de eventos duplicados para ahorrar espacio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q11-ok">✓ Un agregado con 10,000 eventos tarda en reconstituirse. El snapshot guarda el estado en el evento 9,000. Al cargar, se restaura el snapshot y solo se aplican los últimos 1,000 eventos.</div>
+      <div class="quiz-feedback fail" id="msm4q11-fail">✗ Snapshot = estado materializado en un punto temporal. Al cargar el agregado: load snapshot + apply events since snapshot. Evita reproducir miles de eventos históricos en cada carga.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Por qué se dice que CQRS implica "consistencia eventual" en el query side?</div>
+      <div class="quiz-options" id="msm4q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q12',false)"><div class="quiz-letter">A</div> Porque el query side usa transacciones eventualmente consistentes de SQL</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q12',true)"><div class="quiz-letter">B</div> Porque el query side se actualiza asíncronamente mediante eventos; existe un lag entre que el command side persiste un cambio y el query side lo refleja</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q12',false)"><div class="quiz-letter">C</div> Porque los queries usan caché con TTL que puede estar desactualizado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q12',false)"><div class="quiz-letter">D</div> Porque el query side no garantiza que los datos existan</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q12-ok">✓ Flujo: Command → EventStore → Evento publicado → Proyección actualiza read model. Este proceso es asíncrono. Durante milisegundos o segundos, el query side puede mostrar datos "viejos".</div>
+      <div class="quiz-feedback fail" id="msm4q12-fail">✗ Write → evento publicado → (lag asíncrono) → proyección actualiza read model. El lag puede ser ms o segundos. El UI debe diseñarse para esto (optimistic updates, "tu pedido está siendo procesado").</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Cuándo NO aplicar CQRS?</div>
+      <div class="quiz-options" id="msm4q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q13',false)"><div class="quiz-letter">A</div> Nunca; CQRS debe usarse siempre en microservicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q13',true)"><div class="quiz-letter">B</div> En dominios simples con pocas operaciones, CQRS añade complejidad sin beneficio real. Es especialmente valioso cuando las necesidades de lectura y escritura divergen significativamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q13',false)"><div class="quiz-letter">C</div> Cuando el equipo tiene más de 5 desarrolladores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q13',false)"><div class="quiz-letter">D</div> Cuando se usa Java; solo es apropiado para .NET</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q13-ok">✓ CQRS es complejidad adicional. Para un CRUD simple, aumenta el número de clases, la consistencia eventual puede confundir, y el beneficio de escalado independiente no aplica. Usarlo donde genuinamente ayuda.</div>
+      <div class="quiz-feedback fail" id="msm4q13-fail">✗ CQRS brilla cuando: read/write tienen modelos muy diferentes, necesitas escalar cada lado independientemente, tienes rich domain model. Para CRUDs simples, añade complejidad sin retorno.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Qué rol cumple <code>AggregateLifecycle.apply()</code> en Axon Framework?</div>
+      <div class="quiz-options" id="msm4q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q14',false)"><div class="quiz-letter">A</div> Persiste el agregado directamente en la base de datos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q14',true)"><div class="quiz-letter">B</div> Registra un evento en el event store y llama inmediatamente a los @EventSourcingHandler del agregado para actualizar su estado interno</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q14',false)"><div class="quiz-letter">C</div> Publica el evento a Kafka para que otros servicios lo consuman</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q14',false)"><div class="quiz-letter">D</div> Valida las reglas de negocio del command recibido</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q14-ok">✓ apply() hace dos cosas: 1) encola el evento para persistirlo en el event store al final de la transacción, 2) invoca inmediatamente @EventSourcingHandler para mutar el estado del agregado.</div>
+      <div class="quiz-feedback fail" id="msm4q14-fail">✗ AggregateLifecycle.apply(event): registra el evento en el event store Y llama @EventSourcingHandler para actualizar el estado interno. Así el agregado puede hacer validaciones en el mismo command handler basadas en el estado ya mutado.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Cómo garantiza una Saga la consistencia cuando el orquestador mismo falla?</div>
+      <div class="quiz-options" id="msm4q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q15',false)"><div class="quiz-letter">A</div> Usando transacciones 2-phase commit entre todos los servicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q15',true)"><div class="quiz-letter">B</div> Persistiendo el estado de la Saga en una base de datos, de modo que al recuperarse pueda continuar desde el último paso completado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q15',false)"><div class="quiz-letter">C</div> Haciendo que todos los pasos sean idempotentes y que se ejecuten infinitamente hasta completarse</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q15',false)"><div class="quiz-letter">D</div> Las Sagas no pueden recuperarse del fallo del orquestador</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q15-ok">✓ El estado de la Saga (qué pasos se completaron, cuál está pendiente) se persiste en una SAGA STATE TABLE. Al reiniciar, el orquestador lee el estado y continúa desde donde quedó.</div>
+      <div class="quiz-feedback fail" id="msm4q15-fail">✗ El orquestador persiste el estado de cada Saga instance: currentStep, completedSteps, sagaId. Al reiniciar, lee de la BD y continúa. Por eso los pasos deben ser idempotentes (pueden re-ejecutarse).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué ventaja aporta el "time travel" (viaje en el tiempo) de Event Sourcing?</div>
+      <div class="quiz-options" id="msm4q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q16',false)"><div class="quiz-letter">A</div> Permite ejecutar queries con datos futuros proyectados</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q16',true)"><div class="quiz-letter">B</div> Reconstruir el estado del sistema en cualquier momento pasado, útil para debugging, auditorías retroactivas y reconstrucción de proyecciones con nuevas reglas de negocio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q16',false)"><div class="quiz-letter">C</div> Ejecutar la aplicación en múltiples zonas horarias simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q16',false)"><div class="quiz-letter">D</div> Reducir la latencia de las consultas usando datos históricos en caché</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q16-ok">✓ "¿Cómo estaba la orden el 5 de mayo a las 14:32?" → reproduce eventos hasta ese timestamp. También: si cambias las reglas de negocio, puedes reconstruir proyecciones aplicando los eventos históricos con la nueva lógica.</div>
+      <div class="quiz-feedback fail" id="msm4q16-fail">✗ Time travel: reproduce eventos hasta un timestamp = estado en ese momento. Útil para: debugging retroactivo, auditorías legales y reconstrucción de proyecciones con lógica nueva sobre datos históricos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué es el "Event Upcasting" en sistemas de Event Sourcing evolutivos?</div>
+      <div class="quiz-options" id="msm4q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q17',false)"><div class="quiz-letter">A</div> Convertir eventos de Kafka a eventos de RabbitMQ</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q17',true)"><div class="quiz-letter">B</div> Transformar eventos con esquema antiguo al esquema actual al leerlos del event store, permitiendo evolucionar el esquema de eventos sin migrar datos históricos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q17',false)"><div class="quiz-letter">C</div> Aumentar la prioridad de eventos críticos en la cola de procesamiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q17',false)"><div class="quiz-letter">D</div> Escalar automáticamente los consumidores de eventos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q17-ok">✓ Si OrderCreatedEvent v1 no tenía el campo 'currency' y v2 sí lo tiene, el upcaster transforma los eventos v1 del store (añadiendo currency='USD' por defecto) al leerlos, sin modificar los datos almacenados.</div>
+      <div class="quiz-feedback fail" id="msm4q17-fail">✗ Upcasting: leer evento v1 del store → transformarlo a v2 en memoria → @EventSourcingHandler recibe v2. Los datos históricos no se modifican. Axon Framework incluye soporte nativo para upcasters.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué ocurre si una proyección falla al procesar un evento en CQRS?</div>
+      <div class="quiz-options" id="msm4q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q18',false)"><div class="quiz-letter">A</div> El evento se borra del event store para evitar reprocessing</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q18',true)"><div class="quiz-letter">B</div> El event store retiene el evento. La proyección puede corregirse y reconstruirse desde el inicio del stream o desde un checkpoint, procesando todos los eventos históricos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q18',false)"><div class="quiz-letter">C</div> El command side hace rollback de la transacción original</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q18',false)"><div class="quiz-letter">D</div> La inconsistencia entre command y query side es permanente</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q18-ok">✓ El event store es append-only e inmutable. Si la proyección falla, corriges el bug y reconstruyes la proyección reproduciendo todos los eventos desde el principio. Esta es una de las grandes ventajas de Event Sourcing.</div>
+      <div class="quiz-feedback fail" id="msm4q18-fail">✗ Ventaja clave de ES: el event store es la fuente de verdad inmutable. Las proyecciones son derivadas y reconstruibles. Fix the bug + replay all events = proyección corregida sin pérdida de datos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un Evento de Dominio y un Mensaje de Integración en Event Sourcing?</div>
+      <div class="quiz-options" id="msm4q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q19',false)"><div class="quiz-letter">A</div> Son idénticos; solo cambia el nombre según el contexto</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q19',true)"><div class="quiz-letter">B</div> El Evento de Dominio es interno al bounded context y puede contener detalles privados. El Mensaje de Integración es la versión pública para otros servicios, con datos deliberadamente expuestos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q19',false)"><div class="quiz-letter">C</div> Los Eventos de Dominio se envían por HTTP; los de Integración por Kafka</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q19',false)"><div class="quiz-letter">D</div> Los Eventos de Dominio son síncronos; los de Integración son asíncronos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q19-ok">✓ Evento de Dominio: detallado, para reconstrucción interna, puede cambiar libremente. Mensaje de Integración: contrato público con otros BCs, versionado, mínimo necesario para no exponer detalles internos.</div>
+      <div class="quiz-feedback fail" id="msm4q19-fail">✗ Domain Event: interno al BC, rico en detalles, puede evolucionar libremente. Integration Event: contrato público entre BCs, versioned API, solo los datos necesarios para el consumidor externo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Por qué se recomienda que los Command Handlers sean transaccionales?</div>
+      <div class="quiz-options" id="msm4q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q20',false)"><div class="quiz-letter">A</div> Para bloquear la base de datos de lectura durante la escritura</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm4q20',true)"><div class="quiz-letter">B</div> Para garantizar atomicidad: el agregado se guarda Y el evento se persiste como una sola unidad. Si el guardado falla, el evento no se propaga y no hay inconsistencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q20',false)"><div class="quiz-letter">C</div> Para mejorar el rendimiento usando connection pooling de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm4q20',false)"><div class="quiz-letter">D</div> Las transacciones son optativas en los command handlers</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm4q20-ok">✓ Sin transacción: save(aggregate) OK + publishEvent() falla → el estado cambió pero nadie fue notificado → inconsistencia. Con @Transactional, si el evento no se puede publicar, el save también hace rollback.</div>
+      <div class="quiz-feedback fail" id="msm4q20-fail">✗ @Transactional garantiza: save aggregate + persist event = atomic. Si algo falla, todo hace rollback. Evita el escenario: "datos actualizados pero evento no enviado", que crea inconsistencias silenciosas.</div>
+    </div>
+  </div>
+
+</ng-container>

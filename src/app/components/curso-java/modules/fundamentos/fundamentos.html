@@ -1,0 +1,882 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===0">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">01</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Introducción a Java</h2>
+        <p class="lesson-sub">Java es un lenguaje orientado a objetos, compilado a bytecode y ejecutado en la JVM. Multiplataforma por diseño: <em>Write Once, Run Anywhere</em>.</p>
+      </div>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+          <div class="tc-title">JDK</div>
+          <div class="tc-body">Java Development Kit — compilador <code>javac</code>, herramientas y JRE incluido.</div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+          <div class="tc-title">JVM</div>
+          <div class="tc-body">Java Virtual Machine — interpreta el bytecode (<code>.class</code>) en la plataforma real.</div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+          <div class="tc-title">JRE</div>
+          <div class="tc-body">Java Runtime Environment — necesario para ejecutar aplicaciones Java ya compiladas.</div>
+        </div>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Ciclo de vida: <code>Main.java</code> → <code>javac</code> → <code>Main.class</code> (bytecode) → <code>java</code> (JVM) → Ejecución.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:0, file:'Hola.java', hint:'Hola Mundo clásico'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===1">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">02</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Instalación &amp; Setup</h2>
+        <p class="lesson-sub">Instala el JDK y verifica que el entorno esté configurado correctamente.</p>
+      </div>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">1</span><div><strong>Descarga JDK 25 LTS</strong> desde <code>jdk.java.net</code> o adoptium.net.</div></div>
+        <div class="step"><span class="step-n">2</span><div>Configura <code>JAVA_HOME</code> apuntando al directorio raíz del JDK.</div></div>
+        <div class="step"><span class="step-n">3</span><div>Añade <code>%JAVA_HOME%\bin</code> (Windows) o <code>$JAVA_HOME/bin</code> (Unix) al <code>PATH</code>.</div></div>
+        <div class="step"><span class="step-n">4</span><div>Verifica: <code>java -version</code> y <code>javac -version</code> en la terminal.</div></div>
+        <div class="step"><span class="step-n">5</span><div>IDEs recomendados: <strong>IntelliJ IDEA</strong> (Community gratis), VS Code + Extension Pack for Java.</div></div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:1, file:'Version.java', hint:'Verifica la versión instalada'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===2">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">03</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Variables y Tipos de Datos</h2>
+        <p class="lesson-sub">Java es de <strong>tipado estático</strong>: el tipo se declara una vez y no cambia. Existen 8 tipos primitivos y tipos de referencia (objetos).</p>
+      </div>
+
+      <h3 class="var-h3">¿Qué es una variable en Java?</h3>
+      <p class="var-desc">Una variable en Java es un nombre simbólico que se usa para almacenar un valor.</p>
+
+      <h3 class="var-h3">Estructura de declaración de una variable</h3>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-type">&lt;tipo_de_dato&gt; </span> <span class="a-paren">&lt;nombre_variable&gt;</span> = <span class="a-num">&lt;valor&gt;</span>;</div>
+      </div>
+
+      <div class="var-label">Ejemplo:</div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">int</span> edad = <span class="a-num">25</span>;</div>
+        <div class="anatomy-line"><span class="a-kw">int</span> a = <span class="a-num">2</span>, b, c = <span class="a-num">10</span>;</div>
+      </div>
+
+      <h3 class="var-h3">Reglas para nombrar variables</h3>
+      <p class="var-desc">El nombre de la variable puede contener:</p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div>Letras (<code>a-z</code>, <code>A-Z</code>)</div></div>
+        <div class="step"><span class="step-n">·</span><div>Dígitos (<code>0-9</code>)</div></div>
+        <div class="step"><span class="step-n">·</span><div>El símbolo <code>$</code> (dólar)</div></div>
+        <div class="step"><span class="step-n">·</span><div>El símbolo <code>_</code> (guión bajo)</div></div>
+        <div class="step"><span class="step-n">!</span><div>Debe comenzar con una letra, <code>$</code> o <code>_</code></div></div>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">int</span> edad1 = <span class="a-num">30</span>;       <span class="a-cm">// ✓ válido</span></div>
+        <div class="anatomy-line"><span class="a-kw">int</span> _total = <span class="a-num">100</span>;      <span class="a-cm">// ✓ válido</span></div>
+        <div class="anatomy-line"><span class="a-kw">int</span> $monto = <span class="a-num">500</span>;      <span class="a-cm">// ✓ válido</span></div>
+        <div class="anatomy-line"><span class="a-kw">int</span> <span class="a-err"> 1numero</span> = <span class="a-num">10</span>;      <span class="a-cm">// ✗ error de compilación</span></div>
+      </div>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> No puede ser una <strong>palabra reservada</strong> del lenguaje (<code>int</code>, <code>String</code>, <code> <b>goto</b>,</code>...).
+        <br><i class="ico ico-alert" aria-hidden="true"></i> Es <strong>sensible a mayúsculas y minúsculas</strong> (case-sensitive).</div>
+
+      <h3 class="var-h3">Tipos de variables según su ámbito y ciclo de vida</h3>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+          <div class="tc-title">a) Variables locales</div>
+          <div class="tc-body">
+            <ul>
+              <li>Declaradas dentro de un método, constructor o bloque.</li>
+              <li><strong>No tienen valor por defecto</strong> — deben inicializarse antes de usarse.</li>
+              <li>Existen sólo mientras se ejecuta el bloque donde están.</li>
+            </ul>
+          </div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">void</span> <span class="a-fn"> metodo</span>() {{ '{' }}</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;<span class="a-kw">int</span> x = <span class="a-num">10</span>;</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(x);</div>
+            <div class="anatomy-line">{{ '}' }}</div>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+          <div class="tc-title">b) Variables de instancia</div>
+          <div class="tc-body"> 
+            <ul>
+              <li>Declaradas dentro de una clase pero fuera de cualquier método.</li>
+              <li> Cada objeto tiene su <strong>copia independiente</strong>.</li>
+              <li>Se inicializan con valores por defecto si no se asignan manualmente.</li>
+          </ul>
+        </div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type"> Persona</span> {{ '{' }}</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;<span class="a-type">String</span> nombre;</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;<span class="a-kw">int</span> edad;</div>
+            <div class="anatomy-line">{{ '}' }}</div>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+          <div class="tc-title">c) Variables estáticas (de clase)</div>
+          <div class="tc-body">
+            <ul>
+              <li>Declaradas con la palabra clave <code>static</code>.</li>
+              <li><strong>Una sola copia</strong> compartida por todas las instancias.</li>
+              <li>Existen desde que se carga la clase en memoria.</li>
+            </ul>
+          </div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type"> Contador</span> {{ '{' }}</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;<span class="a-kw">static int</span> totalObjetos = <span class="a-num">0</span>;</div>
+            <div class="anatomy-line">{{ '}' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3">Tipos de datos primitivos </h3> <p >Almacenan valores directamente</p>
+
+      <table class="ref-table">
+        <tr><th>Tipo</th><th>Tamaño</th><th>Rango</th><th>Valor por defecto</th><th>Ejemplo</th></tr>
+        <tr><td><code>byte</code></td><td>8 bits</td><td>-128 a 127</td><td><code>0</code></td><td><code>byte b = 100;</code></td></tr>
+        <tr><td><code>short</code></td><td>16 bits</td><td>-32768 a 32767</td><td><code>0</code></td><td><code>short s = 3000;</code></td></tr>
+        <tr><td><code>int</code></td><td>32 bits</td><td>-2³¹ a 2³¹-1</td><td><code>0</code></td><td><code>int i = 42;</code></td></tr>
+        <tr><td><code>long</code></td><td>64 bits</td><td>-2⁶³ a 2⁶³-1</td><td><code>0L</code></td><td><code>long l = 3000000000L;</code></td></tr>
+        <tr><td><code>float</code></td><td>32 bits</td><td>±3.4×10³⁸</td><td><code>0.0f</code></td><td><code>float f = 3.14f;</code></td></tr>
+        <tr><td><code>double</code></td><td>64 bits</td><td>±1.8×10³⁰⁸</td><td><code>0.0</code></td><td><code>double d = 3.14;</code></td></tr>
+        <tr><td><code>boolean</code></td><td>1 bit</td><td>true / false</td><td><code>false</code></td><td><code>boolean ok = true;</code></td></tr>
+        <tr><td><code>char</code></td><td>16 bits</td><td>U+0000 a U+FFFF</td><td><code>'\u0000'</code></td><td><code>char c = 'A';</code></td></tr>
+      </table>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> En una asignación cada variable tiene una copia del dato. <br><i class="ico ico-alert" aria-hidden="true"></i> <code>String</code> <strong>no</strong> es primitivo — es un objeto de clase <code>java.lang.String</code>. Se compara con <code>.equals()</code>, no&nbsp;con&nbsp;<code>==</code>.</div>
+
+      <h3 class="var-h3">Conversiones de tipos</h3>
+      <p class="var-desc">Todos los tipos primitivos son convertibles entre sí, a excepción de <code>boolean</code>.</p>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-arrow-up" aria-hidden="true"></i></div>
+          <div class="tc-title">Conversión implícita</div>
+          <div class="tc-body">Se produce automáticamente cuando no hay pérdida de datos. Java amplía el tipo de menor a mayor capacidad (<em>widening</em>).</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">int</span> n = <span class="a-num">45</span>;</div>
+            <div class="anatomy-line"><span class="a-kw">double</span> x = n; <span class="a-cm">// OK automático</span></div>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-arrow-down" aria-hidden="true"></i></div>
+          <div class="tc-title">Conversión explícita (casting)</div>
+          <div class="tc-body">Necesaria cuando hay posible pérdida de datos. Se indica el tipo destino entre paréntesis antes del valor (<em>narrowing</em>).</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">double</span> a = <span class="a-num">4.5</span>;</div>
+            <div class="anatomy-line"><span class="a-kw">int</span> x = (<span class="a-kw">int</span>) a; <span class="a-cm">// x = 4</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Orden de ampliación: <code>byte → short → int → long → float → double</code>. Ir en sentido inverso requiere casting.</div>
+      <h3 class="var-h3">Tipos por referencia / tipos objeto</h3>
+      <p class="var-desc">Almacenan la <strong>dirección de memoria</strong> donde vive el objeto, no el valor en sí.</p>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+          <div class="tc-title">¿Qué son tipos referencia?</div>
+          <div class="tc-body">
+            <ul style="margin:0;padding-left:18px;line-height:1.8">
+              <li>Clases (<code>String</code>, <code>Integer</code>, <code>Scanner</code>, etc.)</li>
+              <li>Interfaces</li>
+              <li>Arrays (<code>int[]</code>, <code>String[]</code>, etc.)</li>
+              <li>Enumeraciones (<code>enum</code>)</li>
+              <li>Registros (Java 16+)</li>
+              <li>Cualquier objeto creado con <code>new</code></li>
+            </ul>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+          <div class="tc-title">Dos referencias, un objeto</div>
+          <div class="tc-body">Asignar una variable de referencia a otra <strong>no copia</strong> el objeto, ambas apuntan al mismo.</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-type">Object</span> ob1 = <span class="a-kw">new</span> <span class="a-fn"> Object</span>();</div>
+            <div class="anatomy-line"><span class="a-type">Object</span> ob2 = ob1; <span class="a-cm">// misma ref</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3">Según comportamiento especial (modificadores)</h3>
+      <table class="ref-table">
+        <tr><th>Modificador</th><th>Significado</th></tr>
+        <tr><td><code>final</code></td><td>Valor constante; no se puede cambiar después de inicializarse.</td></tr>
+        <tr><td><code>static final</code></td><td>Constante global de clase (similar a <code>const</code> en otros lenguajes).</td></tr>
+        <tr><td><code>volatile</code></td><td>Cambios visibles inmediatamente entre hilos.</td></tr>
+        <tr><td><code>transient</code></td><td>No se serializa al guardar el objeto.</td></tr>
+        <tr><td><code>synchronized</code> <em style="font-weight:400">(aplica más a métodos)</em></td><td>Garantiza que <strong>solo un hilo a la vez</strong> puede ejecutar el código sincronizado.</td></tr>
+      </table>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> <strong>No</strong> se puede hacer conversión ni implícita ni explícita entre tipos primitivos y objetos. Para eso Java usa <em>autoboxing</em> (<code>int</code>&nbsp;<i class="ico ico-arrows" aria-hidden="true"></i>&nbsp;<code>Integer</code>).</div>
+
+      <br>
+      <h3 class="var-h3">Convención de nombres (buenas prácticas)</h3>
+      <table class="ref-table">
+        <tr><th>Elemento</th><th>Convención</th><th>Ejemplo</th></tr>
+        <tr><td>Variables</td><td>camelCase</td><td><code>totalVentas</code>, <code>numeroClientes</code></td></tr>
+        <tr><td>Constantes</td><td>MAYÚSCULAS_CON_GUIONES</td><td><code>MAX_INTENTOS</code></td></tr>
+        <tr><td>Clases</td><td>PascalCase</td><td><code>Producto</code>, <code>ClienteVIP</code></td></tr>
+        <tr><td>Métodos</td><td>camelCase</td><td><code>calcularTotal()</code>, <code>obtenerNombre()</code></td></tr>
+      </table>
+
+      <h3 class="var-h3">¿Qué es la inferencia de tipos en Java?</h3>
+      <p class="var-desc">La inferencia de tipos es la habilidad del compilador de Java para deducir automáticamente el tipo de una expresión sin que el programador tenga que declararlo explícitamente.</p>
+
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+          <div class="tc-title">Métodos genéricos</div>
+          <div class="tc-body">Java puede deducir el tipo genérico a partir de los tipos de los argumentos del método.</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">static</span> &lt;T&gt; <span class="a-type">T</span> <span class="a-fn"> pick</span>(<span class="a-type">T</span> a, <span class="a-type">T</span> b) {{ '{' }} <span class="a-kw">return</span> a; {{ '}' }}</div>
+            <div class="anatomy-line"><span class="a-type">String</span> result = <span class="a-fn">pick</span>(<span class="a-str">"Hola"</span>, <span class="a-str">"Mundo"</span>);</div>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-diamond" aria-hidden="true"></i></div>
+          <div class="tc-title">Operador diamante (<code>&lt;&gt;</code>)</div>
+          <div class="tc-body">Introducido en Java 7, permite omitir los parámetros genéricos en el constructor si el contexto lo deja claro.</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-type">List</span>&lt;<span class="a-type">String</span>&gt; lista = <span class="a-kw">new</span> <span class="a-fn"> ArrayList</span>&lt;&gt;();</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3"><code>var</code> para variables locales</h3>
+      <p class="var-desc">Desde Java 10, puedes usar <code>var</code> para que el compilador identifique el tipo local automáticamente:</p>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">var</span> mapa = <span class="a-kw">new</span> <span class="a-fn"> HashMap</span>&lt;<span class="a-type">String</span>, <span class="a-type">Integer</span>&gt;();</div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:1.2rem">Restricciones:</h3>
+      <div class="steps-list">
+        <div class="step">
+          <span class="step-n">-</span>
+          <div>
+            <strong>Es obligatorio asignar explícitamente un valor a la variable</strong>
+            <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+              <div class="anatomy-line"><span class="a-kw">var</span> num = <span class="a-num">10</span>; <span class="a-cm">// Válido</span></div>
+              <div class="anatomy-line"><span class="a-err"><span class="a-kw">var</span> customer;</span> <span class="a-cm">// error de compilación</span></div>
+              <div class="anatomy-line"><span class="a-err"><span class="a-kw">var</span> customer = <span class="a-kw">null</span>;</span> <span class="a-cm">// error de compilación</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-n">-</span>
+          <div>
+            <strong>No es posible utilizarlo en declaraciones múltiples</strong>
+            <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+              <div class="anatomy-line"><span class="a-err"><span class="a-kw">var</span> a,b=<span class="a-num">10</span>;</span> <span class="a-cm">// incorrecto</span></div>
+              <div class="anatomy-line"><span class="a-err"><span class="a-kw">var</span> a= <span class="a-num">10</span>, b= <span class="a-num">11</span>;</span> <span class="a-cm">// incorrecto</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-n">-</span>
+          <div>
+            <strong>Es válido usarlo en bucles <code>for</code></strong>
+            <div class="theory-grid" style="margin-top:.5rem;gap:.6rem">
+              <div class="code-anatomy var-scope-code">
+                <div class="anatomy-line"><span class="a-kw">for</span> (<span class="a-kw">var</span> a=<span class="a-num">0</span>; a&lt;<span class="a-num">10</span>; a++) {{ '{' }}</div>
+                <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(a);</div>
+                <div class="anatomy-line">{{ '}' }}</div>
+              </div>
+              <div class="code-anatomy var-scope-code">
+                <div class="anatomy-line"><span class="a-kw">var</span> data = <span class="a-kw">new int</span>[]{{ '{' }}<span class="a-num">1</span>,<span class="a-num">2</span>,<span class="a-num">3</span>{{ '}' }};</div>
+                <div class="anatomy-line"><span class="a-kw">for</span> (<span class="a-kw">var</span> value:data) {{ '{' }}</div>
+                <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(value);</div>
+                <div class="anatomy-line">{{ '}' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-n">-</span>
+          <div>
+            <strong>En arrays no puede utilizarse con inicialización abreviada</strong>
+            <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+              <div class="anatomy-line"><span class="a-err"><span class="a-kw">var</span> data = {{ '{' }}<span class="a-num">1</span>,<span class="a-num">2</span>,<span class="a-num">3</span>{{ '}' }};</span> <span class="a-cm">// Incorrecto</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:1.4rem">Expresiones lambda (Java 8)</h3>
+      <p class="var-desc">También se infiere el tipo de los parámetros del lambda desde el contexto:</p>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-type">List</span>&lt;<span class="a-type">Integer</span>&gt; nums = <span class="a-type">List</span>.<span class="a-fn">of</span>(<span class="a-num">1</span>, <span class="a-num">2</span>, <span class="a-num">3</span>);</div>
+        <div class="anatomy-line">nums.<span class="a-fn">forEach</span>(n -&gt; System.out.<span class="a-fn">println</span>(n));</div>
+      </div>
+      <br>
+      <ng-container *ngTemplateOutlet="playground; context:{id:2, file:'Variables.java', hint:'Edita los valores y ejecuta'}"></ng-container>
+      <div class="quiz-section">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Quiz rápido</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 2</div>
+          <div class="quiz-q">¿Qué tipo almacena el valor <code>3.14</code> con mayor precisión?</div>
+          <div class="quiz-options" id="q2a">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2a',false)"><div class="quiz-letter">A</div> float</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'q2a',true)"><div class="quiz-letter">B</div> double</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2a',false)"><div class="quiz-letter">C</div> int</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2a',false)"><div class="quiz-letter">D</div> long</div>
+          </div>
+          <div class="quiz-feedback ok" id="q2a-ok">✓ <code>double</code> tiene 64 bits (doble precisión IEEE 754).</div>
+          <div class="quiz-feedback fail" id="q2a-fail">✗ Incorrecto. <code>double</code> tiene mayor precisión que <code>float</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 2</div>
+          <div class="quiz-q">¿Qué palabra clave declara una constante en Java?</div>
+          <div class="quiz-options" id="q2b">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2b',false)"><div class="quiz-letter">A</div> const</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'q2b',true)"><div class="quiz-letter">B</div> final</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2b',false)"><div class="quiz-letter">C</div> static</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q2b',false)"><div class="quiz-letter">D</div> readonly</div>
+          </div>
+          <div class="quiz-feedback ok" id="q2b-ok">✓ <code>final</code> hace que la variable no pueda reasignarse.</div>
+          <div class="quiz-feedback fail" id="q2b-fail">✗ Java usa <code>final</code>, no <code>const</code> (eso es de C/C++).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===3">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">04</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Clasificación de operadores en Java</h2>
+        <p class="lesson-sub">Java cuenta con 9 categorías de operadores, cada una con reglas específicas de aplicación y precedencia.</p>
+      </div>
+
+      <h3 class="var-h3">1. Operadores aritméticos</h3>
+      <p class="var-desc"><code>+, -, *, /, %</code></p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>:</div></div>
+        <div class="step"><span class="step-n">○</span><div>Se aplican a <strong>tipos numéricos</strong> (<code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>). 
+          <br>Operaciones con <code>byte</code> o <code>short</code> promocionan a <code>int</code> (regla de promoción aritmética):
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line"><span class="a-kw">byte</span> a = <span class="a-num">10</span>, b = <span class="a-num">20</span>;</div>
+            <div class="anatomy-line"><span class="a-kw">byte</span> c = (<span class="a-kw">byte</span>) (a + b);</div>
+          </div>
+        </div></div>
+        <div class="step"><span class="step-n">○</span><div><code>/</code> entre enteros realiza <strong>división entera truncada</strong>.</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>%</code> (módulo) conserva el signo del <strong>dividendo</strong>:
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line">System.out.<span class="a-fn">println</span>(<span class="a-num">5</span> % <span class="a-num">-2</span>);</div>
+            <div class="anatomy-line">System.out.<span class="a-fn">println</span>(<span class="a-num">-5</span> % <span class="a-num">2</span>);</div>
+          </div>
+        </div></div>
+      </div>
+
+      <h3 class="var-h3">2. Operadores unarios</h3>
+      <p class="var-desc"><code>+, -, ++, --, !, ~</code></p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>:</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>++</code> y <code>--</code> pueden ser <strong>prefijo</strong> o <strong>sufijo</strong>:
+          <div class="steps-list" style="margin-top:.4rem">
+            <div class="step"><span class="step-n">■</span><div><code>++x</code>: incrementa <em>antes</em> de usar.</div></div>
+            <div class="step"><span class="step-n">■</span><div><code>x++</code>: incrementa <em>después</em> de usar.</div></div>
+          </div>
+        </div></div>
+        <div class="step"><span class="step-n">○</span><div><code>!</code> solo se aplica a <code>boolean</code>.</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>~</code> solo a tipos enteros (invierte bits).</div></div>
+      </div>
+
+      <h3 class="var-h3">3. Operadores de asignación</h3>
+      <p class="var-desc"><code>=, +=, -=, *=, /=, %=</code> etc.</p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>:</div></div>
+        <div class="step"><span class="step-n">○</span><div>Evaluación <strong>de derecha a izquierda</strong>:
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line"><span class="a-kw">int</span> a, b, c;</div>
+            <div class="anatomy-line">a = b = c = <span class="a-num">10</span>;</div>
+          </div>
+        </div></div>
+        <div class="step"><span class="step-n">○</span><div>Operaciones con <code>+=</code> aplican conversión automática:
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line"><span class="a-kw">byte</span> x = <span class="a-num">10</span>;</div>
+            <div class="anatomy-line">x += <span class="a-num">5</span>;</div>
+            <div class="anatomy-line"><span class="a-err">x = x + <span class="a-num">5</span>;</span></div>
+          </div>
+        </div></div>
+      </div>
+
+      <h3 class="var-h3">4. Operadores relacionales</h3>
+      <p class="var-desc"><code>&lt;, &gt;, &lt;=, &gt;=, ==, !=, instanceof</code></p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>:</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>==</code> y <code>!=</code> para primitivos compara <strong>valores</strong>.</div></div>
+        <div class="step"><span class="step-n">○</span><div>Para objetos compara <strong>referencias</strong>, no contenido (salvo que <code>equals()</code> se sobreescriba).</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>instanceof</code> ahora (Java 16+) admite <strong>pattern matching</strong>:
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line"><span class="a-kw">if</span> (obj <span class="a-kw">instanceof </span> <span class="a-type">String</span> s) {{ '{' }}</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(s.<span class="a-fn">toUpperCase</span>());</div>
+            <div class="anatomy-line">{{ '}' }}</div>
+          </div>
+        </div></div>
+      </div>
+
+      <h3 class="var-h3">5. Operadores lógicos</h3>
+      <p class="var-desc"><code>&amp;&amp;, ||, !</code></p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>: Son <strong>short-circuit</strong>:
+          <div class="steps-list" style="margin-top:.4rem">
+            <div class="step"><span class="step-n">■</span><div>En <code>a &amp;&amp; b</code>, si <code>a</code> es <code>false</code>, <strong>no evalúa</strong> <code>b</code>.</div></div>
+            <div class="step"><span class="step-n">■</span><div>En <code>a || b</code>, si <code>a</code> es <code>true</code>, <strong>no evalúa</strong> <code>b</code>.</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <h3 class="var-h3">6. Operadores bit a bit</h3>
+      <p class="var-desc"><code>&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;, &gt;&gt;&gt;</code></p>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+          <div class="tc-title">Reglas</div>
+          <div class="tc-body">
+            <ul style="margin:0;padding-left:16px;line-height:1.9">
+              <li>Operan sobre enteros (<code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>).</li>
+              <li><code>&gt;&gt;</code>: desplazamiento aritmético (mantiene signo).</li>
+              <li><code>&gt;&gt;&gt;</code>: desplazamiento lógico (rellena con ceros).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+          <div class="tc-title">Ejemplo</div>
+          <div class="tc-body">
+            <div class="code-anatomy var-scope-code">
+              <div class="anatomy-line"><span class="a-kw">int</span> x = <span class="a-num">-8</span>;</div>
+              <div class="anatomy-line">System.out.<span class="a-fn">println</span>(x &gt;&gt; <span class="a-num">2</span>);</div>
+              <div class="anatomy-line">System.out.<span class="a-fn">println</span>(x &gt;&gt;&gt; <span class="a-num">2</span>);</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3">7. Operadores condicionales</h3>
+      <p class="var-desc">Ternario <code>? :</code></p>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><strong>Reglas</strong>:</div></div>
+        <div class="step"><span class="step-n">○</span><div><code>condicion ? valorSi : valorNo</code> — ambos lados deben ser <strong>tipos compatibles</strong>:
+          <div class="code-anatomy var-scope-code" style="margin-top:.5rem">
+            <div class="anatomy-line"><span class="a-kw">int</span> x = <span class="a-kw">true</span> ? <span class="a-num">1</span> : <span class="a-num">2</span>;</div>
+            <div class="anatomy-line"><span class="a-err"><span class="a-kw">int</span> y = <span class="a-kw">true</span> ? <span class="a-num">1</span> : <span class="a-str">"hola"</span>;</span></div>
+          </div>
+        </div></div>
+      </div>
+
+      <h3 class="var-h3">8. Operadores de comparación de objetos</h3>
+      <div class="steps-list">
+        <div class="step"><span class="step-n">·</span><div><code>==</code> — compara <strong>referencias</strong>.</div></div>
+        <div class="step"><span class="step-n">·</span><div><code>equals()</code> — compara <strong>contenido</strong> (si está implementado).</div></div>
+      </div>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> <strong>Recordatorio</strong>: nunca confundir <code>==</code> con <code>equals()</code> para Strings:
+        <div class="code-anatomy var-scope-code" style="margin-top:.6rem">
+          <div class="anatomy-line"><span class="a-type">String</span> a = <span class="a-kw">new </span> <span class="a-fn">String</span>(<span class="a-str">"hola"</span>);</div>
+          <div class="anatomy-line"><span class="a-type">String</span> b = <span class="a-kw">new </span> <span class="a-fn">String</span>(<span class="a-str">"hola"</span>);</div>
+          <div class="anatomy-line">System.out.<span class="a-fn">println</span>(a == b);</div>
+          <div class="anatomy-line">System.out.<span class="a-fn">println</span>(a.<span class="a-fn">equals</span>(b));</div>
+        </div>
+      </div>
+
+      <h3 class="var-h3">9. Operadores especiales</h3>
+      <table class="ref-table">
+        <tr><th>Operador</th><th>Descripción</th></tr>
+        <tr><td><code>new</code></td><td>Crea objetos.</td></tr>
+        <tr><td><code>.</code></td><td>Acceso a miembros.</td></tr>
+        <tr><td><code>[]</code></td><td>Indexación de arrays.</td></tr>
+        <tr><td><code>::</code></td><td>Referencias a métodos (Java 8+).</td></tr>
+        <tr><td><code>...</code></td><td>Parámetros variables (varargs).</td></tr>
+      </table>
+
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> División entera: <code>10 / 3 = 3</code>.
+        <br><i class="ico ico-bulb" aria-hidden="true"></i> Para decimales: <code>10 / (double) 3 = 3.333...</code></div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:3, file:'Operadores.java', hint:'Prueba distintos valores'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===4">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">05</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Estructuras de control de flujo — Decisión</h2>
+        <p class="lesson-sub">Permiten ejecutar código según una condición. Java ofrece <code>if</code>, <code>if-else</code>, <code>if-else if-else</code> y el operador ternario.</p>
+      </div>
+
+      <h3 class="var-h3">1.1. if</h3>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-title">Forma básica</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">int</span> edad = <span class="a-num">20</span>;</div>
+            <div class="anatomy-line">&nbsp;</div>
+            <div class="anatomy-line"><span class="a-kw">if</span> (edad &gt;= <span class="a-num">18</span>) {{ '{' }}</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Eres mayor de edad"</span>);</div>
+            <div class="anatomy-line">{{ '}' }}</div>
+          </div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-title">Con operador ternario</div>
+          <div class="code-anatomy var-scope-code">
+            <div class="anatomy-line"><span class="a-kw">int</span> edad = <span class="a-num">20</span>;</div>
+            <div class="anatomy-line">&nbsp;</div>
+            <div class="anatomy-line"><span class="a-type">String</span> resultado =</div>
+            <div class="anatomy-line pl">&nbsp;&nbsp;(edad &gt;= <span class="a-num">18</span>) ? <span class="a-str">"Mayor"</span> : <span class="a-str">"Menor"</span>;</div>
+            <div class="anatomy-line">&nbsp;</div>
+            <div class="anatomy-line">System.out.<span class="a-fn">println</span>(resultado);</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3">1.2. if-else</h3>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">int</span> edad = <span class="a-num">16</span>;</div>
+        <div class="anatomy-line">&nbsp;</div>
+        <div class="anatomy-line"><span class="a-kw">if</span> (edad &gt;= <span class="a-num">18</span>) {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Eres mayor de edad"</span>);</div>
+        <div class="anatomy-line">{{ '}' }} <span class="a-kw">else</span> {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Eres menor de edad"</span>);</div>
+        <div class="anatomy-line">{{ '}' }}</div>
+      </div>
+
+      <h3 class="var-h3">1.3. if – else if – else</h3>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">int</span> nota = <span class="a-num">85</span>;</div>
+        <div class="anatomy-line">&nbsp;</div>
+        <div class="anatomy-line"><span class="a-kw">if</span> (nota &gt;= <span class="a-num">90</span>) {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Excelente"</span>);</div>
+        <div class="anatomy-line">{{ '}' }} <span class="a-kw">else if</span> (nota &gt;= <span class="a-num">75</span>) {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Bueno"</span>);</div>
+        <div class="anatomy-line">{{ '}' }} <span class="a-kw">else if</span> (nota &gt;= <span class="a-num">60</span>) {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Aprobado"</span>);</div>
+        <div class="anatomy-line">{{ '}' }} <span class="a-kw">else</span> {{ '{' }}</div>
+        <div class="anatomy-line pl">&nbsp;&nbsp;System.out.<span class="a-fn">println</span>(<span class="a-str">"Reprobado"</span>);</div>
+        <div class="anatomy-line">{{ '}' }}</div>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> El operador ternario es ideal para asignaciones simples. Para lógica compleja o múltiples ramas, usa <code>if-else if</code>.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:4, file:'IfElse.java', hint:'Cambia el valor de nota y prueba cada rama'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===5">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">06</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">switch — Expresión de Java 14+</h2>
+        <p class="lesson-sub">Java 14 modernizó <code>switch</code> convirtiéndolo en expresión con la sintaxis de flecha <code>-&gt;</code>, que elimina el <code>break</code> implícito y evita los <em>fall-through</em> accidentales.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label bad">Sintaxis clásica (Java 1–13)</div>
+          <div class="compare-code">int dia = 2; <br>String nombre; <br>switch (dia) {{ '{' }}<br>&nbsp;&nbsp;case 1: nombre = "Lunes"; break;<br>&nbsp;&nbsp;case 2: nombre = "Martes"; break;<br>&nbsp;&nbsp;default: nombre = "?"; break;<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Expresión moderna (Java 14+)</div>
+          <div class="compare-code">int dia = 2;<br>String nombre = switch (dia) {{ '{' }}<br>&nbsp;&nbsp;case 1 -&gt; "Lunes";<br>&nbsp;&nbsp;case 2 -&gt; "Martes";<br>&nbsp;&nbsp;default -&gt; "?";<br>{{ '}' }};</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:5, file:'SwitchDemo.java', hint:'Cambia el valor de dia'}"></ng-container>
+      <div class="quiz-section">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Quiz rápido</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta única</div>
+          <div class="quiz-q">En la sintaxis moderna de <code>switch</code>, ¿qué evita el uso de <code>-&gt;</code>?</div>
+          <div class="quiz-options" id="q5a">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q5a',false)"><div class="quiz-letter">A</div> Errores de compilación</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'q5a',true)"><div class="quiz-letter">B</div> El fall-through entre casos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q5a',false)"><div class="quiz-letter">C</div> El uso de variables</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'q5a',false)"><div class="quiz-letter">D</div> El tipo de dato</div>
+          </div>
+          <div class="quiz-feedback ok" id="q5a-ok">✓ La flecha no produce fall-through, elimina la necesidad de <code>break</code>.</div>
+          <div class="quiz-feedback fail" id="q5a-fail">✗ La flecha <code>-&gt;</code> elimina el <em>fall-through</em> automático.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===6">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">07</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">Bucles for</h2>
+        <p class="lesson-sub">El bucle <code>for</code> clásico repite un bloque un número determinado de veces. El <code>for-each</code> itera colecciones y arrays sin índice explícito.</p>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">for</span> <span class="a-paren">(inicialización; condición; incremento)</span> <span class="a-br">{{ '{' }}</span></div>
+        <div class="anatomy-line pl"><span class="a-body">  // cuerpo</span></div>
+        <div class="anatomy-line"><span class="a-br">{{ '}' }}</span></div>
+        <div class="anatomy-line" style="margin-top:8px"><span class="a-kw">for</span> <span class="a-paren">(Tipo elem : coleccion)</span> <span class="a-br">{{ '{' }}</span></div>
+        <div class="anatomy-line pl"><span class="a-body">  // for-each</span></div>
+        <div class="anatomy-line"><span class="a-br">{{ '}' }}</span></div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:6, file:'BuclesFor.java', hint:'Modifica el rango o el array'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===7">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">08</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">while &amp; do-while</h2>
+        <p class="lesson-sub"><code>while</code> evalúa la condición <strong>antes</strong> de ejecutar. <code>do-while</code> garantiza que el cuerpo se ejecuta <strong>al menos una vez</strong>.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">while</div>
+          <div class="compare-code">while (condición) {{ '{' }}<br>&nbsp;&nbsp;cuerpo;<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label">do-while</div>
+          <div class="compare-code">do {{ '{' }}<br>&nbsp;&nbsp;cuerpo;<br>{{ '}' }} while (condición);</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:7, file:'Bucles.java', hint:'Observa la diferencia de salida'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===8">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">09</span><span class="lesson-mod">Módulo 1</span></div>
+        <h2 class="lesson-title">break &amp; continue</h2>
+        <p class="lesson-sub"><code>break</code> termina el bucle inmediatamente. <code>continue</code> salta a la siguiente iteración. Ambos aceptan etiquetas para bucles anidados.</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Usa <code>break</code> con etiqueta (<code>outer: for...</code>) para salir de bucles anidados sin banderas booleanas.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:8, file:'BreakContinue.java', hint:'Observa qué números se imprimen'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m1" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 1 — Fundamentos</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 20</div>
+          <div class="quiz-q">¿Cuál es el tamaño en bits del tipo <code>int</code> en Java?</div>
+          <div class="quiz-options" id="em1q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">A</div> 8 bits</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">B</div> 16 bits</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q01',true)"><div class="quiz-letter">C</div> 32 bits</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">D</div> 64 bits</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q01-ok">✓ <code>int</code> ocupa 32 bits y tiene rango de -2³¹ a 2³¹-1.</div>
+          <div class="quiz-feedback fail" id="em1q01-fail">✗ <code>int</code> ocupa 32 bits. Para 64 bits usa <code>long</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 20</div>
+          <div class="quiz-q">¿Cuál tipo primitivo almacena únicamente los valores <code>true</code> o <code>false</code>?</div>
+          <div class="quiz-options" id="em1q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">A</div> int</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q02',true)"><div class="quiz-letter">B</div> boolean</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">C</div> bit</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">D</div> bool</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q02-ok">✓ <code>boolean</code> es el único tipo primitivo con valor lógico.</div>
+          <div class="quiz-feedback fail" id="em1q02-fail">✗ <code>boolean</code> almacena <code>true</code> o <code>false</code>. <code>bool</code> y <code>bit</code> no existen en Java.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 20</div>
+          <div class="quiz-q">¿Qué palabra clave declara una constante que no puede reasignarse?</div>
+          <div class="quiz-options" id="em1q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">A</div> const</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">B</div> readonly</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">C</div> immutable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q03',true)"><div class="quiz-letter">D</div> final</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q03-ok">✓ <code>final</code> impide la reasignación de la variable. <code>const</code> no existe en Java.</div>
+          <div class="quiz-feedback fail" id="em1q03-fail">✗ Java usa <code>final</code>. <code>const</code> es de C/C++; <code>readonly</code> es de C#.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 20</div>
+          <div class="quiz-q">¿Qué produce la expresión <code>10 / 3</code> cuando ambos operandos son <code>int</code>?</div>
+          <div class="quiz-options" id="em1q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">A</div> 3.33</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q04',true)"><div class="quiz-letter">B</div> 3</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">C</div> 3.0</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">D</div> Error de compilación</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q04-ok">✓ La división entera trunca la parte decimal → resultado entero 3.</div>
+          <div class="quiz-feedback fail" id="em1q04-fail">✗ División entre enteros produce entero (truncado) → 3. Para decimales usa <code>(double) 10 / 3</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 20</div>
+          <div class="quiz-q">¿Qué tipo primitivo tiene el rango de -128 a 127?</div>
+          <div class="quiz-options" id="em1q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">A</div> short</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q05',true)"><div class="quiz-letter">B</div> byte</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">C</div> int</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">D</div> char</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q05-ok">✓ <code>byte</code> tiene 8 bits con rango -128 a 127. <code>short</code> llega a ±32767.</div>
+          <div class="quiz-feedback fail" id="em1q05-fail">✗ <code>byte</code> es el tipo de 8 bits con rango -128 a 127.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 20</div>
+          <div class="quiz-q">¿Cuántos tipos primitivos existen en Java?</div>
+          <div class="quiz-options" id="em1q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">A</div> 6</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">B</div> 7</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q06',true)"><div class="quiz-letter">C</div> 8</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">D</div> 10</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q06-ok">✓ Los 8 primitivos son: <code>byte, short, int, long, float, double, boolean, char</code>.</div>
+          <div class="quiz-feedback fail" id="em1q06-fail">✗ Java tiene exactamente 8 tipos primitivos: byte, short, int, long, float, double, boolean, char.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>continue</code> dentro de un bucle?</div>
+          <div class="quiz-options" id="em1q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">A</div> Termina el bucle inmediatamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">B</div> Termina el programa</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q07',true)"><div class="quiz-letter">C</div> Salta a la siguiente iteración</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">D</div> Ejecuta el bloque finally</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q07-ok">✓ <code>continue</code> omite el resto del cuerpo y pasa a la siguiente iteración.</div>
+          <div class="quiz-feedback fail" id="em1q07-fail">✗ <code>continue</code> salta a la siguiente iteración; <code>break</code> es quien termina el bucle.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 20</div>
+          <div class="quiz-q">¿Cuál bucle garantiza que su cuerpo se ejecuta al menos una vez?</div>
+          <div class="quiz-options" id="em1q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">A</div> for</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">B</div> while</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">C</div> for-each</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q08',true)"><div class="quiz-letter">D</div> do-while</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q08-ok">✓ <code>do-while</code> evalúa la condición al final, tras ejecutar el cuerpo una primera vez.</div>
+          <div class="quiz-feedback fail" id="em1q08-fail">✗ Solo <code>do-while</code> evalúa la condición después del cuerpo, garantizando al menos una ejecución.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 20</div>
+          <div class="quiz-q">¿Cuál es el resultado de la expresión <code>"Java" + 1 + 2</code>?</div>
+          <div class="quiz-options" id="em1q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">A</div> Java3</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q09',true)"><div class="quiz-letter">B</div> Java12</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">C</div> 3Java</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">D</div> Error de compilación</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q09-ok">✓ El <code>+</code> concatena de izquierda a derecha: <code>"Java"+1="Java1"</code>, luego <code>"Java1"+2="Java12"</code>.</div>
+          <div class="quiz-feedback fail" id="em1q09-fail">✗ La concatenación va de izquierda a derecha: <code>"Java"+1 → "Java1"</code>, después <code>"Java1"+2 → "Java12"</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 20</div>
+          <div class="quiz-q">¿Cuál es la sintaxis del operador ternario en Java?</div>
+          <div class="quiz-options" id="em1q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">A</div> condición ?? val1 : val2</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">B</div> condición :: val1 :: val2</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q10',true)"><div class="quiz-letter">C</div> condición ? val1 : val2</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">D</div> condición |> val1 : val2</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q10-ok">✓ El operador ternario <code>? :</code> es una expresión condicional compacta.</div>
+          <div class="quiz-feedback fail" id="em1q10-fail">✗ La sintaxis correcta es <code>condición ? expresiónTrue : expresiónFalse</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 20</div>
+          <div class="quiz-q">¿Desde qué versión de Java la expresión <code>switch</code> con <code>-&gt;</code> es estable (GA)?</div>
+          <div class="quiz-options" id="em1q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">A</div> Java 11</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">B</div> Java 12</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">C</div> Java 13</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q11',true)"><div class="quiz-letter">D</div> Java 14</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q11-ok">✓ Switch expression con <code>-&gt;</code> se estabilizó en Java 14 (JEP 361).</div>
+          <div class="quiz-feedback fail" id="em1q11-fail">✗ La expresión switch es GA desde Java 14 (JEP 361). En Java 12–13 era preview.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 20</div>
+          <div class="quiz-q">¿Cómo se debe comparar el contenido de dos objetos <code>String</code> en Java?</div>
+          <div class="quiz-options" id="em1q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">A</div> Con el operador <code>==</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">B</div> Con el operador <code>!=</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q12',true)"><div class="quiz-letter">C</div> Con el método <code>.equals()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">D</div> Con el operador <code>===</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q12-ok">✓ <code>.equals()</code> compara el contenido; <code>==</code> compara si son el mismo objeto en memoria.</div>
+          <div class="quiz-feedback fail" id="em1q12-fail">✗ <code>==</code> compara referencias. Para comparar contenido, usa <code>.equals()</code> o <code>Objects.equals()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 20</div>
+          <div class="quiz-q">¿Qué tipo primitivo almacena un carácter Unicode de 16 bits?</div>
+          <div class="quiz-options" id="em1q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">A</div> byte</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">B</div> short</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">C</div> int</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q13',true)"><div class="quiz-letter">D</div> char</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q13-ok">✓ <code>char</code> almacena un carácter Unicode de 16 bits (U+0000 a U+FFFF).</div>
+          <div class="quiz-feedback fail" id="em1q13-fail">✗ <code>char</code> es el tipo de 16 bits para caracteres Unicode. Se escribe con comillas simples: <code>'A'</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>break</code> dentro de un bucle <code>for</code>?</div>
+          <div class="quiz-options" id="em1q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">A</div> Salta a la siguiente iteración</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q14',true)"><div class="quiz-letter">B</div> Termina el bucle inmediatamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">C</div> Reinicia el contador del bucle</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">D</div> Lanza una excepción</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q14-ok">✓ <code>break</code> sale del bucle inmediatamente y continúa con el código siguiente.</div>
+          <div class="quiz-feedback fail" id="em1q14-fail">✗ <code>break</code> termina el bucle; <code>continue</code> es quien salta a la siguiente iteración.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 20</div>
+          <div class="quiz-q">¿Cuál es el modificador de acceso implícito cuando no se escribe ninguno (package-private)?</div>
+          <div class="quiz-options" id="em1q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">A</div> private</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">B</div> public</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q15',true)"><div class="quiz-letter">C</div> package-private (ninguno)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">D</div> protected</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q15-ok">✓ Sin modificador, el acceso es package-private: visible solo dentro del mismo paquete.</div>
+          <div class="quiz-feedback fail" id="em1q15-fail">✗ Omitir el modificador da acceso package-private, visible solo en el mismo paquete.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 20</div>
+          <div class="quiz-q">¿Qué resultado tiene <code>Integer.MAX_VALUE + 1</code> en Java?</div>
+          <div class="quiz-options" id="em1q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">A</div> Lanza ArithmeticException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">B</div> Devuelve Long.MIN_VALUE</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q16',true)"><div class="quiz-letter">C</div> Desbordamiento silencioso: Integer.MIN_VALUE</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">D</div> Compila pero no ejecuta</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q16-ok">✓ Java no lanza excepción en overflow de enteros — el resultado da la vuelta: <code>2147483647 + 1 = -2147483648</code> (Integer.MIN_VALUE).</div>
+          <div class="quiz-feedback fail" id="em1q16-fail">✗ Java ignora el overflow de int silenciosamente. Usa <code>Math.addExact()</code> si necesitas detectarlo.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 20</div>
+          <div class="quiz-q">¿Qué hace el operador <code>&gt;&gt;&gt;</code> que lo diferencia de <code>&gt;&gt;</code>?</div>
+          <div class="quiz-options" id="em1q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">A</div> Desplaza bits y rellena con el bit de signo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q17',true)"><div class="quiz-letter">B</div> Desplaza bits sin signo, rellena siempre con 0</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">C</div> Solo funciona con long</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">D</div> Es idéntico a &gt;&gt; para valores positivos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q17-ok">✓ <code>&gt;&gt;&gt;</code> es el desplazamiento a derecha sin signo (unsigned right shift): siempre rellena con <code>0</code> independientemente del signo. <code>&gt;&gt;</code> propaga el bit de signo.</div>
+          <div class="quiz-feedback fail" id="em1q17-fail">✗ <code>&gt;&gt;</code> rellena con el bit de signo (aritmético). <code>&gt;&gt;&gt;</code> siempre rellena con 0 (lógico/sin signo).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>var x = 3.14;</code> introducido en Java 10?</div>
+          <div class="quiz-options" id="em1q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">A</div> Declara una variable de tipo Object</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">B</div> Declara una variable sin tipo (como JavaScript)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q18',true)"><div class="quiz-letter">C</div> Infiere el tipo local: el compilador deduce <code>double</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">D</div> Solo puede usarse en métodos estáticos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q18-ok">✓ <code>var</code> (LVTI - Local Variable Type Inference) hace que el compilador deduzca el tipo. <code>var x = 3.14</code> → el compilador lo declara como <code>double</code>. El tipado sigue siendo estático.</div>
+          <div class="quiz-feedback fail" id="em1q18-fail">✗ <code>var</code> NO es tipado dinámico. El compilador deduce el tipo en tiempo de compilación (LVTI). Solo aplica a variables locales.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 20</div>
+          <div class="quiz-q">¿Cuál es el resultado de <code>System.out.println(1 + 2 + "3")</code>?</div>
+          <div class="quiz-options" id="em1q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">A</div> 123</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q19',true)"><div class="quiz-letter">B</div> 33</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">C</div> 6</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">D</div> Error de compilación</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q19-ok">✓ Evaluación de izquierda a derecha: <code>1 + 2 = 3</code> (suma entera), luego <code>3 + "3" = "33"</code> (concatenación). La presencia del String activa concatenación para operaciones posteriores.</div>
+          <div class="quiz-feedback fail" id="em1q19-fail">✗ El operador <code>+</code> va de izquierda a derecha: <code>1+2=3</code>, después <code>3+"3"="33"</code>. Si fuera <code>"1"+2+3</code> sería "123".</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 20</div>
+          <div class="quiz-q">¿Cuándo produce <code>==</code> <code>true</code> al comparar dos Strings?</div>
+          <div class="quiz-options" id="em1q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">A</div> Siempre que los contenidos sean iguales</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">B</div> Nunca entre Strings</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q20',true)"><div class="quiz-letter">C</div> Cuando apuntan al mismo objeto en memoria (misma referencia)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">D</div> Solo con literales, nunca con new</div>
+          </div>
+          <div class="quiz-feedback ok" id="em1q20-ok">✓ <code>==</code> compara referencias. Dos literales pueden compartir referencia (pool), pero <code>new String("x") == new String("x")</code> siempre es <code>false</code>. Usa siempre <code>.equals()</code> para contenido.</div>
+          <div class="quiz-feedback fail" id="em1q20-fail">✗ <code>==</code> compara si dos variables apuntan al MISMO objeto en memoria, no si tienen el mismo contenido. Usa <code>.equals()</code> para comparar contenido.</div>
+        </div>
+      </div>
+
+</ng-container>

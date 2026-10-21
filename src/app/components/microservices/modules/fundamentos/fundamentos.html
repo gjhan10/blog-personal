@@ -1,0 +1,482 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===0">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">01</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">¿Qué son los Microservicios?</h2>
+      <p class="lesson-sub">Una arquitectura de microservicios descompone una aplicación en servicios pequeños, autónomos y desplegables de forma independiente, cada uno responsable de una capacidad de negocio específica.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Monolito</div>
+        <div class="compare-code">Un único artefacto desplegable<br>Toda la lógica en un proceso<br>Escalado todo-o-nada<br>Un fallo puede tumbar todo<br>Deploy lento y riesgoso<br>Un stack tecnológico forzado</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Microservicios</div>
+        <div class="compare-code">Múltiples servicios independientes<br>Cada servicio = un proceso<br>Escalado selectivo por servicio<br>Fallos aislados (fault isolation)<br>Deploy independiente y rápido<br>Polyglot: cada servicio elige su tech</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Autonomía</div>
+        <div class="tc-body">Cada servicio puede ser desarrollado, desplegado y escalado de forma independiente. Los equipos poseen su servicio end-to-end.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Base de datos por servicio</div>
+        <div class="tc-body">Cada microservicio tiene su propia base de datos (o schema). Esto garantiza el acoplamiento débil y permite elegir la tecnología adecuada para cada dominio.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">Comunicación vía API</div>
+        <div class="tc-body">Los servicios se comunican únicamente a través de APIs bien definidas (REST, gRPC, eventos). No comparten código interno ni base de datos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Complejidad operacional</div>
+        <div class="tc-body">A cambio de flexibilidad, se incrementa la complejidad: observabilidad distribuida, consistencia eventual, latencia de red y gestión de muchos servicios.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Los microservicios no son una solución universal. Para equipos pequeños o dominios simples, un monolito bien estructurado (modular monolith) suele ser más apropiado.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===1">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">02</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">Bounded Context & DDD</h2>
+      <p class="lesson-sub">El Domain-Driven Design (DDD) proporciona las herramientas conceptuales para identificar los límites naturales entre microservicios a través del concepto de Bounded Context.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-map" aria-hidden="true"></i></div>
+        <div class="tc-title">Bounded Context</div>
+        <div class="tc-body">Un límite explícito dentro del cual un modelo de dominio es válido y consistente. El mismo término ("Pedido") puede tener significados distintos en el contexto de Ventas y de Logística.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-book" aria-hidden="true"></i></div>
+        <div class="tc-title">Ubiquitous Language</div>
+        <div class="tc-body">Vocabulario compartido entre desarrolladores y expertos del dominio dentro de un Bounded Context. Reduce la ambigüedad y alinea el código con el negocio.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></div>
+        <div class="tc-title">Aggregate</div>
+        <div class="tc-body">Un grupo de objetos de dominio que se tratan como una unidad. El Aggregate Root es el único punto de entrada para modificar el estado. Por ejemplo: <code>Order</code> con sus <code>OrderLines</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">Context Map</div>
+        <div class="tc-body">Diagrama que muestra cómo los distintos Bounded Contexts se relacionan: Shared Kernel, Customer-Supplier, Conformist, Anti-Corruption Layer, etc.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Aggregate Root — Order</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Order</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">OrderId</span> id;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">OrderStatus</span> status;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">List</span>&lt;<span class="a-type">OrderLine</span>&gt; lines = <span class="a-kw">new</span> <span class="a-type">ArrayList</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> addLine(<span class="a-type">Product</span> product, <span class="a-kw">int</span> qty) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">if</span> (status != <span class="a-type">OrderStatus</span>.DRAFT) <span class="a-kw">throw new</span> <span class="a-type">DomainException</span>(<span class="a-str">"Cannot modify"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;lines.add(<span class="a-kw">new</span> <span class="a-type">OrderLine</span>(product, qty));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===2">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">03</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">Patrones de Descomposición</h2>
+      <p class="lesson-sub">Cómo dividir un monolito en microservicios usando estrategias basadas en el dominio de negocio.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">Por capacidad de negocio</div>
+        <div class="tc-body">Cada servicio implementa una capacidad estable del negocio: Gestión de pedidos, Gestión de usuarios, Procesamiento de pagos. Las capacidades cambian poco con el tiempo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Por subdominio (DDD)</div>
+        <div class="tc-body">Identifica subdominios Core (ventaja competitiva), Supporting (apoya el negocio) y Generic (commodities). Los servicios core merecen más inversión.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-leaf" aria-hidden="true"></i></div>
+        <div class="tc-title">Strangler Fig Pattern</div>
+        <div class="tc-body">Migración incremental del monolito. Se añade un proxy que redirige gradualmente tráfico al nuevo microservicio, hasta que el monolito queda vacío y se elimina.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ban" aria-hidden="true"></i></div>
+        <div class="tc-title">Anti-patrones a evitar</div>
+        <div class="tc-body">Nanoservicios (demasiado granulares), servicios chatty (muchas llamadas síncronas entre sí), shared database (acoplamiento alto) y distributed monolith.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Strangler Fig — Proxy con Spring Cloud Gateway</span></div>
+      <div class="anatomy-line"><span class="a-cm"># application.yml</span></div>
+      <div class="anatomy-line">spring:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;cloud.gateway.routes:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;- id: new-orders</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uri: http://orders-service:8081</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;predicates: [Path=/api/orders/**]</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;- id: legacy-monolith</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uri: http://monolith:8080</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;predicates: [Path=/**]</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===3">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">04</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">Comunicación síncrona vs asíncrona</h2>
+      <p class="lesson-sub">La elección entre comunicación síncrona (REST/gRPC) y asíncrona (mensajería/eventos) tiene profundas implicaciones en la resiliencia y el acoplamiento entre servicios.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Síncrona (REST/gRPC)</div>
+        <div class="compare-code">Requiere que el receptor esté disponible<br>Acoplamiento temporal<br>Fácil de depurar con trazas HTTP<br>Simple para queries y comandos inmediatos<br>Cascada de fallos posible<br>Latencia acumulada en cadenas</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Asíncrona (Kafka/RabbitMQ)</div>
+        <div class="compare-code">Receptor puede estar caído temporalmente<br>Desacoplamiento temporal<br>Más compleja de depurar (correlationId)<br>Ideal para flujos de trabajo largos<br>Fallos aislados automáticamente<br>Mayor throughput y resiliencia</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usar síncrona</div>
+        <div class="tc-body">Consultas que requieren respuesta inmediata (leer un perfil, verificar stock), operaciones que necesitan confirmación antes de continuar, llamadas simples de bajo acoplamiento.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-send" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usar asíncrona</div>
+        <div class="tc-body">Notificaciones (email, SMS), procesos de negocio largos (checkout → pago → envío), integración entre dominios distintos, operaciones que toleran eventual consistency.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===4">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">05</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">API Design First (OpenAPI)</h2>
+      <p class="lesson-sub">Diseñar el contrato de la API antes de implementarla mejora la colaboración entre equipos y garantiza interfaces estables. OpenAPI 3.x es el estándar de facto.</p>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Define el contrato en <strong>openapi.yml</strong> con paths, schemas y respuestas.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Genera código servidor/cliente con <strong>OpenAPI Generator</strong> o <strong>springdoc-openapi</strong>.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Usa <strong>Contract Testing</strong> (Pact) para verificar que consumidor y productor cumplen el contrato.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Versiona las APIs con <strong>URL versioning</strong> (<code>/v1/orders</code>) o headers (<code>Accept: application/vnd.api+json;version=2</code>).</div></div>
+      <div class="step"><span class="step-n">5</span><div>Publica el contrato en un <strong>API Registry</strong> (Backstage, Apicurio) para descubrimiento.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># openapi.yml</span></div>
+      <div class="anatomy-line">openapi: <span class="a-str">"3.0.3"</span></div>
+      <div class="anatomy-line">paths:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;/orders/{{ '{' }}id{{ '}' }}:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;get:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;operationId: getOrder</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;responses:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-str">"200"</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;application/json:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;schema:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">$ref</span>: <span class="a-str">'#/components/schemas/OrderDto'</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===5">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">06</span><span class="lesson-mod">M1 · Fundamentos</span></div>
+      <h2 class="lesson-title">Challenges & Anti-patrones</h2>
+      <p class="lesson-sub">Los microservicios resuelven problemas de escala y autonomía, pero introducen complejidad que debe gestionarse activamente para no crear un "Distributed Monolith".</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Distributed Monolith</div>
+        <div class="tc-body">Servicios que están desplegados separados pero tienen acoplamiento alto: base de datos compartida, deploys coordinados obligatorios, fallos en cascada. El peor de ambos mundos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">Servicios Chatty</div>
+        <div class="tc-body">Un flujo de negocio requiere 10+ llamadas síncronas encadenadas entre servicios. Solución: agregar datos (BFF, GraphQL) o cambiar a comunicación asíncrona.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Consistencia Eventual</div>
+        <div class="tc-body">Sin transacciones distribuidas, la consistencia entre servicios es eventual. Hay que diseñar para ello: idempotencia, reintentos, compensación (Saga).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">Observabilidad</div>
+        <div class="tc-body">Sin trazas distribuidas, logs correlacionados y métricas por servicio, depurar un problema que atraviesa 5 servicios es casi imposible en producción.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-alert" aria-hidden="true"></i> Regla de oro: empieza con un monolito modular. Extrae microservicios cuando tengas límites claros, equipos separados o necesidades de escalado independiente.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m1" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 1 — Fundamentos y Descomposición</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuál es el principal beneficio de los microservicios sobre un monolito en términos de despliegue?</div>
+      <div class="quiz-options" id="msm1q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q01',false)"><div class="quiz-letter">A</div> Menor uso de recursos del servidor</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q01',true)"><div class="quiz-letter">B</div> Despliegue independiente de cada servicio sin afectar a los demás</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q01',false)"><div class="quiz-letter">C</div> Configuración más sencilla de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q01',false)"><div class="quiz-letter">D</div> Eliminación completa de la latencia de red</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q01-ok">✓ El despliegue independiente es el beneficio clave: un equipo puede desplegar su servicio múltiples veces al día sin coordinarse con otros equipos.</div>
+      <div class="quiz-feedback fail" id="msm1q01-fail">✗ El beneficio principal es la independencia en el despliegue, permitiendo iterar rápido y de forma autónoma por servicio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué define un Bounded Context en Domain-Driven Design?</div>
+      <div class="quiz-options" id="msm1q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q02',false)"><div class="quiz-letter">A</div> El límite físico de la red que separa servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q02',false)"><div class="quiz-letter">B</div> El número máximo de instancias que puede tener un servicio</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q02',true)"><div class="quiz-letter">C</div> El límite explícito dentro del cual un modelo de dominio es consistente y válido</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q02',false)"><div class="quiz-letter">D</div> La base de datos asignada a un microservicio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q02-ok">✓ Un Bounded Context define dónde un modelo de dominio es válido. Fuera de ese contexto, los mismos términos pueden tener significados distintos.</div>
+      <div class="quiz-feedback fail" id="msm1q02-fail">✗ El Bounded Context es el límite conceptual donde el modelo de dominio y su lenguaje ubicuo son consistentes.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Qué patrón se usa para migrar gradualmente de un monolito a microservicios redirigiendo tráfico progresivamente?</div>
+      <div class="quiz-options" id="msm1q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q03',false)"><div class="quiz-letter">A</div> Anti-Corruption Layer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q03',false)"><div class="quiz-letter">B</div> Event Sourcing</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q03',true)"><div class="quiz-letter">C</div> Strangler Fig Pattern</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q03',false)"><div class="quiz-letter">D</div> Saga Pattern</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q03-ok">✓ El Strangler Fig Pattern (Martin Fowler) permite migrar incrementalmente: un proxy redirige tráfico al nuevo microservicio, "estrangulando" gradualmente el monolito.</div>
+      <div class="quiz-feedback fail" id="msm1q03-fail">✗ El Strangler Fig Pattern es la estrategia de migración incremental: se añade un proxy que redirige funcionalidades del monolito al nuevo servicio progresivamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Por qué el patrón "Shared Database" es un anti-patrón en microservicios?</div>
+      <div class="quiz-options" id="msm1q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q04',false)"><div class="quiz-letter">A</div> Porque las bases de datos relacionales no escalan horizontalmente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q04',true)"><div class="quiz-letter">B</div> Porque acopla los servicios a través del esquema, impidiendo la evolución y el despliegue independiente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q04',false)"><div class="quiz-letter">C</div> Porque aumenta los costos de licencia de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q04',false)"><div class="quiz-letter">D</div> Porque no es posible hacer backups distribuidos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q04-ok">✓ Compartir base de datos crea acoplamiento fuerte: cambiar el esquema requiere coordinar todos los servicios. Viola el principio de autonomía.</div>
+      <div class="quiz-feedback fail" id="msm1q04-fail">✗ El anti-patrón Shared Database acopla servicios a través del esquema: un cambio en la tabla afecta a múltiples servicios, imposibilitando el despliegue independiente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Qué es un "Distributed Monolith" y por qué es problemático?</div>
+      <div class="quiz-options" id="msm1q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q05',false)"><div class="quiz-letter">A</div> Un monolito desplegado en múltiples regiones de nube</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q05',true)"><div class="quiz-letter">B</div> Servicios desplegados por separado pero con alto acoplamiento, combinando la complejidad de ambos mundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q05',false)"><div class="quiz-letter">C</div> Un monolito que usa múltiples bases de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q05',false)"><div class="quiz-letter">D</div> Una arquitectura donde todos los servicios comparten el mismo proceso</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q05-ok">✓ Un Distributed Monolith combina lo peor de ambos: la complejidad operacional de los microservicios sin los beneficios de autonomía y despliegue independiente.</div>
+      <div class="quiz-feedback fail" id="msm1q05-fail">✗ El Distributed Monolith tiene servicios separados pero con acoplamiento alto (base de datos compartida, deploys coordinados), heredando los problemas de ambas arquitecturas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre descomposición por capacidad de negocio y por subdominio (DDD)?</div>
+      <div class="quiz-options" id="msm1q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q06',false)"><div class="quiz-letter">A</div> Son exactamente iguales, solo cambia la nomenclatura</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q06',true)"><div class="quiz-letter">B</div> Las capacidades son estables y orientadas al negocio; los subdominios identifican la importancia estratégica (core, supporting, generic)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q06',false)"><div class="quiz-letter">C</div> Las capacidades se basan en la tecnología; los subdominios en el equipo de desarrollo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q06',false)"><div class="quiz-letter">D</div> Solo la descomposición por subdominio es válida en microservicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q06-ok">✓ Las capacidades de negocio son estables y orientadas a lo que la empresa hace. DDD añade la dimensión estratégica: core domains (ventaja competitiva) merecen más inversión.</div>
+      <div class="quiz-feedback fail" id="msm1q06-fail">✗ Las capacidades de negocio son estables y funcionales. DDD clasifica subdominios estratégicamente: core (diferenciador), supporting (necesario), generic (commodity).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué es un Anti-Corruption Layer (ACL) en DDD?</div>
+      <div class="quiz-options" id="msm1q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q07',false)"><div class="quiz-letter">A</div> Un patrón de seguridad para prevenir inyección SQL</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q07',true)"><div class="quiz-letter">B</div> Una capa que traduce entre modelos de diferentes Bounded Contexts, protegiendo al dominio propio de conceptos externos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q07',false)"><div class="quiz-letter">C</div> Un mecanismo para prevenir que los datos se corrompan en la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q07',false)"><div class="quiz-letter">D</div> Una capa de validación en el API Gateway</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q07-ok">✓ El ACL actúa como adaptador/traductor: convierte el modelo externo al modelo interno del dominio, evitando que conceptos de sistemas legacy contaminen el diseño.</div>
+      <div class="quiz-feedback fail" id="msm1q07-fail">✗ El ACL traduce entre modelos de diferentes contextos. Por ejemplo, adapta el concepto de "Customer" de un sistema legacy al "User" del contexto propio sin contaminar el dominio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Cuándo NO debería usarse una arquitectura de microservicios?</div>
+      <div class="quiz-options" id="msm1q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q08',false)"><div class="quiz-letter">A</div> Cuando la aplicación tiene más de 100 usuarios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q08',true)"><div class="quiz-letter">B</div> Cuando el equipo es pequeño, el dominio no está bien entendido o la aplicación es nueva (complejidad prematura)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q08',false)"><div class="quiz-letter">C</div> Cuando se usa Java como lenguaje de programación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q08',false)"><div class="quiz-letter">D</div> Cuando la aplicación requiere alta disponibilidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q08-ok">✓ Los microservicios añaden complejidad operacional. Sin límites bien definidos, equipos autónomos y dominio maduro, un monolito modular es preferible.</div>
+      <div class="quiz-feedback fail" id="msm1q08-fail">✗ Microservicios prematuros son costosos. Primero define límites claros del dominio, luego evalúa si la complejidad adicional está justificada por los beneficios.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Qué es el patrón "Database per Service" y cuál es su principal consecuencia?</div>
+      <div class="quiz-options" id="msm1q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q09',false)"><div class="quiz-letter">A</div> Cada servicio usa una instancia diferente de hardware; implica mayor costo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q09',true)"><div class="quiz-letter">B</div> Cada servicio gestiona sus propios datos; implica consistencia eventual entre servicios en lugar de transaccional</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q09',false)"><div class="quiz-letter">C</div> Solo se pueden usar bases de datos NoSQL; no se soportan bases relacionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q09',false)"><div class="quiz-letter">D</div> Los datos de todos los servicios deben sincronizarse cada hora</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q09-ok">✓ Database per Service garantiza desacoplamiento fuerte pero requiere consistencia eventual entre servicios: no hay transacciones ACID cruzando límites de servicio.</div>
+      <div class="quiz-feedback fail" id="msm1q09-fail">✗ Database per Service desacopla los datos de cada servicio. La consecuencia es que la consistencia entre servicios es eventual, no transaccional. Se usan Sagas como solución.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué es el "Ubiquitous Language" en DDD?</div>
+      <div class="quiz-options" id="msm1q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q10',false)"><div class="quiz-letter">A</div> Un lenguaje de programación universal para todos los microservicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q10',true)"><div class="quiz-letter">B</div> El vocabulario compartido entre desarrolladores y expertos del negocio dentro de un Bounded Context</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q10',false)"><div class="quiz-letter">C</div> El protocolo de comunicación estándar entre microservicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q10',false)"><div class="quiz-letter">D</div> La documentación de la API en un formato común</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q10-ok">✓ El Ubiquitous Language es el glosario común entre negocio y desarrollo. Los mismos términos se usan en conversaciones, documentación y código, reduciendo la fricción.</div>
+      <div class="quiz-feedback fail" id="msm1q10-fail">✗ El Ubiquitous Language es el vocabulario compartido dentro de un Bounded Context. Si el negocio dice "Pedido", el código también dice "Order" (o "Pedido"), no "Request" o "Purchase".</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué significa "loose coupling, high cohesion" aplicado a microservicios?</div>
+      <div class="quiz-options" id="msm1q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q11',false)"><div class="quiz-letter">A</div> Los servicios deben ser pequeños y comunicarse frecuentemente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q11',true)"><div class="quiz-letter">B</div> Cada servicio encapsula responsabilidades relacionadas (cohesión alta) y minimiza dependencias con otros servicios (acoplamiento bajo)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q11',false)"><div class="quiz-letter">C</div> Los servicios deben compartir código y librerías comunes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q11',false)"><div class="quiz-letter">D</div> La arquitectura debe tener pocos servicios pero con mucha funcionalidad cada uno</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q11-ok">✓ Alta cohesión: todo lo relacionado con "pagos" vive en el servicio de pagos. Bajo acoplamiento: el servicio de pagos no depende directamente del servicio de inventario.</div>
+      <div class="quiz-feedback fail" id="msm1q11-fail">✗ Cohesión alta = todo lo relacionado en un servicio. Acoplamiento bajo = mínimas dependencias entre servicios. Cambiar un servicio no debe requerir cambiar otros.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un microservicio y un nanoservicio?</div>
+      <div class="quiz-options" id="msm1q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q12',false)"><div class="quiz-letter">A</div> Los nanoservicios usan menos memoria que los microservicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q12',true)"><div class="quiz-letter">B</div> Los nanoservicios son demasiado granulares (una función = un servicio), generando overhead operacional excesivo sin beneficios proporcionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q12',false)"><div class="quiz-letter">C</div> Los nanoservicios son solo un término de marketing sin diferencia técnica</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q12',false)"><div class="quiz-letter">D</div> Los nanoservicios son funciones serverless y los microservicios son containers</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q12-ok">✓ Los nanoservicios son un anti-patrón: granularidad excesiva genera overhead de red, operacional y de gestión sin beneficios. Un servicio debe agrupar una capacidad de negocio completa.</div>
+      <div class="quiz-feedback fail" id="msm1q12-fail">✗ Los nanoservicios (un endpoint = un servicio) son un anti-patrón. El overhead operacional y de comunicación supera los beneficios. La granularidad correcta sigue la capacidad de negocio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué es un Aggregate Root en DDD?</div>
+      <div class="quiz-options" id="msm1q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q13',false)"><div class="quiz-letter">A</div> La base de datos principal de un microservicio</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q13',true)"><div class="quiz-letter">B</div> La entidad raíz de un Aggregate que actúa como único punto de entrada para modificar el estado del grupo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q13',false)"><div class="quiz-letter">C</div> El servicio de mayor prioridad en el sistema</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q13',false)"><div class="quiz-letter">D</div> El administrador del repositorio de código</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q13-ok">✓ El Aggregate Root garantiza la invarianza del Aggregate. Solo se puede acceder a los objetos internos (OrderLines) a través del Root (Order), que valida las reglas de negocio.</div>
+      <div class="quiz-feedback fail" id="msm1q13-fail">✗ El Aggregate Root es la entidad principal de un grupo. Ejemplo: Order es el Root, OrderLine es interno. Solo se interactúa con Order, que mantiene las invarianzas del dominio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cuándo es preferible la comunicación asíncrona sobre la síncrona entre microservicios?</div>
+      <div class="quiz-options" id="msm1q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q14',false)"><div class="quiz-letter">A</div> Cuando se necesita una respuesta inmediata del receptor</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q14',true)"><div class="quiz-letter">B</div> Para flujos de trabajo largos, notificaciones o cuando se tolera consistencia eventual y se quiere desacoplar temporalmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q14',false)"><div class="quiz-letter">C</div> Siempre, porque la asíncrona es siempre más rápida</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q14',false)"><div class="quiz-letter">D</div> Solo cuando los servicios están en zonas de disponibilidad diferentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q14-ok">✓ La comunicación asíncrona es ideal para procesos de negocio largos (checkout completo), notificaciones y cuando el productor no debe bloquearse esperando al consumidor.</div>
+      <div class="quiz-feedback fail" id="msm1q14-fail">✗ La asíncrona es preferible para flujos largos, notificaciones e integración entre dominios distintos. La síncrona es mejor para queries inmediatas y operaciones que requieren confirmación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué rol cumple el API Gateway en una arquitectura de microservicios?</div>
+      <div class="quiz-options" id="msm1q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q15',false)"><div class="quiz-letter">A</div> Almacena en caché la base de datos de todos los servicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q15',true)"><div class="quiz-letter">B</div> Punto de entrada único para los clientes, que enruta peticiones, gestiona autenticación, rate limiting y compone respuestas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q15',false)"><div class="quiz-letter">C</div> Gestiona la base de datos compartida entre servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q15',false)"><div class="quiz-letter">D</div> Sincroniza el código fuente entre equipos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q15-ok">✓ El API Gateway es el punto de entrada único que evita exponer servicios directamente. Centraliza cross-cutting concerns: autenticación, logging, rate limiting, SSL termination.</div>
+      <div class="quiz-feedback fail" id="msm1q15-fail">✗ El API Gateway actúa como punto de entrada único, enrutando peticiones a los servicios adecuados y gestionando autenticación, rate limiting y otras preocupaciones transversales.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué es el patrón "Branch by Abstraction" en el contexto de migración de monolito?</div>
+      <div class="quiz-options" id="msm1q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q16',false)"><div class="quiz-letter">A</div> Una técnica de Git para gestionar múltiples versiones del monolito</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q16',true)"><div class="quiz-letter">B</div> Introducir una abstracción (interfaz) sobre el código a reemplazar, implementar el nuevo servicio detrás de la abstracción, y eliminar la implementación antigua</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q16',false)"><div class="quiz-letter">C</div> Crear ramas de código separadas para cada microservicio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q16',false)"><div class="quiz-letter">D</div> Usar interfaces genéricas en todos los servicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q16-ok">✓ Branch by Abstraction permite reemplazar una implementación monolítica sin interrumpir el servicio: se introduce una interfaz, se construye la nueva implementación y se migra gradualmente.</div>
+      <div class="quiz-feedback fail" id="msm1q16-fail">✗ Se introduce una interfaz sobre el código a migrar, se implementa la nueva versión (microservicio) detrás de ella y se cambia el routing sin interrumpir el sistema.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Cuál es el principal riesgo de los "servicios chatty" en microservicios?</div>
+      <div class="quiz-options" id="msm1q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q17',false)"><div class="quiz-letter">A</div> Consumen demasiado espacio en disco</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q17',true)"><div class="quiz-letter">B</div> Latencia acumulada y fragilidad en cascada: si un servicio falla, toda la cadena de llamadas falla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q17',false)"><div class="quiz-letter">C</div> Generan demasiados logs que saturan el sistema de observabilidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q17',false)"><div class="quiz-letter">D</div> Requieren más desarrolladores para mantenerlos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q17-ok">✓ Los servicios chatty (muchas llamadas síncronas encadenadas) acumulan latencia y fallos: si el servicio D falla, A→B→C→D todos fallan. Solución: agregar o usar eventos asíncronos.</div>
+      <div class="quiz-feedback fail" id="msm1q17-fail">✗ Los servicios chatty acumulan latencia de red y crean fallos en cascada. 10 llamadas × 50ms = 500ms mínimos. Solución: BFF para agregar, eventos asíncronos o redesign.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué es el patrón "Backend for Frontend" (BFF)?</div>
+      <div class="quiz-options" id="msm1q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q18',false)"><div class="quiz-letter">A</div> Un framework de Java para construir interfaces de usuario</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q18',true)"><div class="quiz-letter">B</div> Un servicio backend dedicado por cliente (móvil, web, TV), que agrega y adapta datos de múltiples microservicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q18',false)"><div class="quiz-letter">C</div> Una base de datos específica para los servicios de frontend</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q18',false)"><div class="quiz-letter">D</div> Un API Gateway exclusivo para aplicaciones web</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q18-ok">✓ El BFF reduce el chattiness del cliente al agregar múltiples llamadas en una sola respuesta adaptada al cliente específico. Una app móvil puede necesitar datos distintos a la web.</div>
+      <div class="quiz-feedback fail" id="msm1q18-fail">✗ BFF crea un backend especializado por tipo de cliente que agrega y transforma datos de múltiples microservicios. Reduce el número de roundtrips y adapta el formato al cliente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cuál es la granularidad correcta para un microservicio según las buenas prácticas?</div>
+      <div class="quiz-options" id="msm1q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q19',false)"><div class="quiz-letter">A</div> Debe tener exactamente 500 líneas de código</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q19',false)"><div class="quiz-letter">B</div> Un servicio por endpoint REST</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q19',true)"><div class="quiz-letter">C</div> Una capacidad de negocio completa o un Bounded Context: suficientemente pequeño para un equipo y suficientemente grande para ser autónomo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q19',false)"><div class="quiz-letter">D</div> Debe coincidir con cada tabla de la base de datos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q19-ok">✓ La granularidad correcta sigue el principio de una capacidad de negocio completa. Jeff Bezos: un equipo que se puede alimentar con dos pizzas debe poder gestionar el servicio.</div>
+      <div class="quiz-feedback fail" id="msm1q19-fail">✗ No hay una métrica de líneas de código. La granularidad se basa en: una capacidad de negocio, un Bounded Context, o la regla de las "dos pizzas" de Amazon para el tamaño del equipo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué implica la consistencia eventual en microservicios y cómo se gestiona?</div>
+      <div class="quiz-options" id="msm1q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q20',false)"><div class="quiz-letter">A</div> Los datos nunca son consistentes en sistemas distribuidos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm1q20',true)"><div class="quiz-letter">B</div> Los servicios estarán consistentes en algún momento futuro (no inmediatamente); se gestiona con operaciones idempotentes, eventos compensatorios y Sagas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q20',false)"><div class="quiz-letter">C</div> Se requiere un coordinador global de transacciones distribuidas (2PC)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm1q20',false)"><div class="quiz-letter">D</div> Solo aplica a bases de datos NoSQL, no a bases relacionales</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm1q20-ok">✓ Consistencia eventual es el modelo base en microservicios. Se gestiona diseñando operaciones idempotentes, usando eventos de dominio y el patrón Saga para transacciones distribuidas.</div>
+      <div class="quiz-feedback fail" id="msm1q20-fail">✗ La consistencia eventual significa que los datos convergerán a un estado consistente, pero no instantáneamente. Se gestiona con idempotencia, eventos compensatorios y Sagas.</div>
+    </div>
+  </div>
+
+</ng-container>

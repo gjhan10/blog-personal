@@ -1,0 +1,448 @@
+﻿<ng-container>
+  <div class="lesson-card" *ngIf="globalLesson===0">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">01</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">¿Qué es Spring Boot?</h2>
+      <p class="lesson-sub">Spring Boot es un framework opinado sobre Spring Framework que elimina la configuración manual mediante auto-configuración, starters y un servidor embebido.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Spring Framework (sin Boot)</div>
+        <div class="compare-code">web.xml (servlet descriptor)<br>applicationContext.xml<br>dispatcher-servlet.xml<br>Configurar datasource manualmente<br>Deploy en Tomcat externo</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Spring Boot</div>
+        <div class="compare-code">@SpringBootApplication<br>application.properties<br>Servidor Tomcat embebido<br>Auto-configuración inteligente<br>spring-boot-starter-web</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Auto-Configuración</div>
+        <div class="tc-body">Detecta las dependencias en el classpath y configura beans automáticamente. Si añades <code>spring-boot-starter-data-jpa</code>, configura un <code>DataSource</code>, <code>EntityManagerFactory</code> y repositorios.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">Starters</div>
+        <div class="tc-body">Dependencias curadas que agrupan todo lo necesario. <code>spring-boot-starter-web</code> incluye Spring MVC, Jackson, Tomcat embebido y validación.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Fat JAR</div>
+        <div class="tc-body">El plugin Maven/Gradle empaqueta toda la aplicación (código + dependencias + servidor) en un único JAR ejecutable: <code>java -jar app.jar</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Opinado</div>
+        <div class="tc-body">Spring Boot toma decisiones por defecto razonables. Siempre puedes sobreescribir cualquier configuración cuando lo necesitas.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Spring Boot 3.x requiere Java 17+ y Spring Framework 6.x. Usa Jakarta EE 9+ (paquete <code>jakarta.*</code> en lugar de <code>javax.*</code>).</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===1">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">02</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">Spring Initializr</h2>
+      <p class="lesson-sub"><strong>start.spring.io</strong> genera la estructura base de un proyecto Spring Boot en segundos. Elige dependencias, versión Java y sistema de build.</p>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Abre <code>start.spring.io</code> y selecciona <strong>Maven</strong> o <strong>Gradle</strong>.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Elige <strong>Java 21</strong> (LTS) y la última versión estable de Spring Boot 3.x.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Completa <strong>Group</strong> (<code>com.empresa</code>) y <strong>Artifact</strong> (<code>mi-api</code>).</div></div>
+      <div class="step"><span class="step-n">4</span><div>Añade dependencias: <strong>Spring Web</strong>, <strong>Spring Data JPA</strong>, <strong>H2</strong>, <strong>Lombok</strong>.</div></div>
+      <div class="step"><span class="step-n">5</span><div>Descarga el ZIP, descomprímelo y ábrelo en IntelliJ IDEA.</div></div>
+      <div class="step"><span class="step-n">6</span><div>Ejecuta <code>mvn spring-boot:run</code> o usa el botón Run en el IDE.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">&lt;!-- pom.xml generado --&gt;</span></div>
+      <div class="anatomy-line"><span class="a-kw">&lt;parent&gt;</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">&lt;groupId&gt;</span>org.springframework.boot<span class="a-kw">&lt;/groupId&gt;</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="a-kw">&lt;/artifactId&gt;</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">&lt;version&gt;</span>3.3.0<span class="a-kw">&lt;/version&gt;</span></div>
+      <div class="anatomy-line"><span class="a-kw">&lt;/parent&gt;</span></div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> El <code>spring-boot-starter-parent</code> gestiona versiones de todas las dependencias compatibles. Evita conflictos de versión.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===2">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">03</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">Starters & Autoconfiguration</h2>
+      <p class="lesson-sub">Los starters son POMs que agrupan dependencias relacionadas. La auto-configuración usa condiciones para activar beans solo cuando tiene sentido.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">spring-boot-starter-web</div>
+        <div class="tc-body">Spring MVC + Tomcat embebido + Jackson (JSON) + Bean Validation. Activa <code>DispatcherServlet</code> auto-configurado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">spring-boot-starter-data-jpa</div>
+        <div class="tc-body">Hibernate + Spring Data JPA + JDBC. Configura <code>DataSource</code>, <code>EntityManagerFactory</code> y <code>TransactionManager</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">spring-boot-starter-security</div>
+        <div class="tc-body">Spring Security con configuración por defecto: HTTP Basic, forma de login, CSRF activo. Todo personalizable.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-flask" aria-hidden="true"></i></div>
+        <div class="tc-title">@Conditional*</div>
+        <div class="tc-body"><code>@ConditionalOnClass</code>, <code>@ConditionalOnMissingBean</code>, <code>@ConditionalOnProperty</code>. La auto-config solo actúa si se cumplen las condiciones.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@AutoConfiguration</span></div>
+      <div class="anatomy-line"><span class="a-kw">@ConditionalOnClass</span>(<span class="a-type">DataSource</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">@ConditionalOnMissingBean</span>(<span class="a-type">DataSource</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">DataSourceAutoConfiguration</span> {{ '{' }} ... {{ '}' }}</div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> En Spring Boot 3, el archivo de auto-configuraciones cambió de <code>spring.factories</code> a <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code>.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===3">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">04</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">application.properties / yml</h2>
+      <p class="lesson-sub">El archivo de configuración centraliza propiedades del servidor, base de datos, logging y cualquier propiedad personalizada.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml</span></div>
+      <div class="anatomy-line"><span class="a-kw">server</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">port</span>: <span class="a-num">8080</span></div>
+      <div class="anatomy-line"><span class="a-kw">spring</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">datasource</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">url</span>: <span class="a-str">jdbc:postgresql://localhost:5432/mydb</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">username</span>: <span class="a-str">user</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">jpa</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">hibernate.ddl-auto</span>: <span class="a-str">validate</span></div>
+      <div class="anatomy-line"><span class="a-kw">app</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">jwt-secret</span>: <span class="a-str">mi-clave-secreta</span></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@ConfigurationProperties</span>(<span class="a-str">"app"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public record</span> <span class="a-type">AppProperties</span>(<span class="a-type">String</span> jwtSecret) {{ '{' }} {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Value</span>(<span class="a-str">"${{ '{' }}server.port{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">private int</span> port;</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Orden de prioridad (mayor a menor): argumentos de línea de comandos → variables de entorno → application-{{ '{' }}profile{{ '}' }}.yml → application.yml.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===4">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">05</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">@SpringBootApplication</h2>
+      <p class="lesson-sub">Esta anotación compuesta activa tres mecanismos fundamentales de Spring Boot en una sola línea.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">@Configuration</div>
+        <div class="tc-body">Marca la clase como fuente de definiciones de beans <code>@Bean</code>. Equivale a un XML de configuración de Spring.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cpu" aria-hidden="true"></i></div>
+        <div class="tc-title">@EnableAutoConfiguration</div>
+        <div class="tc-body">Activa el mecanismo de auto-configuración. Spring Boot lee los registros en <code>AutoConfiguration.imports</code> y aplica solo los que cumplen las condiciones.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">@ComponentScan</div>
+        <div class="tc-body">Escanea el paquete de la clase y sus subpaquetes buscando <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@SpringBootApplication</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">MiApiApplication</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public static void</span> main(<span class="a-type">String</span>[] args) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">SpringApplication</span>.run(<span class="a-type">MiApiApplication</span>.class, args);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Coloca la clase principal en el paquete raíz de tu aplicación para que <code>@ComponentScan</code> encuentre todos tus componentes.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===5">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">06</span><span class="lesson-mod">Módulo 1</span></div>
+      <h2 class="lesson-title">Primera API REST</h2>
+      <p class="lesson-sub">Con Spring Boot puedes tener una API REST funcional en menos de 10 líneas de código.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@RestController</span></div>
+      <div class="anatomy-line"><span class="a-kw">@RequestMapping</span>(<span class="a-str">"/api/saludo"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">SaludoController</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GetMapping</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">String</span> hola() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-str">"¡Hola desde Spring Boot!"</span>;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GetMapping</span>(<span class="a-str">"/{{ '{' }}nombre{{ '}' }}"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Map</span>&lt;<span class="a-type">String</span>, <span class="a-type">String</span>&gt; personalizado(<span class="a-kw">@PathVariable String</span> nombre) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">Map</span>.of(<span class="a-str">"mensaje"</span>, <span class="a-str">"Hola, "</span> + nombre);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Ejecuta <code>mvn spring-boot:run</code> y accede a <code>http://localhost:8080/api/saludo/Carlos</code>. Jackson serializa el <code>Map</code> a JSON automáticamente.</div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Flujo de una petición</div>
+        <div class="tc-body">HTTP Request → DispatcherServlet → HandlerMapping → Controller → Service → Repository → Response</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">Jackson por defecto</div>
+        <div class="tc-body">Spring Boot auto-configura <code>ObjectMapper</code>. Cualquier objeto Java devuelto por un <code>@RestController</code> se convierte a JSON.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-section" id="eval-m1" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 1 — Introducción & Setup</div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">En Spring Boot 3, ¿dónde se registran las clases de auto-configuración?</div>
+      <div class="quiz-options" id="em1q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">A</div> META-INF/spring.factories</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q01',true)"><div class="quiz-letter">B</div> META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">C</div> META-INF/services/org.springframework.boot.AutoConfiguration</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q01',false)"><div class="quiz-letter">D</div> META-INF/spring/auto-config.xml</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q01-ok">✓ Spring Boot 3 migró de spring.factories a AutoConfiguration.imports para el registro de auto-configuraciones.</div>
+      <div class="quiz-feedback fail" id="em1q01-fail">✗ En Spring Boot 3, el archivo es META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué condición garantiza @ConditionalOnMissingBean?</div>
+      <div class="quiz-options" id="em1q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">A</div> El bean solo se crea si la clase está en el classpath</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q02',true)"><div class="quiz-letter">B</div> El bean solo se crea si no existe ya un bean del mismo tipo en el contexto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">C</div> El bean se crea solo si hay una propiedad en application.properties</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q02',false)"><div class="quiz-letter">D</div> El bean se crea solo si el perfil activo no está configurado</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q02-ok">✓ @ConditionalOnMissingBean permite que el usuario sobreescriba la auto-configuración simplemente declarando su propio bean.</div>
+      <div class="quiz-feedback fail" id="em1q02-fail">✗ @ConditionalOnMissingBean verifica que no exista un bean del mismo tipo. Así la auto-config no sobreescribe la del usuario.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Cuál es el orden de prioridad correcto para la configuración externalizada (de mayor a menor)?</div>
+      <div class="quiz-options" id="em1q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">A</div> application.yml → variables de entorno → argumentos de línea de comandos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q03',true)"><div class="quiz-letter">B</div> Argumentos de línea de comandos → variables de entorno → application.yml</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">C</div> Variables de entorno → application.yml → argumentos de línea de comandos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q03',false)"><div class="quiz-letter">D</div> application.yml → argumentos de línea de comandos → variables de entorno</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q03-ok">✓ Argumentos CLI tienen la prioridad más alta, lo que facilita sobrescribir configuración en CI/CD sin modificar archivos.</div>
+      <div class="quiz-feedback fail" id="em1q03-fail">✗ El orden correcto es: argumentos CLI > variables de entorno > application-{{ '{' }}profile{{ '}' }}.yml > application.yml > @PropertySource > valores por defecto.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Qué versión mínima de Java requiere Spring Boot 3.x?</div>
+      <div class="quiz-options" id="em1q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">A</div> Java 11</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">B</div> Java 15</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q04',true)"><div class="quiz-letter">C</div> Java 17</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q04',false)"><div class="quiz-letter">D</div> Java 21</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q04-ok">✓ Spring Boot 3.x y Spring Framework 6.x requieren Java 17 como mínimo y usan Jakarta EE 9+ (paquetes jakarta.*).</div>
+      <div class="quiz-feedback fail" id="em1q04-fail">✗ Spring Boot 3.x requiere Java 17+. También migró de javax.* a jakarta.* (Jakarta EE 9+).</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Qué hace @SpringBootApplication cuando se coloca en un subpaquete incorrecto?</div>
+      <div class="quiz-options" id="em1q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">A</div> La aplicación lanza una excepción al arrancar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q05',true)"><div class="quiz-letter">B</div> @ComponentScan solo escanea ese subpaquete y sus hijos, ignorando otros componentes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">C</div> Spring Boot escanea siempre desde la raíz del proyecto independientemente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q05',false)"><div class="quiz-letter">D</div> Todos los beans se registran igualmente gracias a la auto-configuración</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q05-ok">✓ @ComponentScan escanea desde el paquete donde está la clase principal. Si está en un subpaquete, los beans de otros paquetes no se detectan.</div>
+      <div class="quiz-feedback fail" id="em1q05-fail">✗ @ComponentScan escanea el paquete de la clase anotada y sus hijos. Si está mal ubicada, muchos beans no se registran y la app falla silenciosamente.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué propiedad habilita la inicialización perezosa (lazy) de todos los beans al arrancar?</div>
+      <div class="quiz-options" id="em1q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">A</div> spring.beans.lazy=true</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q06',true)"><div class="quiz-letter">B</div> spring.main.lazy-initialization=true</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">C</div> spring.context.lazy-beans=true</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q06',false)"><div class="quiz-letter">D</div> spring.autoconfigure.lazy=true</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q06-ok">✓ spring.main.lazy-initialization=true retrasa la creación de beans hasta su primer uso, reduciendo el tiempo de arranque pero aumentando la latencia de la primera solicitud.</div>
+      <div class="quiz-feedback fail" id="em1q06-fail">✗ La propiedad correcta es spring.main.lazy-initialization=true. Mejora el arranque pero puede ocultar errores de configuración hasta el primer uso.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre @ConfigurationProperties y @Value?</div>
+      <div class="quiz-options" id="em1q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">A</div> @Value soporta relaxed binding; @ConfigurationProperties no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q07',true)"><div class="quiz-letter">B</div> @ConfigurationProperties soporta binding jerárquico y tipado seguro; @Value es para propiedades individuales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">C</div> Son equivalentes y se pueden usar indistintamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q07',false)"><div class="quiz-letter">D</div> @Value soporta objetos complejos; @ConfigurationProperties solo para primitivos</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q07-ok">✓ @ConfigurationProperties es preferible para grupos de propiedades relacionadas. Soporta relaxed binding, validación con @Validated y objetos anidados.</div>
+      <div class="quiz-feedback fail" id="em1q07-fail">✗ @ConfigurationProperties vincula grupos de propiedades a objetos Java con binding jerárquico y tipado seguro. @Value es para inyectar propiedades individuales.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Qué hace spring.main.allow-bean-definition-overriding=true?</div>
+      <div class="quiz-options" id="em1q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">A</div> Permite que dos beans tengan el mismo nombre en diferentes contextos de aplicación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q08',true)"><div class="quiz-letter">B</div> Permite redefinir un bean con el mismo nombre; por defecto está desactivado en Spring Boot 2.1+</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">C</div> Activa la herencia de beans entre contextos padre e hijo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q08',false)"><div class="quiz-letter">D</div> Permite usar @Primary en múltiples beans del mismo tipo</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q08-ok">✓ Desde Spring Boot 2.1, la sobreescritura de beans está desactivada por defecto. Necesitas esta propiedad si tienes definiciones de bean duplicadas.</div>
+      <div class="quiz-feedback fail" id="em1q08-fail">✗ spring.main.allow-bean-definition-overriding=true permite redefinir beans con el mismo nombre. Desactivado por defecto desde Spring Boot 2.1 para detectar errores.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia principal entre un fat JAR y un thin JAR en Spring Boot?</div>
+      <div class="quiz-options" id="em1q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">A</div> El fat JAR usa Java modules; el thin JAR no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q09',true)"><div class="quiz-letter">B</div> El fat JAR incluye todas las dependencias; el thin JAR solo el código de la aplicación y requiere dependencias externas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">C</div> El thin JAR es más rápido en ejecución que el fat JAR</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q09',false)"><div class="quiz-letter">D</div> Solo el fat JAR puede contener un servidor embebido</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q09-ok">✓ El fat JAR (uber JAR) de Spring Boot incluye todo el código + dependencias + servidor. Facilita el despliegue pero tiene mayor tamaño.</div>
+      <div class="quiz-feedback fail" id="em1q09-fail">✗ Fat JAR = código + dependencias + servidor todo en un archivo. Thin JAR = solo código de la app, requiere dependencias disponibles en el classpath.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué hace Spring Boot DevTools al detectar cambios en el classpath?</div>
+      <div class="quiz-options" id="em1q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">A</div> Compila y reconstruye el JAR completo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q10',true)"><div class="quiz-letter">B</div> Reinicia la aplicación usando dos classloaders para un restart rápido</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">C</div> Solo recarga las plantillas HTML sin reiniciar el contexto Spring</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q10',false)"><div class="quiz-letter">D</div> Detiene la aplicación y la reinicia manualmente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q10-ok">✓ DevTools usa dos classloaders: uno para clases que no cambian (librerías) y otro para el código de la app. El restart solo recarga el segundo, siendo más rápido que reiniciar todo.</div>
+      <div class="quiz-feedback fail" id="em1q10-fail">✗ DevTools usa dos ClassLoaders. Uno base para dependencias (no cambia) y uno de restart para el código de la app. Restart ~2x más rápido que reinicio completo.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué anotación excluye una auto-configuración específica?</div>
+      <div class="quiz-options" id="em1q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">A</div> @DisableAutoConfiguration(DataSourceAutoConfiguration.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q11',true)"><div class="quiz-letter">B</div> @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">C</div> @ConditionalOnMissingClass(DataSourceAutoConfiguration.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q11',false)"><div class="quiz-letter">D</div> @SuppressAutoConfiguration(DataSourceAutoConfiguration.class)</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q11-ok">✓ El atributo exclude de @SpringBootApplication (o @EnableAutoConfiguration) permite desactivar auto-configuraciones específicas.</div>
+      <div class="quiz-feedback fail" id="em1q11-fail">✗ Usa @SpringBootApplication(exclude = DataSourceAutoConfiguration.class) o la propiedad spring.autoconfigure.exclude.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">En un proyecto Spring Boot, ¿qué hace el spring-boot-maven-plugin al ejecutar mvn package?</div>
+      <div class="quiz-options" id="em1q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">A</div> Solo compila las clases Java sin crear ningún JAR</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">B</div> Crea solo el thin JAR sin las dependencias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q12',true)"><div class="quiz-letter">C</div> Reempaqueta el JAR de Maven añadiendo todas las dependencias y haciéndolo ejecutable con java -jar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q12',false)"><div class="quiz-letter">D</div> Genera solo un WAR desplegable en Tomcat externo</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q12-ok">✓ El plugin ejecuta la fase repackage: transforma el JAR estándar en un fat JAR ejecutable con estructura BOOT-INF/ para código y dependencias.</div>
+      <div class="quiz-feedback fail" id="em1q12-fail">✗ spring-boot-maven-plugin reempaqueta el JAR incluyendo todas las dependencias dentro de BOOT-INF/lib/, haciéndolo ejecutable con java -jar.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué formato de configuración es preferible para entornos con múltiples documentos en un solo archivo?</div>
+      <div class="quiz-options" id="em1q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">A</div> application.properties (siempre preferible)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q13',true)"><div class="quiz-letter">B</div> application.yml (soporta múltiples documentos con --- y estructura jerárquica)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">C</div> Son totalmente equivalentes sin ninguna diferencia funcional</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q13',false)"><div class="quiz-letter">D</div> application.xml es el formato recomendado por Spring</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q13-ok">✓ YAML soporta múltiples documentos separados por --- en un archivo, y su estructura jerárquica es más legible para configuraciones complejas.</div>
+      <div class="quiz-feedback fail" id="em1q13-fail">✗ YAML permite múltiples documentos con --- en un archivo, estructura jerárquica y listas, lo que lo hace preferible para configuraciones complejas.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Qué significa que Spring Boot sea "opinado" (opinionated)?</div>
+      <div class="quiz-options" id="em1q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">A</div> No permite personalizar la configuración por defecto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">B</div> Solo soporta MySQL como base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q14',true)"><div class="quiz-letter">C</div> Toma decisiones de configuración sensatas por defecto, pero todas son sobreescribibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q14',false)"><div class="quiz-letter">D</div> Solo funciona con Maven y no con Gradle</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q14-ok">✓ "Opinado" significa que Spring Boot elige configuraciones por defecto razonables (p.ej. Jackson para JSON, HikariCP para pool) pero puedes sobreescribir cualquiera.</div>
+      <div class="quiz-feedback fail" id="em1q14-fail">✗ "Opinado" = configuraciones por defecto razonables que funcionan sin configuración manual. Siempre puedes sobreescribir cualquier decisión.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué propiedad configura el servidor embebido para escuchar en el puerto 9090?</div>
+      <div class="quiz-options" id="em1q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">A</div> spring.server.port=9090</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q15',true)"><div class="quiz-letter">B</div> server.port=9090</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">C</div> tomcat.port=9090</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q15',false)"><div class="quiz-letter">D</div> http.port=9090</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q15-ok">✓ server.port es la propiedad estándar. Aplica a cualquier servidor embebido (Tomcat, Jetty, Undertow).</div>
+      <div class="quiz-feedback fail" id="em1q15-fail">✗ La propiedad correcta es server.port=9090. No depende del tipo de servidor embebido que uses.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿En qué se diferencia @WebMvcTest de @SpringBootTest?</div>
+      <div class="quiz-options" id="em1q16">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q16',true)"><div class="quiz-letter">A</div> @WebMvcTest carga solo la capa web; @SpringBootTest carga el contexto completo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">B</div> @SpringBootTest es más rápido porque usa mocks internamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">C</div> @WebMvcTest lanza un servidor HTTP real; @SpringBootTest no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q16',false)"><div class="quiz-letter">D</div> Son equivalentes, solo cambia el nombre</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q16-ok">✓ @WebMvcTest es un test slice que carga solo los beans de la capa web (@Controller, filtros, etc.), siendo mucho más rápido que @SpringBootTest.</div>
+      <div class="quiz-feedback fail" id="em1q16-fail">✗ @WebMvcTest carga solo la capa web (controllers, filters). @SpringBootTest carga el contexto completo. Los test slices son más rápidos.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué hace spring.jpa.hibernate.ddl-auto=validate?</div>
+      <div class="quiz-options" id="em1q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">A</div> Crea el schema al arrancar y lo destruye al detener</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">B</div> Actualiza el schema automáticamente sin borrar datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q17',true)"><div class="quiz-letter">C</div> Solo valida que el schema de la BD coincide con las entidades JPA, sin modificar nada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q17',false)"><div class="quiz-letter">D</div> No hace nada con el schema de la base de datos</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q17-ok">✓ validate es el valor recomendado para producción. Verifica que el schema existente sea compatible con las entidades JPA, sin modificar nada.</div>
+      <div class="quiz-feedback fail" id="em1q17-fail">✗ validate solo comprueba que la BD coincide con las entidades. Para producción, usa validate junto con Flyway o Liquibase para gestionar migraciones.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Cuál es la función del spring-boot-starter-parent en el pom.xml?</div>
+      <div class="quiz-options" id="em1q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">A</div> Solo define la versión de Java a usar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q18',true)"><div class="quiz-letter">B</div> Gestiona versiones de dependencias (BOM), plugins Maven y encoding por defecto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">C</div> Añade todas las dependencias posibles de Spring Boot al proyecto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q18',false)"><div class="quiz-letter">D</div> Solo configura el spring-boot-maven-plugin</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q18-ok">✓ spring-boot-starter-parent actúa como un BOM (Bill of Materials): gestiona versiones de +400 dependencias, plugins y propiedades como encoding y versión Java.</div>
+      <div class="quiz-feedback fail" id="em1q18-fail">✗ spring-boot-starter-parent es un BOM que gestiona versiones de cientos de dependencias compatibles, plugins Maven y configuración de build por defecto.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Qué ocurre si defines dos beans del mismo tipo sin @Primary ni @Qualifier en Spring Boot?</div>
+      <div class="quiz-options" id="em1q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">A</div> Spring usa el bean declarado primero</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q19',true)"><div class="quiz-letter">B</div> Spring lanza NoUniqueBeanDefinitionException al intentar inyectar ese tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">C</div> Spring fusiona los dos beans en uno automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q19',false)"><div class="quiz-letter">D</div> El segundo bean sobreescribe al primero silenciosamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q19-ok">✓ NoUniqueBeanDefinitionException se lanza cuando Spring no puede determinar cuál bean inyectar. Se resuelve con @Primary o @Qualifier.</div>
+      <div class="quiz-feedback fail" id="em1q19-fail">✗ Spring lanza NoUniqueBeanDefinitionException. Soluciones: @Primary en el bean preferido, @Qualifier en el punto de inyección, o usar el nombre del bean como nombre del parámetro.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué hace @ConditionalOnProperty(name="feature.enabled", havingValue="true")?</div>
+      <div class="quiz-options" id="em1q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">A</div> El bean se crea siempre independientemente del valor de la propiedad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em1q20',true)"><div class="quiz-letter">B</div> El bean solo se crea si feature.enabled=true está en la configuración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">C</div> La propiedad se establece en true automáticamente al arrancar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em1q20',false)"><div class="quiz-letter">D</div> El bean se crea si la propiedad NO está definida</div>
+      </div>
+      <div class="quiz-feedback ok" id="em1q20-ok">✓ @ConditionalOnProperty permite feature flags en la configuración. matchIfMissing=true es útil para activar el bean cuando la propiedad no existe.</div>
+      <div class="quiz-feedback fail" id="em1q20-fail">✗ El bean solo existe si feature.enabled=true. Si la propiedad no existe, el bean no se crea. Usa matchIfMissing=true para cambiar este comportamiento.</div>
+    </div>
+  </div>
+</ng-container>

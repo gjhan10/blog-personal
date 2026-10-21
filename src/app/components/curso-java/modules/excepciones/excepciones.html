@@ -1,0 +1,677 @@
+﻿<ng-container>
+  <div class="lesson-card" *ngIf="globalLesson===28">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">29</span><span class="lesson-mod">Excepciones</span></div>
+      <h2 class="lesson-title">try / catch / finally</h2>
+      <p class="lesson-sub">Las excepciones son <strong>eventos anormales</strong> que interrumpen el flujo normal del programa. Java usa un mecanismo estructurado que separa el código normal del de manejo de errores.</p>
+    </div>
+
+    <h3 class="var-h3">Tipos de Throwable</h3>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Checked Exception</div>
+        <div class="tc-body">Hereda de <code>Exception</code> (no de <code>RuntimeException</code>). El <strong>compilador obliga</strong> a manejarlas con <code>try-catch</code> o declararlas con <code>throws</code>. Ej: <code>IOException</code>, <code>SQLException</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Unchecked Exception</div>
+        <div class="tc-body">Hereda de <code>RuntimeException</code>. El compilador <strong>no obliga</strong> a capturarlas. Indican errores de programación. Ej: <code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>, <code>ClassCastException</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Error</div>
+        <div class="tc-body">Hereda de <code>Error</code>. Condiciones <strong>graves del sistema</strong> que normalmente no deben capturarse. Ej: <code>OutOfMemoryError</code>, <code>StackOverflowError</code>. No representan bugs del programa.</div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Anatomía del bloque try-catch-finally</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label good">Estructura completa — reglas del examen Oracle</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// 1. Código que puede lanzar excepción</span><br>
+          &nbsp;&nbsp;<span class="a-type">int</span> resultado = <span class="a-fn">dividir</span>(<span class="a-body">10</span>, <span class="a-body">0</span>);<br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">ArithmeticException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// 2. Captura más específica PRIMERO</span><br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Aritmética: "</span> + e.<span class="a-fn">getMessage</span>());<br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">RuntimeException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// 3. Más general después</span><br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Runtime: "</span> + e.<span class="a-fn">getMessage</span>());<br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">IOException</span> | <span class="a-type">SQLException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// 4. Multi-catch (Java 7+) — variable efectivamente final</span><br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"I/O o BD: "</span> + e.<span class="a-fn">getMessage</span>());<br>
+          {{ '}' }} <span class="a-kw">finally</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// 5. Siempre se ejecuta (incluso con return en try)</span><br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Limpieza garantizada"</span>);<br>
+          {{ '}' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box"><i class="ico ico-bolt" aria-hidden="true"></i> <strong>Reglas de oro para el examen:</strong> (1) Los <code>catch</code> más específicos van primero — el compilador rechaza un catch de clase padre antes que el de la hija. (2) En multi-catch la variable <code>e</code> es implícitamente <code>final</code> — no puedes reasignarla. (3) <code>finally</code> se ejecuta siempre, <strong>incluso con</strong> <code>return</code> en el try. La única excepción es <code>System.exit()</code> o un crash de JVM.</div>
+
+    <h3 class="var-h3" style="margin-top:20px">Métodos clave de Throwable</h3>
+    <table class="exc-table">
+      <thead><tr><th>Método</th><th>Descripción</th><th>Ejemplo resultado</th></tr></thead>
+      <tbody>
+        <tr><td><code>getMessage()</code></td><td>Mensaje descriptivo de la excepción</td><td><code>"/ by zero"</code></td></tr>
+        <tr><td><code>getClass().getName()</code></td><td>Nombre completo de la clase</td><td><code>"java.lang.ArithmeticException"</code></td></tr>
+        <tr><td><code>printStackTrace()</code></td><td>Imprime la traza de pila completa</td><td>Stack trace en stderr</td></tr>
+        <tr><td><code>getCause()</code></td><td>Causa original (excepción encadenada)</td><td>Otra instancia de <code>Throwable</code> o <code>null</code></td></tr>
+        <tr><td><code>getSuppressed()</code></td><td>Excepciones suprimidas (try-with-resources)</td><td>Array de <code>Throwable[]</code></td></tr>
+        <tr><td><code>addSuppressed(t)</code></td><td>Añade una excepción suprimida manualmente</td><td>Modifica la lista interna</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="var-h3" style="margin-top:20px">Excepción encadenada (Chained Exceptions)</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label good">Patrón: envolver causa original con contexto de negocio</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> {{ '{' }}<br>
+          &nbsp;&nbsp;conectarBaseDeDatos();&nbsp;&nbsp;<span class="a-comment">// lanza SQLException</span><br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">SQLException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// Envolvemos la causa original con contexto de negocio</span><br>
+          &nbsp;&nbsp;<span class="a-kw">throw new</span> <span class="a-type">RuntimeException</span>(<span class="a-str">"No se pudo iniciar el servicio"</span>, e);<br>
+          {{ '}' }}<br><br>
+          <span class="a-comment">// El constructor Exception(String msg, Throwable cause)</span><br>
+          <span class="a-comment">// guarda la causa → accesible con getCause()</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">throw vs throws</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label">throw — lanza la instancia (en el cuerpo)</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">void</span> <span class="a-fn">validar</span>(<span class="a-type">int</span> edad) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">if</span> (edad &lt; 0) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// throw (sin s) lanza la excepción</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">throw new</span> <span class="a-type">IllegalArgumentException</span>(<span class="a-str">"Edad inválida"</span>);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          {{ '}' }}
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label">throws — declara en la firma (checked)</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-comment">// throws (con s) en la firma del método</span><br>
+          <span class="a-kw">void</span> <span class="a-fn">leerArchivo</span>(<span class="a-type">String</span> ruta)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">throws</span> <span class="a-type">IOException</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// El llamador DEBE manejar IOException</span><br>
+          &nbsp;&nbsp;Files.<span class="a-fn">readAllLines</span>(<span class="a-type">Path</span>.<span class="a-fn">of</span>(ruta));<br>
+          {{ '}' }}
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngTemplateOutlet="playground; context:{id:28, file:'ExcepcionesDemo.java', hint:'Modifica el dividendo a 0 y observa el flujo try→catch→finally'}"></ng-container>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===29">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">30</span><span class="lesson-mod">Excepciones</span></div>
+      <h2 class="lesson-title">Jerarquía de Excepciones</h2>
+      <p class="lesson-sub">Conocer la jerarquía completa es esencial para el examen OCP. Determina qué excepciones son <em>checked</em>, cuáles son <em>unchecked</em>, cómo se ordenan los bloques <code>catch</code> y cuándo el compilador se queja.</p>
+    </div>
+
+    <h3 class="var-h3">Excepciones más importantes del examen OCP</h3>
+    <table class="exc-table">
+      <thead><tr><th>Excepción</th><th>Tipo</th><th>Cuándo se lanza</th></tr></thead>
+      <tbody>
+        <tr><td><code>NullPointerException</code></td><td><span class="badge-unc">Unchecked</span></td><td>Acceso a campo/método de referencia <code>null</code></td></tr>
+        <tr><td><code>ArrayIndexOutOfBoundsException</code></td><td><span class="badge-unc">Unchecked</span></td><td>Índice de array fuera de rango</td></tr>
+        <tr><td><code>ClassCastException</code></td><td><span class="badge-unc">Unchecked</span></td><td>Cast inválido: <code>(String) objeto</code> cuando no es String</td></tr>
+        <tr><td><code>ArithmeticException</code></td><td><span class="badge-unc">Unchecked</span></td><td>División entera por cero</td></tr>
+        <tr><td><code>NumberFormatException</code></td><td><span class="badge-unc">Unchecked</span></td><td><code>Integer.parseInt("abc")</code></td></tr>
+        <tr><td><code>IllegalArgumentException</code></td><td><span class="badge-unc">Unchecked</span></td><td>Argumento inválido pasado a un método</td></tr>
+        <tr><td><code>IllegalStateException</code></td><td><span class="badge-unc">Unchecked</span></td><td>Estado del objeto no válido para esa operación</td></tr>
+        <tr><td><code>StackOverflowError</code></td><td><span class="badge-err">Error</span></td><td>Recursión infinita (call stack llena)</td></tr>
+        <tr><td><code>OutOfMemoryError</code></td><td><span class="badge-err">Error</span></td><td>Heap lleno, JVM no puede asignar memoria</td></tr>
+        <tr><td><code>IOException</code></td><td><span class="badge-chk">Checked</span></td><td>Error de E/S (archivos, red, streams)</td></tr>
+        <tr><td><code>FileNotFoundException</code></td><td><span class="badge-chk">Checked</span></td><td>Archivo no encontrado (extiende <code>IOException</code>)</td></tr>
+        <tr><td><code>SQLException</code></td><td><span class="badge-chk">Checked</span></td><td>Error de base de datos JDBC</td></tr>
+        <tr><td><code>InterruptedException</code></td><td><span class="badge-chk">Checked</span></td><td>Hilo interrumpido durante <code>sleep()</code> o <code>wait()</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="var-h3" style="margin-top:20px">Checked vs Unchecked — comparativa completa</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label">Checked — compilador lo verifica</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-comment">// Extiende Exception (NO RuntimeException)</span><br>
+          <span class="a-kw">public class</span> <span class="a-type">MiChecked</span> <span class="a-kw">extends</span> <span class="a-type">Exception</span> {{ '{' }}{{ '}' }}<br><br>
+          <span class="a-comment">// Método DEBE declarar throws o envolver en try-catch</span><br>
+          <span class="a-kw">void</span> <span class="a-fn">metodo</span>() <span class="a-kw">throws</span> <span class="a-type">IOException</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-type">Files</span>.<span class="a-fn">readAllLines</span>(<span class="a-type">Path</span>.<span class="a-fn">of</span>(<span class="a-str">"x"</span>));<br>
+          {{ '}' }}<br><br>
+          <span class="a-comment">// Caso de uso: recuperación posible</span><br>
+          <span class="a-comment">// (archivo no encontrado → mostrar mensaje)</span>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label">Unchecked — sin obligación de declarar</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-comment">// Extiende RuntimeException</span><br>
+          <span class="a-kw">public class</span> <span class="a-type">MiUnchecked</span> <span class="a-kw">extends</span> <span class="a-type">RuntimeException</span> {{ '{' }}{{ '}' }}<br><br>
+          <span class="a-comment">// Sin throws — el compilador no lo exige</span><br>
+          <span class="a-kw">void</span> <span class="a-fn">metodo</span>(<span class="a-type">String</span> s) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-type">Integer</span>.<span class="a-fn">parseInt</span>(s);<span class="a-comment">// puede lanzar NFE</span><br>
+          {{ '}' }}<br><br>
+          <span class="a-comment">// Caso de uso: error de programación</span><br>
+          <span class="a-comment">// (input no validado = bug del dev)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Reglas de orden de bloques catch</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad"><i class="ico ico-x" aria-hidden="true"></i> Error de compilación — padre antes que hija</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> {{ '{' }} ... {{ '}' }}<br>
+          <span class="a-kw">catch</span> (<span class="a-type">Exception</span> e) {{ '{' }} ... {{ '}' }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// PADRE</span><br>
+          <span class="a-kw">catch</span> (<span class="a-type">ArithmeticException</span> e) {{ '{' }} ... {{ '}' }}<br>
+          <span class="a-comment">// ↑ COMPILE ERROR: already caught by Exception</span>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good"><i class="ico ico-check" aria-hidden="true"></i> Correcto — específico antes que general</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> {{ '{' }} ... {{ '}' }}<br>
+          <span class="a-kw">catch</span> (<span class="a-type">ArithmeticException</span> e) {{ '{' }} ... {{ '}' }}<span class="a-comment">// HIJA</span><br>
+          <span class="a-kw">catch</span> (<span class="a-type">RuntimeException</span> e) {{ '{' }} ... {{ '}' }}&nbsp;&nbsp;<span class="a-comment">// PADRE</span><br>
+          <span class="a-kw">catch</span> (<span class="a-type">Exception</span> e) {{ '{' }} ... {{ '}' }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// ABUELO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box"><i class="ico ico-bolt" aria-hidden="true"></i> <strong>Para el examen:</strong> (1) Si en multi-catch pones dos tipos donde uno hereda del otro, es <strong>error de compilación</strong>: <code>catch(Exception | ArithmeticException e)</code> es ilegal. (2) <code>catch(Exception)</code> captura cualquier <code>Exception</code> pero NO captura <code>Error</code> — son ramas independientes de <code>Throwable</code>. (3) Solo <code>catch(Throwable)</code> captura todo, pero es mala práctica.</div>
+
+    <ng-container *ngTemplateOutlet="playground; context:{id:29, file:'JerarquiaDemo.java', hint:'Añade un catch(Exception e) al final y observa el orden de captura'}"></ng-container>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===30">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">31</span><span class="lesson-mod">Excepciones</span></div>
+      <h2 class="lesson-title">Excepciones Personalizadas</h2>
+      <p class="lesson-sub">Las excepciones propias (<em>custom exceptions</em>) modelan errores del <strong>dominio de negocio</strong> con mensajes significativos, datos adicionales y una jerarquía coherente. Son esenciales en aplicaciones de producción.</p>
+    </div>
+
+    <h3 class="var-h3">¿Cuándo crear checked vs unchecked?</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label">Checked custom — extiende Exception</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">public class</span> <span class="a-type">DatosInvalidosException</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">extends</span> <span class="a-type">Exception</span> {{ '{' }}<br><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">DatosInvalidosException</span>(<span class="a-type">String</span> msg) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">super</span>(msg);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          &nbsp;&nbsp;<span class="a-comment">// El llamador DEBE capturarla o propagarla</span><br>
+          {{ '}' }}
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label">Unchecked custom — extiende RuntimeException</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">public class</span> <span class="a-type">SaldoInsuficienteException</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">extends</span> <span class="a-type">RuntimeException</span> {{ '{' }}<br><br>
+          &nbsp;&nbsp;<span class="a-kw">private final double</span> saldo, monto;<br><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">SaldoInsuficienteException</span>(<span class="a-kw">double</span> s, <span class="a-kw">double</span> m) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">super</span>(<span class="a-type">String</span>.<span class="a-fn">format</span>(<span class="a-str">"Saldo %.2f insuficiente para retirar %.2f"</span>, s, m));<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.saldo = s; <span class="a-kw">this</span>.monto = m;<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">public double</span> <span class="a-fn">getSaldo</span>() {{ '{' }} <span class="a-kw">return</span> saldo; {{ '}' }}<br>
+          {{ '}' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <strong>Guía de diseño:</strong> Usa <strong>checked</strong> cuando el llamador puede <em>razonablemente</em> recuperarse (ej: archivo no encontrado → buscar alternativa). Usa <strong>unchecked</strong> para errores de programación o condiciones que no deberían ocurrir en código correcto (ej: argumento nulo, estado inválido). La tendencia moderna favorece <em>unchecked</em> para no contaminar las firmas de métodos.</div>
+
+    <h3 class="var-h3" style="margin-top:20px">Los 4 constructores estándar (best practice OCP)</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label good">Plantilla completa de excepción personalizada</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">public class</span> <span class="a-type">MiExcepcion</span> <span class="a-kw">extends</span> <span class="a-type">RuntimeException</span> {{ '{' }}<br><br>
+          &nbsp;&nbsp;<span class="a-comment">// 1. Sin argumentos</span><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">MiExcepcion</span>() {{ '{' }} <span class="a-kw">super</span>(); {{ '}' }}<br><br>
+          &nbsp;&nbsp;<span class="a-comment">// 2. Con mensaje</span><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">MiExcepcion</span>(<span class="a-type">String</span> mensaje) {{ '{' }} <span class="a-kw">super</span>(mensaje); {{ '}' }}<br><br>
+          &nbsp;&nbsp;<span class="a-comment">// 3. Con causa (encadenamiento de excepciones)</span><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">MiExcepcion</span>(<span class="a-type">Throwable</span> causa) {{ '{' }} <span class="a-kw">super</span>(causa); {{ '}' }}<br><br>
+          &nbsp;&nbsp;<span class="a-comment">// 4. Mensaje + causa — el más completo</span><br>
+          &nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-fn">MiExcepcion</span>(<span class="a-type">String</span> msg, <span class="a-type">Throwable</span> causa) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">super</span>(msg, causa);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          {{ '}' }}
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Métodos de diagnóstico en producción</h3>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">getMessage()</div>
+        <div class="tc-body">Retorna el mensaje pasado al constructor. Útil para logs de negocio: <code>e.getMessage()</code> → <code>"Saldo 50.00 insuficiente"</code></div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">getCause()</div>
+        <div class="tc-body">Retorna la excepción original encadenada o <code>null</code>. Permite ver la causa raíz: <code>e.getCause().getMessage()</code></div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">printStackTrace()</div>
+        <div class="tc-body">Imprime la traza completa de llamadas en stderr. En producción usa un logger: <code>logger.error("Error", e)</code></div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-tag" aria-hidden="true"></i></div>
+        <div class="tc-title">toString()</div>
+        <div class="tc-body">Retorna clase + mensaje: <code>"com.app.MiExcepcion: Saldo insuficiente"</code>. Es lo que se imprime automáticamente con <code>System.out.println(e)</code></div>
+      </div>
+    </div>
+
+    <ng-container *ngTemplateOutlet="playground; context:{id:30, file:'CustomExcDemo.java', hint:'Prueba con saldo negativo o retiro mayor al saldo disponible'}"></ng-container>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===31">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">32</span><span class="lesson-mod">Excepciones</span></div>
+      <h2 class="lesson-title">try-with-resources y AutoCloseable</h2>
+      <p class="lesson-sub"><code>try-with-resources</code> (Java 7+) cierra automáticamente cualquier recurso que implemente <code>AutoCloseable</code> al finalizar el bloque, <strong>incluso si ocurre una excepción</strong>. Elimina el patrón verboso de <code>finally</code> manual.</p>
+    </div>
+
+    <h3 class="var-h3">Antes de Java 7 vs try-with-resources</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad"><i class="ico ico-x" aria-hidden="true"></i> Java 6 — finally manual (propenso a bugs)</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-type">Connection</span> conn = <span class="a-kw">null</span>;<br>
+          <span class="a-kw">try</span> {{ '{' }}<br>
+          &nbsp;&nbsp;conn = <span class="a-fn">getConnection</span>();<br>
+          &nbsp;&nbsp;conn.<span class="a-fn">doWork</span>();<br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">SQLException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-fn">log</span>(e);<br>
+          {{ '}' }} <span class="a-kw">finally</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">if</span> (conn != <span class="a-kw">null</span>) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">try</span> {{ '{' }} conn.<span class="a-fn">close</span>(); {{ '}' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">catch</span> (<span class="a-type">SQLException</span> e2) {{ '{' }} <span class="a-fn">log</span>(e2); {{ '}' }}<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          {{ '}' }} <span class="a-comment">// ← 15+ líneas para algo simple</span>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good"><i class="ico ico-check" aria-hidden="true"></i> Java 7+ — try-with-resources</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> (<span class="a-type">Connection</span> conn = <span class="a-fn">getConnection</span>()) {{ '{' }}<br>
+          &nbsp;&nbsp;conn.<span class="a-fn">doWork</span>();<br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">SQLException</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-fn">log</span>(e);<br>
+          {{ '}' }}<br>
+          <span class="a-comment">// conn.close() llamado automáticamente</span><br>
+          <span class="a-comment">// ← 6 líneas, mismo comportamiento</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Múltiples recursos — orden de cierre (LIFO)</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label">Los recursos se cierran en orden INVERSO al de apertura</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">try</span> (<br>
+          &nbsp;&nbsp;<span class="a-type">InputStream</span> in = <span class="a-kw">new</span> <span class="a-type">FileInputStream</span>(<span class="a-str">"data.bin"</span>);&nbsp;&nbsp;<span class="a-comment">// abre 1ro</span><br>
+          &nbsp;&nbsp;<span class="a-type">BufferedReader</span> br = <span class="a-kw">new</span> <span class="a-type">BufferedReader</span>(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">new</span> <span class="a-type">InputStreamReader</span>(in))&nbsp;<span class="a-comment">// abre 2do</span><br>
+          ) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-type">String</span> line;<br>
+          &nbsp;&nbsp;<span class="a-kw">while</span> ((line = br.<span class="a-fn">readLine</span>()) != <span class="a-kw">null</span>)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(line);<br>
+          {{ '}' }}<br>
+          <span class="a-comment">// Cierre automático: br.close() → in.close() (LIFO)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Excepciones suprimidas (Suppressed Exceptions)</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label">Cuando tanto el body como el close() lanzan excepción</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">class</span> <span class="a-type">RecursoFallido</span> <span class="a-kw">implements</span> <span class="a-type">AutoCloseable</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">public void</span> <span class="a-fn">close</span>() <span class="a-kw">throws</span> <span class="a-type">Exception</span> {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">throw new</span> <span class="a-type">Exception</span>(<span class="a-str">"Error en close()"</span>);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          {{ '}' }}<br><br>
+          <span class="a-kw">try</span> (<span class="a-type">RecursoFallido</span> r = <span class="a-kw">new</span> <span class="a-type">RecursoFallido</span>()) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">throw new</span> <span class="a-type">Exception</span>(<span class="a-str">"Error en body"</span>);&nbsp;&nbsp;<span class="a-comment">// ← principal</span><br>
+          {{ '}' }} <span class="a-kw">catch</span> (<span class="a-type">Exception</span> e) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(e.<span class="a-fn">getMessage</span>());<br>
+          &nbsp;&nbsp;<span class="a-comment">// → "Error en body" (la del body es la principal)</span><br>
+          &nbsp;&nbsp;<span class="a-type">Throwable</span>[] sup = e.<span class="a-fn">getSuppressed</span>();<br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(sup[<span class="a-body">0</span>].<span class="a-fn">getMessage</span>());<br>
+          &nbsp;&nbsp;<span class="a-comment">// → "Error en close()" (suprimida, no perdida)</span><br>
+          {{ '}' }}
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Java 9+: variables efectivamente finales en try()</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label good">Java 9 — reutilizar recurso ya declarado (effectively final)</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-type">BufferedReader</span> reader = <span class="a-kw">new</span> <span class="a-type">BufferedReader</span>(...);<br>
+          <span class="a-comment">// Java 9+: usar variable ya declarada si es efectivamente final</span><br>
+          <span class="a-kw">try</span> (reader) {{ '{' }}&nbsp;&nbsp;<span class="a-comment">// ← no redeclara el tipo</span><br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(reader.<span class="a-fn">readLine</span>());<br>
+          {{ '}' }}<br>
+          <span class="a-comment">// reader.close() se llama automáticamente</span><br>
+          <span class="a-comment">// Java 7-8: debías redeclarar: try(BufferedReader r = reader)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="var-h3" style="margin-top:20px">Implementar AutoCloseable personalizado</h3>
+    <div class="compare-grid" style="grid-template-columns:1fr">
+      <div class="compare-col">
+        <div class="compare-label good">Recurso propio compatible con try-with-resources</div>
+        <div class="compare-code compare-code--light">
+          <span class="a-kw">class</span> <span class="a-type">Conexion</span> <span class="a-kw">implements</span> <span class="a-type">AutoCloseable</span> {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> nombre;<br>
+          &nbsp;&nbsp;<span class="a-fn">Conexion</span>(<span class="a-type">String</span> n) {{ '{' }}<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;nombre = n;<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Abriendo: "</span> + nombre);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          &nbsp;&nbsp;<span class="a-kw">public void</span> <span class="a-fn">close</span>() {{ '{' }}&nbsp;&nbsp;<span class="a-comment">// puede throws Exception</span><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Cerrando: "</span> + nombre);<br>
+          &nbsp;&nbsp;{{ '}' }}<br>
+          {{ '}' }}<br><br>
+          <span class="a-kw">try</span> (<span class="a-type">Conexion</span> c = <span class="a-kw">new</span> <span class="a-type">Conexion</span>(<span class="a-str">"BD-1"</span>)) {{ '{' }}<br>
+          &nbsp;&nbsp;<span class="a-type">System</span>.out.<span class="a-fn">println</span>(<span class="a-str">"Trabajando..."</span>);<br>
+          {{ '}' }}<br>
+          <span class="a-comment">// → Abriendo: BD-1 → Trabajando... → Cerrando: BD-1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box"><i class="ico ico-bolt" aria-hidden="true"></i> <strong>Para el examen:</strong> (1) <code>AutoCloseable.close()</code> puede declarar <em>cualquier</em> excepción checked. <code>Closeable.close()</code> solo puede lanzar <code>IOException</code>. (2) Los recursos se cierran en <strong>orden inverso</strong> al de declaración (LIFO). (3) Si el body y el close() lanzan, la del body es la <strong>principal</strong> y la del close() es <strong>suprimida</strong> — accesible con <code>getSuppressed()</code>, no se pierde.</div>
+
+    <ng-container *ngTemplateOutlet="playground; context:{id:31, file:'TryResourcesDemo.java', hint:'Observa cómo el BufferedReader se cierra automáticamente sin finally'}"></ng-container>
+  </div>
+
+  <div class="quiz-section" id="eval-m5" *ngIf="isEval">
+      <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 5 — Manejo de Excepciones</div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 1 de 20</div>
+        <div class="quiz-q">¿De qué clase raíz heredan <em>todas</em> las excepciones y errores en Java?</div>
+        <div class="quiz-options" id="em5q01">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><div class="quiz-letter">A</div> Exception</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><div class="quiz-letter">B</div> Error</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><div class="quiz-letter">C</div> RuntimeException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q01',true)"><div class="quiz-letter">D</div> Throwable</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q01-ok">✓ <code>Throwable</code> es la raíz. Sus dos hijas directas son <code>Error</code> (condiciones graves de JVM) y <code>Exception</code> (condiciones recuperables). <code>RuntimeException</code> es nieta (extiende <code>Exception</code>).</div>
+        <div class="quiz-feedback fail" id="em5q01-fail">✗ La raíz es <code>Throwable</code>. Se bifurca en <code>Error</code> y <code>Exception</code>. <code>RuntimeException</code> extiende <code>Exception</code> (es nieta de <code>Throwable</code>).</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 2 de 20</div>
+        <div class="quiz-q">¿Cuál excepción lanza Java al ejecutar <code>int a = 10 / 0</code>?</div>
+        <div class="quiz-options" id="em5q02">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><div class="quiz-letter">A</div> ZeroDivisionException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><div class="quiz-letter">B</div> MathException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q02',true)"><div class="quiz-letter">C</div> ArithmeticException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><div class="quiz-letter">D</div> NumberFormatException</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q02-ok">✓ <code>ArithmeticException: / by zero</code>. OJO: con <code>double</code> (ej: <code>10.0 / 0</code>) NO lanza excepción — retorna <code>Infinity</code>. Solo la división <em>entera</em> por cero lanza.</div>
+        <div class="quiz-feedback fail" id="em5q02-fail">✗ Es <code>ArithmeticException</code>. Solo aplica a división entera. Con <code>double</code>: <code>10.0 / 0</code> retorna <code>Double.POSITIVE_INFINITY</code> sin excepción.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 3 de 20</div>
+        <div class="quiz-q">¿Qué bloque se garantiza que se ejecuta siempre, incluso si hay un <code>return</code> dentro de <code>try</code>?</div>
+        <div class="quiz-options" id="em5q03">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><div class="quiz-letter">A</div> catch</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><div class="quiz-letter">B</div> try</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q03',true)"><div class="quiz-letter">C</div> finally</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><div class="quiz-letter">D</div> throws</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q03-ok">✓ <code>finally</code> siempre se ejecuta, incluso con <code>return</code> en <code>try</code> o <code>catch</code>. Las únicas excepciones: <code>System.exit()</code>, <code>Runtime.halt()</code>, o fallo catastrófico de la JVM.</div>
+        <div class="quiz-feedback fail" id="em5q03-fail">✗ <code>finally</code> se ejecuta siempre. Ni un <code>return</code> en <code>try</code> lo omite. Solo <code>System.exit()</code> puede impedirlo.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 4 de 20</div>
+        <div class="quiz-q">¿Qué error produce este código?
+          <br><code>catch(Exception e) {{ '{' }}...{{ '}' }} catch(ArithmeticException e) {{ '{' }}...{{ '}' }}</code></div>
+        <div class="quiz-options" id="em5q04">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><div class="quiz-letter">A</div> Ninguno — es código válido</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q04',true)"><div class="quiz-letter">B</div> Error de compilación — "Exception already caught"</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><div class="quiz-letter">C</div> Solo produce un warning</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><div class="quiz-letter">D</div> Solo falla en tiempo de ejecución</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q04-ok">✓ Error de compilación: el compilador detecta que <code>ArithmeticException</code> ya está cubierta por <code>Exception</code> y el segundo catch sería inalcanzable. Siempre: específico → general.</div>
+        <div class="quiz-feedback fail" id="em5q04-fail">✗ Error de compilación. <code>Exception</code> captura todo, incluyendo <code>ArithmeticException</code>. El segundo catch es código inalcanzable ("unreachable code"). Debes poner el más específico primero.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 5 de 20</div>
+        <div class="quiz-q">En multi-catch <code>catch(IOException | SQLException e)</code>, ¿qué característica tiene la variable <code>e</code>?</div>
+        <div class="quiz-options" id="em5q05">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><div class="quiz-letter">A</div> Es mutable — puedes reasignarla</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q05',true)"><div class="quiz-letter">B</div> Es implícitamente final — no puedes reasignarla</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><div class="quiz-letter">C</div> Su tipo inferido es siempre Object</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><div class="quiz-letter">D</div> Solo puede ser de tipo Exception</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q05-ok">✓ En multi-catch, la variable es <strong>implícitamente final</strong>. Intentar reasignarla (<code>e = new IOException()</code>) es error de compilación. El tipo inferido es el supertipo común de los tipos listados.</div>
+        <div class="quiz-feedback fail" id="em5q05-fail">✗ En <code>catch(A | B e)</code>, la variable <code>e</code> es implícitamente <code>final</code>. No puedes hacer <code>e = new A()</code> dentro del bloque — error de compilación.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 6 de 20</div>
+        <div class="quiz-q">¿Qué diferencia existe entre <code>throw</code> y <code>throws</code>?</div>
+        <div class="quiz-options" id="em5q06">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><div class="quiz-letter">A</div> Son exactamente lo mismo</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><div class="quiz-letter">B</div> <code>throws</code> lanza la excepción; <code>throw</code> la declara</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q06',true)"><div class="quiz-letter">C</div> <code>throw</code> lanza una instancia concreta; <code>throws</code> declara en la firma que puede lanzarla</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><div class="quiz-letter">D</div> <code>throws</code> solo aplica a unchecked exceptions</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q06-ok">✓ <code>throw new MiExcepcion()</code> — lanza una instancia concreta (dentro del cuerpo del método). <code>void metodo() throws IOException</code> — declara en la firma que puede lanzarla (el llamador debe manejarla).</div>
+        <div class="quiz-feedback fail" id="em5q06-fail">✗ <code>throw</code> (sin s) se usa en el cuerpo para lanzar. <code>throws</code> va en la firma del método para <em>declarar</em> que puede lanzar esa checked exception.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 7 de 20</div>
+        <div class="quiz-q">¿Cuál de las siguientes es una excepción <em>checked</em>?</div>
+        <div class="quiz-options" id="em5q07">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><div class="quiz-letter">A</div> NullPointerException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><div class="quiz-letter">B</div> ClassCastException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q07',true)"><div class="quiz-letter">C</div> IOException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><div class="quiz-letter">D</div> StackOverflowError</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q07-ok">✓ <code>IOException</code> extiende <code>Exception</code> directamente (no <code>RuntimeException</code>), por eso es <em>checked</em>. El compilador obliga a manejarla. NPE y CCE son unchecked; SOE es un <code>Error</code>.</div>
+        <div class="quiz-feedback fail" id="em5q07-fail">✗ <code>IOException</code> es checked (hereda de <code>Exception</code>). NPE y CCE son unchecked (heredan de <code>RuntimeException</code>). <code>StackOverflowError</code> es un <code>Error</code>, ni siquiera es <code>Exception</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 8 de 20</div>
+        <div class="quiz-q">¿De qué clase debe extender una excepción personalizada <em>unchecked</em>?</div>
+        <div class="quiz-options" id="em5q08">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><div class="quiz-letter">A</div> Exception</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><div class="quiz-letter">B</div> Throwable</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><div class="quiz-letter">C</div> Error</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q08',true)"><div class="quiz-letter">D</div> RuntimeException</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q08-ok">✓ Extender <code>RuntimeException</code> → unchecked (el compilador no obliga a manejarla). Extender <code>Exception</code> → checked. Extender directamente <code>Throwable</code> es técnicamente posible pero no recomendado.</div>
+        <div class="quiz-feedback fail" id="em5q08-fail">✗ Para unchecked: extiende <code>RuntimeException</code>. Para checked: extiende <code>Exception</code>. Nunca extiendas <code>Error</code> — está reservado para condiciones graves de la JVM.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 9 de 20</div>
+        <div class="quiz-q">¿Qué interfaz deben implementar los objetos usados en <code>try(recurso)</code>?</div>
+        <div class="quiz-options" id="em5q09">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><div class="quiz-letter">A</div> Closeable (única opción)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q09',true)"><div class="quiz-letter">B</div> AutoCloseable (o su sub-interfaz Closeable)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><div class="quiz-letter">C</div> Serializable</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><div class="quiz-letter">D</div> No necesita implementar ninguna interfaz</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q09-ok">✓ <code>AutoCloseable</code> define el método <code>close() throws Exception</code>. <code>Closeable</code> extiende <code>AutoCloseable</code> pero restringe <code>close()</code> a solo lanzar <code>IOException</code>. Ambas son válidas.</div>
+        <div class="quiz-feedback fail" id="em5q09-fail">✗ El recurso debe implementar <code>AutoCloseable</code> (o <code>Closeable</code> que es subinterfaz). Sin esta interfaz el compilador rechaza el recurso en el <code>try()</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 10 de 20</div>
+        <div class="quiz-q">Con <code>try(A a = ...; B b = ...)</code>, ¿en qué orden se cierran los recursos?</div>
+        <div class="quiz-options" id="em5q10">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><div class="quiz-letter">A</div> A primero, luego B (orden de apertura)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q10',true)"><div class="quiz-letter">B</div> B primero, luego A (orden inverso — LIFO)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><div class="quiz-letter">C</div> Simultáneamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><div class="quiz-letter">D</div> El orden no está especificado</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q10-ok">✓ Los recursos se cierran en <strong>orden inverso</strong> al de declaración (LIFO). Si declaras <code>try(A a; B b)</code>, primero se cierra B, luego A. Esto garantiza que recursos dependientes se cierren correctamente.</div>
+        <div class="quiz-feedback fail" id="em5q10-fail">✗ Orden <strong>inverso</strong> (LIFO): el último en abrirse es el primero en cerrarse. Con <code>try(A a; B b)</code>: B.close() → A.close().</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 11 de 20</div>
+        <div class="quiz-q">¿Qué sucede si no se captura ni se declara una excepción <em>checked</em>?</div>
+        <div class="quiz-options" id="em5q11">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><div class="quiz-letter">A</div> El programa continúa ignorando la excepción</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><div class="quiz-letter">B</div> Se imprime el stack trace y continúa</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q11',true)"><div class="quiz-letter">C</div> Error de compilación</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><div class="quiz-letter">D</div> Se convierte automáticamente en unchecked</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q11-ok">✓ El compilador rechaza el código con error: "unreported exception X; must be caught or declared to be thrown". Debes elegir: <code>try-catch</code> o agregar <code>throws X</code> a la firma del método.</div>
+        <div class="quiz-feedback fail" id="em5q11-fail">✗ Error de compilación. Las checked exceptions son verificadas en tiempo de compilación — debes capturarlas con <code>catch</code> o propagarlas con <code>throws</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 12 de 20</div>
+        <div class="quiz-q">¿Qué método de <code>Throwable</code> permite acceder a las excepciones suprimidas?</div>
+        <div class="quiz-options" id="em5q12">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><div class="quiz-letter">A</div> getCause()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q12',true)"><div class="quiz-letter">B</div> getSuppressed()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><div class="quiz-letter">C</div> getNextException()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><div class="quiz-letter">D</div> getMessage()</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q12-ok">✓ <code>getSuppressed()</code> retorna <code>Throwable[]</code> con las excepciones suprimidas. En try-with-resources, si el body y el close() lanzan, la del body es principal y la del close() se adjunta con <code>addSuppressed()</code>.</div>
+        <div class="quiz-feedback fail" id="em5q12-fail">✗ <code>getSuppressed()</code> retorna las excepciones suprimidas. <code>getCause()</code> retorna la causa original encadenada — son conceptos distintos.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 13 de 20</div>
+        <div class="quiz-q">¿Cuál jerarquía es correcta para <code>StackOverflowError</code>?</div>
+        <div class="quiz-options" id="em5q13">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><div class="quiz-letter">A</div> Throwable → Exception → RuntimeException → StackOverflowError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q13',true)"><div class="quiz-letter">B</div> Throwable → Error → VirtualMachineError → StackOverflowError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><div class="quiz-letter">C</div> Throwable → Exception → StackOverflowError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><div class="quiz-letter">D</div> Object → Error → StackOverflowError</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q13-ok">✓ <code>StackOverflowError</code> es un <code>VirtualMachineError</code> → <code>Error</code> → <code>Throwable</code>. No es una <code>Exception</code>. Los <code>Error</code> no deben capturarse en aplicaciones normales.</div>
+        <div class="quiz-feedback fail" id="em5q13-fail">✗ <code>StackOverflowError</code> hereda de <code>VirtualMachineError</code> que hereda de <code>Error</code>. NO es una <code>Exception</code>. También en esta rama: <code>OutOfMemoryError</code>.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 14 de 20</div>
+        <div class="quiz-q">Dado: <code>try {{ '{' }} return 1; {{ '}' }} finally {{ '{' }} return 2; {{ '}' }}</code> ¿Qué valor retorna el método?</div>
+        <div class="quiz-options" id="em5q14">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><div class="quiz-letter">A</div> 1</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q14',true)"><div class="quiz-letter">B</div> 2</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><div class="quiz-letter">C</div> Error de compilación</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><div class="quiz-letter">D</div> Lanza una excepción en runtime</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q14-ok">✓ Retorna <strong>2</strong>. El <code>return</code> en <code>finally</code> <strong>suprime</strong> el del <code>try</code>. El valor retornado será el del <code>finally</code>. También suprime cualquier excepción pendiente. Por eso es mala práctica poner <code>return</code> en <code>finally</code>.</div>
+        <div class="quiz-feedback fail" id="em5q14-fail">✗ Retorna <strong>2</strong>. El <code>finally</code> se ejecuta incluso cuando hay un <code>return</code> en el <code>try</code>, y el <code>return 2</code> del <code>finally</code> suprime el <code>return 1</code> del <code>try</code>. Trampa clásica del examen OCP.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 15 de 20</div>
+        <div class="quiz-q">¿Puede <code>catch(Exception e)</code> capturar un <code>Error</code>?</div>
+        <div class="quiz-options" id="em5q15">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><div class="quiz-letter">A</div> Sí, porque Exception captura todo lo que hereda de Throwable</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q15',true)"><div class="quiz-letter">B</div> No — Error y Exception son ramas independientes de Throwable</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><div class="quiz-letter">C</div> Solo si el Error es OutOfMemoryError</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><div class="quiz-letter">D</div> Sí, pero produce una advertencia del compilador</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q15-ok">✓ <code>Error</code> y <code>Exception</code> son hermanos (ambos hijos de <code>Throwable</code>). <code>catch(Exception e)</code> NO captura <code>Error</code>. Para capturar ambos usarías <code>catch(Throwable t)</code>, aunque es mala práctica.</div>
+        <div class="quiz-feedback fail" id="em5q15-fail">✗ <code>Error</code> no hereda de <code>Exception</code> — son ramas hermanas bajo <code>Throwable</code>. <code>catch(Exception)</code> no captura <code>Error</code>. Solo <code>catch(Throwable)</code> captura ambos.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 16 de 20</div>
+        <div class="quiz-q">¿Cuál sintaxis es correcta para el multi-catch introducido en Java 7?</div>
+        <div class="quiz-options" id="em5q16">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><div class="quiz-letter">A</div> <code>catch(IOException, SQLException e)</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q16',true)"><div class="quiz-letter">B</div> <code>catch(IOException | SQLException e)</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><div class="quiz-letter">C</div> <code>catch(IOException &amp; SQLException e)</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><div class="quiz-letter">D</div> <code>catch(Exception&lt;IOException, SQLException&gt; e)</code></div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q16-ok">✓ El operador <code>|</code> separa los tipos en multi-catch. Restricción: los tipos no pueden tener relación herencia entre sí (<code>IOException | FileNotFoundException</code> es error porque FileNotFoundException extiende IOException).</div>
+        <div class="quiz-feedback fail" id="em5q16-fail">✗ Multi-catch usa <code>|</code>: <code>catch(TipoA | TipoB e)</code>. La coma y el <code>&amp;</code> producen error de compilación. Además, no puedes poner tipos relacionados por herencia en el mismo multi-catch.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 17 de 20</div>
+        <div class="quiz-q">¿Qué devuelve <code>getCause()</code> si la excepción no fue creada con una causa?</div>
+        <div class="quiz-options" id="em5q17">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><div class="quiz-letter">A</div> Una nueva RuntimeException vacía</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><div class="quiz-letter">B</div> La propia excepción (this)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q17',true)"><div class="quiz-letter">C</div> null</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><div class="quiz-letter">D</div> Una cadena vacía</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q17-ok">✓ <code>getCause()</code> retorna <code>null</code> si la excepción se construyó sin causa. El patrón de excepción encadenada usa el constructor <code>Exception(String msg, Throwable cause)</code> o <code>initCause()</code> para establecerla.</div>
+        <div class="quiz-feedback fail" id="em5q17-fail">✗ Retorna <code>null</code>. La causa se establece en el constructor con <code>new MiExc("msg", causaOriginal)</code> o con <code>initCause(t)</code> si no se pasó en el constructor.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 18 de 20</div>
+        <div class="quiz-q">¿Qué ocurre si tanto el body del try como el <code>close()</code> del recurso lanzan excepciones en try-with-resources?</div>
+        <div class="quiz-options" id="em5q18">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><div class="quiz-letter">A</div> La excepción del close() reemplaza a la del body</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><div class="quiz-letter">B</div> Ambas excepciones se fusionan en una nueva</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q18',true)"><div class="quiz-letter">C</div> La del body es la principal; la del close() queda suprimida y accesible con getSuppressed()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><div class="quiz-letter">D</div> La excepción del close() se pierde</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q18-ok">✓ La excepción del body es la <strong>principal</strong>. La del <code>close()</code> se adjunta como suprimida mediante <code>addSuppressed()</code>. Se puede recuperar con <code>e.getSuppressed()[0]</code>. No se pierde — es una mejora sobre el viejo try-finally.</div>
+        <div class="quiz-feedback fail" id="em5q18-fail">✗ La del body gana (es la principal). La del <code>close()</code> se guarda como suprimida — accesible con <code>getSuppressed()</code>. Esto es mejor que el try-finally manual donde la excepción del finally podría ocultar la del body.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 19 de 20</div>
+        <div class="quiz-q">¿Cuál es el resultado de ejecutar <code>Integer.parseInt("12.5")</code>?</div>
+        <div class="quiz-options" id="em5q19">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><div class="quiz-letter">A</div> Retorna 12 (trunca la parte decimal)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><div class="quiz-letter">B</div> Retorna 12.5 como double</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q19',true)"><div class="quiz-letter">C</div> Lanza NumberFormatException</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><div class="quiz-letter">D</div> Error de compilación</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q19-ok">✓ <code>NumberFormatException</code> (unchecked) porque <code>"12.5"</code> contiene un punto decimal — no válido para <code>parseInt</code> que solo acepta enteros. Para parsear doubles: <code>Double.parseDouble("12.5")</code>.</div>
+        <div class="quiz-feedback fail" id="em5q19-fail">✗ <code>parseInt</code> solo acepta enteros sin punto decimal. <code>"12.5"</code> lanza <code>NumberFormatException</code>. Para parsear con decimales: <code>Double.parseDouble("12.5")</code> → 12.5.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-label">Pregunta 20 de 20</div>
+        <div class="quiz-q">Al sobreescribir un método que declara <code>throws IOException</code>, ¿puede la subclase declarar <code>throws Exception</code>?</div>
+        <div class="quiz-options" id="em5q20">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><div class="quiz-letter">A</div> Sí, puede declarar cualquier excepción checked</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q20',true)"><div class="quiz-letter">B</div> No — solo puede declarar la misma, subclases de ella, o ninguna</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><div class="quiz-letter">C</div> Solo si la clase padre es abstracta</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><div class="quiz-letter">D</div> Solo aplica a unchecked exceptions</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q20-ok">✓ Regla de Liskov para excepciones: el método sobreescrito puede lanzar la <strong>misma</strong> excepción checked, una <strong>subclase</strong> de ella, o <strong>ninguna</strong>. No puede ampliar la lista. Si el padre declara <code>throws IOException</code>, la hija NO puede declarar <code>throws Exception</code> — error de compilación. Las unchecked no tienen esta restricción.</div>
+        <div class="quiz-feedback fail" id="em5q20-fail">✗ Al sobreescribir, solo puedes: mantener la misma checked exception, reducirla a una subclase, o eliminarla. <strong>No puedes ampliarla</strong>. Si el padre declara <code>throws IOException</code>, la hija no puede declarar <code>throws Exception</code> — error de compilación.</div>
+      </div>
+
+    </div>
+
+</ng-container>

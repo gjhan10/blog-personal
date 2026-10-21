@@ -1,0 +1,347 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===44">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">45</span><span class="lesson-mod">Java 16</span></div>
+        <h2 class="lesson-title">Records (Java 16 — JEP 395)</h2>
+        <p class="lesson-sub">Un <code>record</code> es una clase inmutable compacta. El compilador genera automáticamente constructor canónico, getters, <code>equals()</code>, <code>hashCode()</code> y <code>toString()</code>.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label bad">Antes de records (50+ líneas)</div>
+          <div class="compare-code">class Punto {{ '{' }}<br>&nbsp;&nbsp;private final double x, y;<br>&nbsp;&nbsp;Punto(double x, double y) {{ '{' }} ... {{ '}' }}<br>&nbsp;&nbsp;double x() {{ '{' }} return x; {{ '}' }}<br>&nbsp;&nbsp;// equals, hashCode, toString...<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Con record (1 línea)</div>
+          <div class="compare-code">record Punto(double x, double y) {{ '{' }}{{ '}' }}</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:44, file:'RecordsDemo.java', hint:'Añade un método distancia(Punto o)'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===45">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">46</span><span class="lesson-mod">Java 17</span></div>
+        <h2 class="lesson-title">Sealed Classes (Java 17 — JEP 409)</h2>
+        <p class="lesson-sub">Una clase o interfaz <code>sealed</code> controla qué clases pueden extenderla con la cláusula <code>permits</code>. Combinadas con <code>switch</code> de patrón garantizan exhaustividad.</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Las subclases permitidas deben ser: <code>final</code> (no más subclases), <code>sealed</code> (continúa la jerarquía) o <code>non-sealed</code> (abre la jerarquía).</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:45, file:'SealedDemo.java', hint:'Añade record Triangulo al sealed'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===46">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">47</span><span class="lesson-mod">Java 21</span></div>
+        <h2 class="lesson-title">Pattern Matching en switch (Java 21 — JEP 441)</h2>
+        <p class="lesson-sub">Java 21 estabilizó el <em>pattern matching</em> en <code>switch</code>. Combina type test con extracción de variable en un solo <code>case</code>. Las <code>when</code> guards permiten condiciones adicionales.</p>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">switch</span> <span class="a-paren">(obj)</span> <span class="a-br">{{ '{' }}</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">case</span> <span class="a-type">Integer</span> <span class="a-body">i when i &gt; 0</span> <span class="a-kw">-&gt;</span> <span class="a-body">...</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">case</span> <span class="a-type">String</span> <span class="a-body">s</span> <span class="a-kw">-&gt;</span> <span class="a-body">...</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">case null</span> <span class="a-kw">-&gt;</span> <span class="a-body">...</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">default</span> <span class="a-kw">-&gt;</span> <span class="a-body">...</span></div>
+        <div class="anatomy-line"><span class="a-br">{{ '}' }}</span></div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:46, file:'PatternMatchingDemo.java', hint:'Añade case Double d'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===47">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">48</span><span class="lesson-mod">Java 21</span></div>
+        <h2 class="lesson-title">Virtual Threads — Project Loom (Java 21 — JEP 444)</h2>
+        <p class="lesson-sub">Los <strong>Virtual Threads</strong> son hilos ultraligeros gestionados por la JVM, no por el OS. Permiten millones de hilos concurrentes sin cambiar el modelo de programación.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label bad">Hilo de plataforma</div>
+          <div class="compare-code">~1 MB de stack por hilo<br>Límite: ~thousands<br>Gestionado por el OS</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Virtual Thread</div>
+          <div class="compare-code">~Kilobytes de stack<br>Límite: millones<br>Gestionado por la JVM</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:47, file:'VirtualThreadsDemo.java', hint:'Aumenta a 20 virtual threads'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===48">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">49</span><span class="lesson-mod">Java 21</span></div>
+        <h2 class="lesson-title">Text Blocks &amp; String Templates</h2>
+        <p class="lesson-sub">Los <strong>Text Blocks</strong> (Java 15+) permiten strings multilínea con sangría automática usando <code>""" ... """</code>. <code>.formatted()</code> es el mecanismo de interpolación moderno.</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Java 21 introduce los <strong>String Templates</strong> (JEP 430 preview). La sintaxis definitiva (<code>STR."\{{ '{' }}expr{{ '}' }}"</code>) se revisa en Java 22–24 para mayor seguridad.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:48, file:'TextBlocksDemo.java', hint:'Prueba el text block con JSON'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===49">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">50</span><span class="lesson-mod">Java 22–24</span></div>
+        <h2 class="lesson-title">Novedades Java 22, 23 y 24</h2>
+        <p class="lesson-sub">Java sigue el ciclo semestral de lanzamiento GA en marzo y septiembre. Las JEPs relevantes para Java SE.</p>
+      </div>
+      <div class="theory-grid">
+        <div class="theory-card">
+          <div class="tc-icon">22</div>
+          <div class="tc-title">Java 22 (Mar 2024)</div>
+          <div class="tc-body"><strong>JEP 454</strong> Foreign Function &amp; Memory API (GA) · <strong>JEP 447</strong> Statements before <code>super()</code> (Preview) · <strong>JEP 423</strong> Region Pinning for G1.</div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon">23</div>
+          <div class="tc-title">Java 23 (Sep 2024)</div>
+          <div class="tc-body"><strong>JEP 455</strong> Primitivos en Patterns (Preview) · <strong>JEP 467</strong> Markdown en Javadoc · <strong>JEP 471</strong> Deprecación de métodos en <code>sun.misc.Unsafe</code>.</div>
+        </div>
+        <div class="theory-card">
+          <div class="tc-icon">24</div>
+          <div class="tc-title">Java 24 (Mar 2025)</div>
+          <div class="tc-body"><strong>JEP 484</strong> Class-File API (GA) · <strong>JEP 491</strong> Sync Virtual Threads sin Pinning (GA) · <strong>JEP 493</strong> Linking sin JMODs · <strong>JEP 450</strong> Compact Object Headers.</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:49, file:'Java2224Demo.java', hint:'Ejecuta para ver todas las novedades'}"></ng-container>
+
+    </div>
+    <div class="quiz-section" id="eval-m9" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 9 — Java Moderno</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 20</div>
+          <div class="quiz-q">¿En qué versión de Java se estabilizaron los Records de forma definitiva (GA)?</div>
+          <div class="quiz-options" id="em9q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q01',false)"><div class="quiz-letter">A</div> Java 14</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q01',false)"><div class="quiz-letter">B</div> Java 15</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q01',true)"><div class="quiz-letter">C</div> Java 16</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q01',false)"><div class="quiz-letter">D</div> Java 17</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q01-ok">✓ Records (JEP 395) fueron preview en Java 14 y 15, y se estabilizaron como GA en Java 16.</div>
+          <div class="quiz-feedback fail" id="em9q01-fail">✗ Records se estabilizaron en Java 16 (JEP 395). Fueron preview en Java 14 (JEP 359) y Java 15 (JEP 384).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 20</div>
+          <div class="quiz-q">¿Qué genera automáticamente el compilador para un <code>record</code>?</div>
+          <div class="quiz-options" id="em9q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q02',false)"><div class="quiz-letter">A</div> Solo el constructor canónico</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q02',false)"><div class="quiz-letter">B</div> Constructor y toString</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q02',true)"><div class="quiz-letter">C</div> Constructor canónico, getters, equals, hashCode y toString</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q02',false)"><div class="quiz-letter">D</div> Solo getters y setters</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q02-ok">✓ El compilador genera todo el boilerplate. Los getters tienen el mismo nombre que el campo (sin prefijo <code>get</code>).</div>
+          <div class="quiz-feedback fail" id="em9q02-fail">✗ Un record genera: constructor canónico, accessors (getters sin prefijo), equals, hashCode y toString.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 20</div>
+          <div class="quiz-q">¿Pueden modificarse los campos de un <code>record</code> después de crearlo?</div>
+          <div class="quiz-options" id="em9q03">
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q03',true)"><div class="quiz-letter">A</div> No, son implícitamente <code>final</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q03',false)"><div class="quiz-letter">B</div> Sí, mediante los setters generados</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q03',false)"><div class="quiz-letter">C</div> Solo si el record implementa <code>Mutable</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q03',false)"><div class="quiz-letter">D</div> Solo mediante reflexión</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q03-ok">✓ Los campos de un record son <code>private final</code>. No hay setters. Para "modificar" se crea una nueva instancia.</div>
+          <div class="quiz-feedback fail" id="em9q03-fail">✗ Los records son inmutables por diseño: todos sus componentes son <code>private final</code>. No se generan setters.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 20</div>
+          <div class="quiz-q">¿Puede un <code>record</code> extender otra clase con <code>extends</code>?</div>
+          <div class="quiz-options" id="em9q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q04',false)"><div class="quiz-letter">A</div> Sí, con <code>extends</code> como cualquier clase</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q04',false)"><div class="quiz-letter">B</div> Solo puede extender clases abstractas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q04',true)"><div class="quiz-letter">C</div> No, ya extiende implícitamente <code>java.lang.Record</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q04',false)"><div class="quiz-letter">D</div> Solo puede extender interfaces</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q04-ok">✓ Los records extienden implícitamente <code>java.lang.Record</code> y Java no admite herencia múltiple. Pueden implementar interfaces.</div>
+          <div class="quiz-feedback fail" id="em9q04-fail">✗ Un record no puede extender otra clase porque ya hereda de <code>java.lang.Record</code>. Puede implementar interfaces.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 20</div>
+          <div class="quiz-q">¿Qué hace una <code>sealed interface</code> con la cláusula <code>permits</code>?</div>
+          <div class="quiz-options" id="em9q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q05',false)"><div class="quiz-letter">A</div> Impide la creación de instancias de la interfaz</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q05',true)"><div class="quiz-letter">B</div> Restringe qué clases/interfaces pueden implementarla o extenderla</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q05',false)"><div class="quiz-letter">C</div> Genera métodos automáticos para cada implementor</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q05',false)"><div class="quiz-letter">D</div> Hace la interfaz abstracta</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q05-ok">✓ Solo las clases en <code>permits</code> pueden implementar la sealed interface. Esto cierra la jerarquía y permite exhaustividad en switch.</div>
+          <div class="quiz-feedback fail" id="em9q05-fail">✗ <code>sealed ... permits A, B, C</code> limita las implementaciones a A, B y C. Cualquier otra clase genera error de compilación.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 20</div>
+          <div class="quiz-q">En un <code>switch</code> de pattern matching, ¿qué hace la cláusula <code>when</code>?</div>
+          <div class="quiz-options" id="em9q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q06',false)"><div class="quiz-letter">A</div> Inicia el bloque switch</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q06',true)"><div class="quiz-letter">B</div> Añade una condición adicional al case (guard)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q06',false)"><div class="quiz-letter">C</div> Es otro nombre para <code>default</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q06',false)"><div class="quiz-letter">D</div> Cierra el bloque switch</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q06-ok">✓ <code>case Circulo c when c.radio() > 10 -></code>: solo ejecuta si el patrón coincide Y la condición <code>when</code> es verdadera.</div>
+          <div class="quiz-feedback fail" id="em9q06-fail">✗ <code>when</code> es un guard en pattern matching: <code>case Type t when t.condicion() -> ...</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 20</div>
+          <div class="quiz-q">¿Qué son los Text Blocks introducidos en Java 15?</div>
+          <div class="quiz-options" id="em9q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q07',false)"><div class="quiz-letter">A</div> Anotaciones de documentación multilínea</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q07',false)"><div class="quiz-letter">B</div> Comentarios con formato especial</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q07',true)"><div class="quiz-letter">C</div> Strings multilínea delimitados por <code>"""</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q07',false)"><div class="quiz-letter">D</div> Plantillas HTML embebidas en Java</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q07-ok">✓ Text Blocks = <code>"""..."""</code>. Gestionan automáticamente la indentación y no requieren <code>\n</code> escapados.</div>
+          <div class="quiz-feedback fail" id="em9q07-fail">✗ Text Blocks (JEP 378) son literales de String multilínea con <code>"""</code>. Muy útiles para JSON, HTML o SQL embebidos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 20</div>
+          <div class="quiz-q">¿Qué ventaja principal tienen los Virtual Threads sobre los hilos de plataforma?</div>
+          <div class="quiz-options" id="em9q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q08',false)"><div class="quiz-letter">A</div> Tienen mayor prioridad de ejecución</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q08',false)"><div class="quiz-letter">B</div> Evitan automáticamente todas las condiciones de carrera</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q08',true)"><div class="quiz-letter">C</div> Son extremadamente ligeros (~KB de stack vs ~1 MB en hilos de plataforma)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q08',false)"><div class="quiz-letter">D</div> Funcionan sin necesidad de JVM</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q08-ok">✓ Un Virtual Thread usa ~1 KB inicial de stack; un hilo de plataforma reserva ~1 MB. Puedes crear millones de virtual threads.</div>
+          <div class="quiz-feedback fail" id="em9q08-fail">✗ Los Virtual Threads son ligeros (administrados por la JVM), permitiendo millones de ellos frente a los miles que admite el OS.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 20</div>
+          <div class="quiz-q">¿Qué JEP introdujo las Sealed Classes de forma estable (GA) en Java 17?</div>
+          <div class="quiz-options" id="em9q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q09',false)"><div class="quiz-letter">A</div> JEP 395</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q09',false)"><div class="quiz-letter">B</div> JEP 400</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q09',true)"><div class="quiz-letter">C</div> JEP 409</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q09',false)"><div class="quiz-letter">D</div> JEP 420</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q09-ok">✓ JEP 409 = Sealed Classes GA (Java 17). JEP 395 = Records GA (Java 16).</div>
+          <div class="quiz-feedback fail" id="em9q09-fail">✗ Sealed Classes fueron GA en Java 17 con JEP 409. Preview en Java 15 (JEP 360) y 16 (JEP 397).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 20</div>
+          <div class="quiz-q">¿Qué significa declarar una subclase como <code>non-sealed</code> en una jerarquía <code>sealed</code>?</div>
+          <div class="quiz-options" id="em9q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q10',false)"><div class="quiz-letter">A</div> La clase no puede instanciarse</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q10',false)"><div class="quiz-letter">B</div> Es equivalente a <code>abstract</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q10',true)"><div class="quiz-letter">C</div> Abre la jerarquía: cualquier clase puede extenderla libremente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q10',false)"><div class="quiz-letter">D</div> Es una interfaz sin métodos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q10-ok">✓ <code>non-sealed</code> permite que cualquier clase la extienda, "abriendo" esa rama de la jerarquía sellada.</div>
+          <div class="quiz-feedback fail" id="em9q10-fail">✗ <code>non-sealed</code> significa: esta clase es parte de la jerarquía sellada pero acepta extensión libre sin restricciones.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 20</div>
+          <div class="quiz-q">Dado <code>record Persona(String nombre, int edad)</code>, ¿cómo se accede al campo <code>nombre</code>?</div>
+          <div class="quiz-options" id="em9q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q11',false)"><div class="quiz-letter">A</div> <code>persona.nombre</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q11',false)"><div class="quiz-letter">B</div> <code>persona.getNombre()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q11',false)"><div class="quiz-letter">C</div> <code>persona.get("nombre")</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q11',true)"><div class="quiz-letter">D</div> <code>persona.nombre()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q11-ok">✓ Los records generan accessors con el mismo nombre del campo como método: <code>persona.nombre()</code>, no <code>getNombre()</code>.</div>
+          <div class="quiz-feedback fail" id="em9q11-fail">✗ Los accessors de records son métodos sin prefijo: <code>persona.nombre()</code>. Diferente a los JavaBeans que usan <code>getNombre()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 20</div>
+          <div class="quiz-q">¿Cuál es el ciclo de lanzamiento de versiones GA de Java?</div>
+          <div class="quiz-options" id="em9q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q12',false)"><div class="quiz-letter">A</div> Anual</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q12',false)"><div class="quiz-letter">B</div> Cada dos años</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q12',true)"><div class="quiz-letter">C</div> Semestral (marzo y septiembre)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q12',false)"><div class="quiz-letter">D</div> Cada tres años</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q12-ok">✓ Desde Java 10, Oracle lanza una nueva versión GA cada 6 meses: marzo (par) y septiembre (impar). Las LTS cada ~3 años.</div>
+          <div class="quiz-feedback fail" id="em9q12-fail">✗ Java tiene un ciclo semestral desde 2018: nueva versión en marzo y en septiembre de cada año.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>String::formatted()</code> introducido en Java 15?</div>
+          <div class="quiz-options" id="em9q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q13',false)"><div class="quiz-letter">A</div> Parsea el string a número formateado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q13',true)"><div class="quiz-letter">B</div> Es una forma de instancia equivalente a <code>String.format(this, args)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q13',false)"><div class="quiz-letter">C</div> Convierte el string a mayúsculas con formato</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q13',false)"><div class="quiz-letter">D</div> Solo funciona con text blocks</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q13-ok">✓ <code>"Hola %s".formatted("Mundo")</code> es igual a <code>String.format("Hola %s", "Mundo")</code>. Más cómodo con text blocks.</div>
+          <div class="quiz-feedback fail" id="em9q13-fail">✗ <code>formatted()</code> es el método de instancia de <code>String.format()</code>. Muy útil junto a text blocks.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 20</div>
+          <div class="quiz-q">¿Qué JEP en Java 24 elimina la necesidad de instalar JMODs para realizar linking?</div>
+          <div class="quiz-options" id="em9q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q14',false)"><div class="quiz-letter">A</div> JEP 484</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q14',false)"><div class="quiz-letter">B</div> JEP 491</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q14',false)"><div class="quiz-letter">C</div> JEP 450</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q14',true)"><div class="quiz-letter">D</div> JEP 493</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q14-ok">✓ JEP 493 (Java 24) permite hacer linking con <code>jlink</code> sin tener los archivos JMOD instalados, reduciendo el footprint de la JDK.</div>
+          <div class="quiz-feedback fail" id="em9q14-fail">✗ JEP 493 en Java 24 permite vincular aplicaciones sin necesitar los JMODs del JDK.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 20</div>
+          <div class="quiz-q">¿Qué garantizan las <code>sealed classes</code> al usarse con pattern matching en <code>switch</code>?</div>
+          <div class="quiz-options" id="em9q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q15',false)"><div class="quiz-letter">A</div> Mayor velocidad de ejecución del switch</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q15',false)"><div class="quiz-letter">B</div> Serialización automática de todos los tipos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q15',true)"><div class="quiz-letter">C</div> Exhaustividad: el compilador verifica que todos los subtipos estén cubiertos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q15',false)"><div class="quiz-letter">D</div> Inmutabilidad de los campos de cada subtipo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q15-ok">✓ Como el compilador conoce la jerarquía cerrada, verifica que el switch cubra todos los casos. Sin <code>default</code> si están todos.</div>
+          <div class="quiz-feedback fail" id="em9q15-fail">✗ Sealed classes + pattern matching = exhaustividad garantizada en compilación. El compilador sabe todos los subtipos posibles.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 20</div>
+          <div class="quiz-q">¿Cuáles son las palabras clave principales de <code>module-info.java</code>?</div>
+          <div class="quiz-options" id="em9q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q16',false)"><div class="quiz-letter">A</div> <code>import</code>, <code>export</code>, <code>use</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q16',true)"><div class="quiz-letter">B</div> <code>requires</code>, <code>exports</code>, <code>opens</code>, <code>provides</code>, <code>uses</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q16',false)"><div class="quiz-letter">C</div> <code>module</code>, <code>package</code>, <code>class</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q16',false)"><div class="quiz-letter">D</div> <code>include</code>, <code>expose</code>, <code>depend</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q16-ok">✓ El descriptor de módulo (<code>module-info.java</code>) usa: <code>requires</code> (dependencias), <code>exports</code> (paquetes accesibles en compile-time), <code>opens</code> (reflexión en runtime), <code>provides ... with</code> (implementaciones SPI) y <code>uses</code> (consumidor SPI). Introducido en Java 9 (Project Jigsaw).</div>
+          <div class="quiz-feedback fail" id="em9q16-fail">✗ <code>module-info.java</code> usa: <code>requires</code> (dependencias), <code>exports pkg</code> (acceso compile-time), <code>opens pkg</code> (reflexión runtime), <code>provides Svc with Impl</code> (SPI), <code>uses Svc</code> (consumidor SPI). Estas son las palabras clave del sistema de módulos Java 9+.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 20</div>
+          <div class="quiz-q">¿Qué genera automáticamente el compilador para un <code>record</code> en Java 16+?</div>
+          <div class="quiz-options" id="em9q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q17',false)"><div class="quiz-letter">A</div> Solo getters con prefijo <code>get</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q17',false)"><div class="quiz-letter">B</div> Constructor, getters, <code>toString()</code> pero no <code>equals()</code>/<code>hashCode()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q17',true)"><div class="quiz-letter">C</div> Constructor canónico, accessors (nombre del campo sin <code>get</code>), <code>equals()</code>, <code>hashCode()</code> y <code>toString()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q17',false)"><div class="quiz-letter">D</div> Solo <code>equals()</code> y <code>hashCode()</code> basados en identidad</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q17-ok">✓ Para <code>record Punto(int x, int y)</code>, Java genera automáticamente: constructor canónico <code>Punto(int x, int y)</code>, accessors <code>x()</code> y <code>y()</code> (sin prefijo <code>get</code>), <code>equals()</code> basado en campos, <code>hashCode()</code> basado en campos, y <code>toString()</code> descriptivo. Los campos son implícitamente <code>final</code>.</div>
+          <div class="quiz-feedback fail" id="em9q17-fail">✗ Los records auto-generan: constructor canónico, accessors <code>campo()</code> (sin <code>get</code>), <code>equals()</code> basado en todos los campos, <code>hashCode()</code> consistente con equals, y <code>toString()</code>. Campos son <code>private final</code> implícitamente.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 20</div>
+          <div class="quiz-q">¿Qué es el <em>virtual thread pinning</em> y cuándo ocurría antes de Java 24?</div>
+          <div class="quiz-options" id="em9q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q18',false)"><div class="quiz-letter">A</div> Cuando un virtual thread ejecuta operaciones de I/O asíncronas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q18',false)"><div class="quiz-letter">B</div> Cuando el GC compacta el heap durante la ejecución</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q18',true)"><div class="quiz-letter">C</div> Cuando un virtual thread bloqueaba dentro de un bloque <code>synchronized</code>, manteniendo ocupado el carrier thread del OS</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q18',false)"><div class="quiz-letter">D</div> Cuando se llama a <code>Thread.sleep()</code> desde un virtual thread</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q18-ok">✓ Pinning: antes de Java 24, un virtual thread que bloqueaba dentro de un bloque <code>synchronized</code> (o método nativo) quedaba "fijado" al carrier thread del OS, impidiendo que el carrier sirviera a otros virtual threads. Java 24 (JEP 491) corrigió esto: <code>synchronized</code> ya no causa pinning.</div>
+          <div class="quiz-feedback fail" id="em9q18-fail">✗ Pinning = el virtual thread queda fijado al carrier (OS thread) cuando bloquea dentro de <code>synchronized</code>. Esto anulaba el beneficio de los virtual threads. Solución antes de Java 24: usar <code>ReentrantLock</code> en lugar de <code>synchronized</code>. Java 24 lo arregló.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 20</div>
+          <div class="quiz-q">¿Cuál es el ciclo de releases de Java?</div>
+          <div class="quiz-options" id="em9q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q19',false)"><div class="quiz-letter">A</div> Una versión mayor por año, LTS cada 2 años</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q19',true)"><div class="quiz-letter">B</div> Release cada 6 meses (marzo y septiembre); LTS aproximadamente cada 3 años</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q19',false)"><div class="quiz-letter">C</div> Sin ciclo fijo, releases cuando hay suficientes features</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q19',false)"><div class="quiz-letter">D</div> Cuatro releases por año, LTS anual</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q19-ok">✓ Desde Java 9 (2017), el modelo es time-based: release cada 6 meses (marzo y septiembre). Las versiones LTS (Long-Term Support) tienen soporte extendido (~8 años con Oracle): Java 11, 17, 21 y próximamente 25. Las versiones no-LTS solo tienen 6 meses de soporte.</div>
+          <div class="quiz-feedback fail" id="em9q19-fail">✗ Ciclo de Java: release cada 6 meses (marzo + septiembre). LTS cada ~3 releases (aprox. 3 años entre LTS): Java 11, 17, 21, (25). Versiones no-LTS tienen soporte de solo 6 meses — en producción usa siempre LTS.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 20</div>
+          <div class="quiz-q">¿Qué característica del Pattern Matching en <code>switch</code> (Java 21 GA) permite manejar jerarquías <code>sealed</code> sin <code>default</code>?</div>
+          <div class="quiz-options" id="em9q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q20',false)"><div class="quiz-letter">A</div> El compilador agrega un <code>default</code> invisible automáticamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q20',false)"><div class="quiz-letter">B</div> El <code>switch</code> ignora casos no cubiertos en runtime</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em9q20',true)"><div class="quiz-letter">C</div> El compilador verifica exhaustividad: si todos los subtipos <code>permits</code> están cubiertos, <code>default</code> es innecesario</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em9q20',false)"><div class="quiz-letter">D</div> Los sealed classes obligan a tener <code>default</code> siempre</div>
+          </div>
+          <div class="quiz-feedback ok" id="em9q20-ok">✓ La combinación <code>sealed</code> + pattern matching en <code>switch</code> permite <strong>exhaustividad verificada en compilación</strong>. Si la clase <code>sealed</code> tiene <code>permits A, B, C</code> y el switch cubre los tres, no necesitas <code>default</code>. Si añades <code>D</code> a <code>permits</code>, el switch falla en compilación hasta que lo cubras — protección total contra casos olvidados.</div>
+          <div class="quiz-feedback fail" id="em9q20-fail">✗ El compilador puede verificar exhaustividad cuando el tipo es <code>sealed</code>: conoce todos los subtipos posibles. Si el switch cubre todos los <code>permits</code>, no requiere <code>default</code>. Es una de las principales ventajas de combinar sealed classes con pattern matching.</div>
+        </div>
+      </div>
+
+</ng-container>

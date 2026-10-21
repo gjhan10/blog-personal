@@ -1,0 +1,428 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===37">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 38</span><span class="lesson-mod">Módulo 7 · Actuator &amp; Observabilidad</span></div>
+      <h2 class="lesson-title">Spring Boot Actuator</h2>
+      <p class="lesson-sub">Monitoriza y gestiona tu aplicación en producción con endpoints HTTP listos para usar.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></div>
+        <div class="tc-title">Dependencia</div>
+        <div class="tc-body">Agrega <code>spring-boot-starter-actuator</code>. Los endpoints se exponen bajo <code>/actuator</code> por defecto.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Exposición</div>
+        <div class="tc-body"><code>management.endpoints.web.exposure.include=health,info,metrics,env,beans,mappings</code>. Por defecto sólo <em>health</em> e <em>info</em>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-heart" aria-hidden="true"></i></div>
+        <div class="tc-title">Health endpoint</div>
+        <div class="tc-body">Devuelve <code>UP / DOWN / OUT_OF_SERVICE / UNKNOWN</code>. Kubernetes usa <code>/actuator/health/liveness</code> y <code>/actuator/health/readiness</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">HealthIndicator custom</div>
+        <div class="tc-body">Implementa <code>HealthIndicator</code> → override <code>health()</code> → retorna <code>Health.up().withDetail("key","val").build()</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">management</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">endpoints</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">web</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">exposure</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">include</span><span class="a-cm">: </span><span class="a-str">"health,info,metrics,prometheus"</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">endpoint</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">health</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">show-details</span><span class="a-cm">: </span><span class="a-str">always</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">probes</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">enabled</span><span class="a-cm">: </span><span class="a-kw">true</span></div>
+    </div>
+    <div class="info-box">Nunca expongas <code>/actuator/env</code> o <code>/actuator/shutdown</code> sin autenticación — contienen propiedades sensibles.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===38">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 39</span><span class="lesson-mod">Módulo 7 · Actuator &amp; Observabilidad</span></div>
+      <h2 class="lesson-title">Micrometer</h2>
+      <p class="lesson-sub">Facade de métricas agnóstico del backend (Prometheus, Datadog, CloudWatch…).</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">Tipos de meter</div>
+        <div class="tc-body"><strong>Counter</strong> – sólo sube. <strong>Gauge</strong> – valor instantáneo. <strong>Timer</strong> – duración + count. <strong>DistributionSummary</strong> – histograma de valores.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-tag" aria-hidden="true"></i></div>
+        <div class="tc-title">Tags</div>
+        <div class="tc-body">Añaden dimensiones: <code>Tags.of("status","200","method","GET")</code>. Cada combinación es una serie temporal única.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">@Timed</div>
+        <div class="tc-body">Anota un método con <code>@Timed("mi.operacion")</code> — requiere <code>TimedAspect</code> bean y AOP activo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-plug" aria-hidden="true"></i></div>
+        <div class="tc-title">MeterBinder</div>
+        <div class="tc-body">Implementa <code>MeterBinder</code> → <code>bindTo(MeterRegistry)</code> para registrar métricas personalizadas al arranque.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Component</span></div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">OrderMetrics</span> <span class="a-kw">implements</span> <span class="a-type">MeterBinder</span> <span class="a-cm">{{ '{' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> <span class="a-type">bindTo</span>(<span class="a-type">MeterRegistry</span> r) <span class="a-cm">{{ '{' }}</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Gauge</span>.builder(<span class="a-str">"orders.pending"</span>, queue, <span class="a-type">Queue</span>::size)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.tags(<span class="a-str">"region"</span>, <span class="a-str">"eu"</span>).register(r);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-cm">{{ '}' }}</span></div>
+      <div class="anatomy-line"><span class="a-cm">{{ '}' }}</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===39">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 40</span><span class="lesson-mod">Módulo 7 · Actuator &amp; Observabilidad</span></div>
+      <h2 class="lesson-title">Prometheus &amp; Grafana</h2>
+      <p class="lesson-sub">Exporta métricas de Micrometer a Prometheus y visualízalas en dashboards Grafana.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-upload" aria-hidden="true"></i></div>
+        <div class="tc-title">Dependencia Prometheus</div>
+        <div class="tc-body">Añade <code>micrometer-registry-prometheus</code>. Expone <code>/actuator/prometheus</code> en formato text/plain 0.0.4.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Scrape config</div>
+        <div class="tc-body">En <code>prometheus.yml</code>: <code>scrape_configs → job_name: springboot, metrics_path: /actuator/prometheus, targets: [host:port]</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">PromQL básico</div>
+        <div class="tc-body"><code>rate(http_server_requests_seconds_count[1m])</code> — RPS. <code>histogram_quantile(0.95, ...)</code> — P95. <code>jvm_memory_used_bytes</code> — heap.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-monitor" aria-hidden="true"></i></div>
+        <div class="tc-title">Dashboard Grafana</div>
+        <div class="tc-body">Importa dashboard ID <strong>4701</strong> (JVM Micrometer) desde grafana.com. Conecta datasource Prometheus primero.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># prometheus.yml</span></div>
+      <div class="anatomy-line"><span class="a-kw">scrape_configs</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-cm">- </span><span class="a-kw">job_name</span><span class="a-cm">: </span><span class="a-str">springboot-app</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">metrics_path</span><span class="a-cm">: </span><span class="a-str">/actuator/prometheus</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">static_configs</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">- </span><span class="a-kw">targets</span><span class="a-cm">: [</span><span class="a-str">'localhost:8080'</span><span class="a-cm">]</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===40">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">Lección 41</span><span class="lesson-mod">Módulo 7 · Actuator &amp; Observabilidad</span></div>
+      <h2 class="lesson-title">Distributed Tracing</h2>
+      <p class="lesson-sub">Rastrea peticiones a través de microservicios con Micrometer Tracing y Zipkin.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">TraceId / SpanId</div>
+        <div class="tc-body"><strong>TraceId</strong>: identifica la traza completa (misma en todos los servicios). <strong>SpanId</strong>: identifica una unidad de trabajo dentro de la traza.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-send" aria-hidden="true"></i></div>
+        <div class="tc-title">Propagación B3</div>
+        <div class="tc-body">Headers HTTP: <code>X-B3-TraceId</code>, <code>X-B3-SpanId</code>, <code>X-B3-ParentSpanId</code>, <code>X-B3-Sampled</code>. W3C TraceContext usa <code>traceparent</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-eye" aria-hidden="true"></i></div>
+        <div class="tc-title">ObservationRegistry</div>
+        <div class="tc-body">API unificada en Spring Boot 3: <code>Observation.start("op", registry).observe(() -&gt; ...)</code>. Registra métricas + trazas + logs automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">MDC Correlation</div>
+        <div class="tc-body">Micrometer Tracing inyecta <code>traceId</code> y <code>spanId</code> en MDC. Logback los incluye automáticamente en los logs.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml</span></div>
+      <div class="anatomy-line"><span class="a-kw">management</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">tracing</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">sampling</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">probability</span><span class="a-cm">: </span><span class="a-num">1.0</span> <span class="a-cm"># 100% en dev</span></div>
+      <div class="anatomy-line"><span class="a-kw">spring</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">zipkin</span><span class="a-cm">:</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">base-url</span><span class="a-cm">: </span><span class="a-str">http://localhost:9411</span></div>
+    </div>
+    <div class="info-box">Añade <code>micrometer-tracing-bridge-brave</code> + <code>zipkin-reporter-brave</code> para enviar spans a Zipkin.</div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 7</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q01</div>
+      <div class="quiz-q">¿Cuáles endpoints de Actuator se exponen por defecto vía HTTP?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><span class="quiz-letter">A</span> Todos los disponibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q01',true)"><span class="quiz-letter">B</span> Solo <code>health</code> e <code>info</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><span class="quiz-letter">C</span> Solo <code>health</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><span class="quiz-letter">D</span> <code>health</code>, <code>metrics</code> y <code>env</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q01-ok">Correcto — <code>health</code> e <code>info</code> son los únicos expuestos por defecto.</div>
+      <div class="quiz-feedback fail" id="em7q01-fail">Incorrecto — por defecto solo <code>health</code> e <code>info</code> se exponen vía HTTP.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q02</div>
+      <div class="quiz-q">¿Qué status devuelve Actuator cuando una dependencia (DB) está caída?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><span class="quiz-letter">A</span> ERROR</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><span class="quiz-letter">B</span> FAILED</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q02',true)"><span class="quiz-letter">C</span> DOWN</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><span class="quiz-letter">D</span> CRITICAL</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q02-ok">Correcto — los estados posibles son UP, DOWN, OUT_OF_SERVICE y UNKNOWN.</div>
+      <div class="quiz-feedback fail" id="em7q02-fail">Incorrecto — el estado cuando una dependencia está caída es DOWN.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q03</div>
+      <div class="quiz-q">¿Para qué sirve <code>/actuator/health/liveness</code> en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><span class="quiz-letter">A</span> Indica si la app puede recibir tráfico</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q03',true)"><span class="quiz-letter">B</span> Indica si el proceso debe ser reiniciado (deadlock/corrupción)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><span class="quiz-letter">C</span> Verifica la conexión a la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><span class="quiz-letter">D</span> Expone métricas de JVM</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q03-ok">Correcto — liveness indica si la app está viva (no en deadlock). Readiness indica si puede recibir tráfico.</div>
+      <div class="quiz-feedback fail" id="em7q03-fail">Incorrecto — liveness es para que Kubernetes decida si reiniciar el pod, no si enrutar tráfico.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q04</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>HealthIndicator</code> y <code>HealthContributor</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><span class="quiz-letter">A</span> Son lo mismo, sinónimos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q04',true)"><span class="quiz-letter">B</span> <code>HealthContributor</code> es la interfaz padre; <code>HealthIndicator</code> extiende de ella para casos simples</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><span class="quiz-letter">C</span> <code>HealthContributor</code> solo funciona con WebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><span class="quiz-letter">D</span> <code>HealthIndicator</code> es para métricas, <code>HealthContributor</code> para trazas</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q04-ok">Correcto — <code>HealthContributor</code> es el supertipo; <code>HealthIndicator</code> y <code>CompositeHealthContributor</code> lo extienden.</div>
+      <div class="quiz-feedback fail" id="em7q04-fail">Incorrecto — <code>HealthContributor</code> es la interfaz base de la que hereda <code>HealthIndicator</code>.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q05</div>
+      <div class="quiz-q">¿Qué tipo de meter usarías para medir el tamaño de una cola en tiempo real?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><span class="quiz-letter">A</span> Counter</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><span class="quiz-letter">B</span> Timer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q05',true)"><span class="quiz-letter">C</span> Gauge</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><span class="quiz-letter">D</span> DistributionSummary</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q05-ok">Correcto — Gauge representa un valor instantáneo que puede subir y bajar.</div>
+      <div class="quiz-feedback fail" id="em7q05-fail">Incorrecto — Gauge es el tipo correcto para valores que fluctúan como el tamaño de una cola.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q06</div>
+      <div class="quiz-q">¿Qué calcula <code>histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m]))</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><span class="quiz-letter">A</span> El percentil 5 de latencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q06',true)"><span class="quiz-letter">B</span> La latencia P95 en los últimos 5 minutos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><span class="quiz-letter">C</span> El número de requests por segundo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><span class="quiz-letter">D</span> El promedio de latencia</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q06-ok">Correcto — P95 significa que el 95% de las requests se completan en ese tiempo o menos.</div>
+      <div class="quiz-feedback fail" id="em7q06-fail">Incorrecto — esa expresión PromQL calcula el percentil 95 (P95) de latencia.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q07</div>
+      <div class="quiz-q">¿Qué formato usa el endpoint <code>/actuator/prometheus</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><span class="quiz-letter">A</span> JSON</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q07',true)"><span class="quiz-letter">B</span> Text/plain OpenMetrics 0.0.4</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><span class="quiz-letter">C</span> XML</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><span class="quiz-letter">D</span> Protocol Buffers</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q07-ok">Correcto — Prometheus usa su propio formato text/plain para scrapear métricas.</div>
+      <div class="quiz-feedback fail" id="em7q07-fail">Incorrecto — el endpoint de Prometheus devuelve texto plano en formato OpenMetrics.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q08</div>
+      <div class="quiz-q">¿Qué diferencia hay entre TraceId y SpanId en distributed tracing?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q08',true)"><span class="quiz-letter">A</span> TraceId identifica la traza completa cross-servicios; SpanId identifica una unidad de trabajo dentro</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><span class="quiz-letter">B</span> Son lo mismo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><span class="quiz-letter">C</span> SpanId identifica el microservicio origen</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><span class="quiz-letter">D</span> TraceId cambia en cada hop de servicio</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q08-ok">Correcto — TraceId es constante en toda la traza; SpanId es único por cada operación.</div>
+      <div class="quiz-feedback fail" id="em7q08-fail">Incorrecto — TraceId persiste en toda la traza cross-servicios; SpanId es por operación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q09</div>
+      <div class="quiz-q">¿Qué ventaja tiene W3C TraceContext sobre B3 para propagación de trazas?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><span class="quiz-letter">A</span> Usa menos bytes en los headers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q09',true)"><span class="quiz-letter">B</span> Es un estándar oficial W3C, mejor interoperabilidad entre vendors</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><span class="quiz-letter">C</span> Solo funciona con HTTP/2</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><span class="quiz-letter">D</span> B3 no está soportado en Java</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q09-ok">Correcto — W3C TraceContext (RFC 7230) es el estándar de la industria con mejor compatibilidad.</div>
+      <div class="quiz-feedback fail" id="em7q09-fail">Incorrecto — la ventaja principal de W3C TraceContext es ser un estándar oficial con mejor interoperabilidad.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q10</div>
+      <div class="quiz-q">¿Para qué sirve <code>management.tracing.sampling.probability=1.0</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><span class="quiz-letter">A</span> Deshabilita el tracing</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q10',true)"><span class="quiz-letter">B</span> Envía el 100% de las trazas al backend (solo en dev)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><span class="quiz-letter">C</span> Configura el número máximo de spans por traza</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><span class="quiz-letter">D</span> Activa tracing solo en el endpoint /health</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q10-ok">Correcto — en producción usa valores bajos (0.1 = 10%) para no saturar el sistema.</div>
+      <div class="quiz-feedback fail" id="em7q10-fail">Incorrecto — 1.0 significa muestreo del 100%, solo recomendado en desarrollo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q11</div>
+      <div class="quiz-q">¿Qué hace <code>@Timed("proceso.pago")</code> en un método de servicio?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><span class="quiz-letter">A</span> Limita el tiempo máximo de ejecución</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q11',true)"><span class="quiz-letter">B</span> Registra automáticamente duración y conteo de invocaciones via AOP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><span class="quiz-letter">C</span> Activa caché del resultado por N segundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><span class="quiz-letter">D</span> Añade timeout a la transacción JPA</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q11-ok">Correcto — requiere bean <code>TimedAspect</code> en el contexto para funcionar vía AOP.</div>
+      <div class="quiz-feedback fail" id="em7q11-fail">Incorrecto — <code>@Timed</code> registra métricas de duración y conteo mediante AspectJ.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q12</div>
+      <div class="quiz-q">¿Cómo deshabilitas el endpoint <code>/actuator/shutdown</code> para evitar parar la app remotamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><span class="quiz-letter">A</span> Está habilitado por defecto, no se puede deshabilitar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q12',true)"><span class="quiz-letter">B</span> No incluyéndolo en <code>management.endpoints.web.exposure.include</code> (deshabilitado por defecto)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><span class="quiz-letter">C</span> Con <code>management.endpoint.shutdown.enabled=false</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><span class="quiz-letter">D</span> Eliminando la dependencia actuator</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q12-ok">Correcto — shutdown está deshabilitado por defecto y requiere exposición explícita.</div>
+      <div class="quiz-feedback fail" id="em7q12-fail">Incorrecto — shutdown está deshabilitado por defecto; debes exponerlo explícitamente para habilitarlo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q13</div>
+      <div class="quiz-q">¿Qué inyecta Micrometer Tracing automáticamente en los logs?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><span class="quiz-letter">A</span> El nombre del pod Kubernetes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q13',true)"><span class="quiz-letter">C</span> traceId y spanId en el MDC (Mapped Diagnostic Context)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><span class="quiz-letter">B</span> El userId del SecurityContext</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><span class="quiz-letter">D</span> El tiempo de inicio de la aplicación</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q13-ok">Correcto — permite correlacionar logs y trazas usando el mismo traceId.</div>
+      <div class="quiz-feedback fail" id="em7q13-fail">Incorrecto — Micrometer Tracing inyecta traceId y spanId en el MDC de Logback/Log4j2.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q14</div>
+      <div class="quiz-q">¿Qué es un MeterFilter en Micrometer?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q14',true)"><span class="quiz-letter">A</span> Interceptor que puede aceptar, renombrar o denegar la creación de meters</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><span class="quiz-letter">B</span> Un tipo de meter para filtrar valores nulos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><span class="quiz-letter">C</span> Configuración de autenticación para el endpoint de métricas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><span class="quiz-letter">D</span> Clase que convierte métricas a formato Prometheus</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q14-ok">Correcto — permite filtrar métricas de alta cardinalidad o renombrar prefijos globalmente.</div>
+      <div class="quiz-feedback fail" id="em7q14-fail">Incorrecto — MeterFilter intercepta la creación de meters para aceptarlos, denegarlos o transformarlos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q15</div>
+      <div class="quiz-q">¿Cómo añades info del build (versión del artefacto) al endpoint <code>/actuator/info</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><span class="quiz-letter">A</span> Anotando el main class con <code>@BuildInfo</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q15',true)"><span class="quiz-letter">B</span> Con el plugin <code>spring-boot-maven-plugin</code> goal <code>build-info</code> que genera <code>META-INF/build-info.properties</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><span class="quiz-letter">C</span> Añadiendo propiedades en <code>application.yml</code> bajo <code>info:</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><span class="quiz-letter">D</span> Implementando <code>InfoContributor</code> manualmente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q15-ok">Correcto — el goal build-info genera el archivo de propiedades con version, group, artifact y timestamp.</div>
+      <div class="quiz-feedback fail" id="em7q15-fail">Incorrecto — el plugin Maven spring-boot-maven-plugin con goal build-info genera los datos automáticamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q16</div>
+      <div class="quiz-q">¿Qué hace <code>ObservationRegistry</code> en Spring Boot 3?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q16',true)"><span class="quiz-letter">A</span> API unificada que genera métricas, trazas y logs desde una sola instrumentación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><span class="quiz-letter">B</span> Almacena observaciones en base de datos para auditoría</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><span class="quiz-letter">C</span> Solo gestiona el muestreo de trazas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><span class="quiz-letter">D</span> Reemplaza a MeterRegistry completamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q16-ok">Correcto — ObservationRegistry es la nueva API de observabilidad unificada de Spring Boot 3/Micrometer 1.10+.</div>
+      <div class="quiz-feedback fail" id="em7q16-fail">Incorrecto — ObservationRegistry unifica métricas + trazas + logs desde una sola instrumentación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q17</div>
+      <div class="quiz-q">¿Cuándo usarías <code>CompositeHealthContributor</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><span class="quiz-letter">A</span> Para agrupar varios beans de Spring en un HealthIndicator</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q17',true)"><span class="quiz-letter">B</span> Para agregar varios HealthIndicators bajo un mismo nombre en el endpoint</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><span class="quiz-letter">C</span> Para conectar Grafana con varios datasources</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><span class="quiz-letter">D</span> Para chequeos de health en aplicaciones reactive</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q17-ok">Correcto — p.ej. agrupar múltiples checks de base de datos bajo un mismo key "databases".</div>
+      <div class="quiz-feedback fail" id="em7q17-fail">Incorrecto — CompositeHealthContributor agrupa varios indicadores bajo un nombre en la respuesta del endpoint.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q18</div>
+      <div class="quiz-q">¿Qué dependencia añades para enviar spans a Zipkin con Spring Boot 3?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><span class="quiz-letter">A</span> <code>spring-cloud-sleuth</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q18',true)"><span class="quiz-letter">B</span> <code>micrometer-tracing-bridge-brave</code> + <code>zipkin-reporter-brave</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><span class="quiz-letter">C</span> <code>spring-boot-starter-zipkin</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><span class="quiz-letter">D</span> Solo actuator, ya está incluido</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q18-ok">Correcto — Spring Cloud Sleuth fue reemplazado por Micrometer Tracing en Spring Boot 3.</div>
+      <div class="quiz-feedback fail" id="em7q18-fail">Incorrecto — en Spring Boot 3 se usa micrometer-tracing-bridge-brave + zipkin-reporter-brave.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q19</div>
+      <div class="quiz-q">¿Qué métrica de JVM usarías para detectar memory leaks?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><span class="quiz-letter">A</span> <code>jvm_threads_live_threads</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><span class="quiz-letter">B</span> <code>process_cpu_usage</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q19',true)"><span class="quiz-letter">C</span> <code>jvm_memory_used_bytes{{ '{' }}area="heap"{{ '}' }}</code> con tendencia creciente sin GC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><span class="quiz-letter">D</span> <code>http_server_requests_seconds_count</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q19-ok">Correcto — un heap creciente que no baja tras GC es señal clara de memory leak.</div>
+      <div class="quiz-feedback fail" id="em7q19-fail">Incorrecto — para memory leaks observa jvm_memory_used_bytes{{ '{' }}area="heap"{{ '}' }} con tendencia siempre creciente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">em7q20</div>
+      <div class="quiz-q">¿Qué hace <code>@Observed</code> en Spring Boot 3?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q20',true)"><span class="quiz-letter">A</span> Instrumenta automáticamente el método con métricas y trazas via ObservationRegistry</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><span class="quiz-letter">B</span> Activa logging detallado de parámetros de entrada/salida</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><span class="quiz-letter">C</span> Marca el método para ser incluido en reports de SLA</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><span class="quiz-letter">D</span> Es equivalente a <code>@Timed</code> con la misma implementación</div>
+      </div>
+      <div class="quiz-feedback ok" id="em7q20-ok">Correcto — @Observed es la anotación de alto nivel que genera tanto métricas como trazas automáticamente.</div>
+      <div class="quiz-feedback fail" id="em7q20-fail">Incorrecto — @Observed instrumenta con el ObservationRegistry para generar métricas y trazas a la vez.</div>
+    </div>
+  </div>
+
+</ng-container>

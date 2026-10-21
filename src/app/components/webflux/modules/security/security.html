@@ -1,0 +1,446 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===27">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">28</span><span class="lesson-mod">Módulo 5 · Seguridad</span></div>
+      <h2 class="lesson-title">SecurityWebFilterChain</h2>
+      <p class="lesson-sub">Configuración de seguridad reactiva con Spring Security WebFlux.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shield" aria-hidden="true"></i></div>
+        <div class="tc-title">@EnableWebFluxSecurity</div>
+        <div class="tc-body">Habilita la seguridad WebFlux. No hay <code>WebSecurityConfigurerAdapter</code> — se define un @Bean de <code>SecurityWebFilterChain</code> directamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">SecurityWebFilterChain</div>
+        <div class="tc-body">La cadena de filtros de seguridad reactiva. Se crea con <code>HttpSecurity.build()</code> (en Spring MVC) → ahora <code>ServerHttpSecurity.build()</code> reactivo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">ServerHttpSecurity</div>
+        <div class="tc-body">Equivalente reactivo de HttpSecurity. Configura: <code>.csrf()</code>, <code>.authorizeExchange()</code>, <code>.httpBasic()</code>, <code>.formLogin()</code>, <code>.oauth2ResourceServer()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">PathMatcher reactivo</div>
+        <div class="tc-body"><code>authorizeExchange</code> en lugar de <code>authorizeRequests</code>. Patterns Ant: <code>.pathMatchers("/api/**").authenticated()</code>. Método: <code>.pathMatchers(HttpMethod.POST, ...)</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">@EnableWebFluxSecurity</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">SecurityConfig</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">SecurityWebFilterChain</span> securityChain(<span class="a-type">ServerHttpSecurity</span> http) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> http</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.csrf(<span class="a-type">ServerHttpSecurity</span>.<span class="a-type">CsrfSpec</span>::disable)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.authorizeExchange(ex -&gt; ex</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.pathMatchers(<span class="a-str">"/public/**"</span>).permitAll()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.anyExchange().authenticated())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.oauth2ResourceServer(oauth2 -&gt; oauth2.jwt(<span class="a-type">Customizer</span>.withDefaults()))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===28">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">29</span><span class="lesson-mod">Módulo 5 · Seguridad</span></div>
+      <h2 class="lesson-title">ReactiveAuthenticationManager</h2>
+      <p class="lesson-sub">Autenticación reactiva con usuario/contraseña y carga de usuarios desde base de datos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">ReactiveAuthenticationManager</div>
+        <div class="tc-body">Interfaz: <code>authenticate(Authentication) → Mono&lt;Authentication&gt;</code>. Reemplaza a AuthenticationManager bloqueante. Se registra como @Bean.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-user" aria-hidden="true"></i></div>
+        <div class="tc-title">ReactiveUserDetailsService</div>
+        <div class="tc-body"><code>loadUserByUsername(String) → Mono&lt;UserDetails&gt;</code>. Implementa para cargar usuarios desde R2DBC o cualquier fuente reactiva. Spring auto-configura el AuthenticationManager.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">PasswordEncoder</div>
+        <div class="tc-body"><code>BCryptPasswordEncoder</code> — mismo que Spring MVC. Para comparación reactiva: <code>passwordEncoder.matches(raw, encoded)</code>. No hay versión reactiva, es CPU-bound.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">MapReactiveUserDetailsService</div>
+        <div class="tc-body">Implementación en memoria de ReactiveUserDetailsService. Útil para tests y desarrollo. <code>new MapReactiveUserDetailsService(user1, user2)</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Service</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">UserDetailsServiceImpl</span> <span class="a-kw">implements</span> <span class="a-type">ReactiveUserDetailsService</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">UserDetails</span>&gt; loadUserByUsername(<span class="a-type">String</span> username) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> userRepo.findByUsername(username)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.map(u -&gt; <span class="a-type">User</span>.withUsername(u.getUsername())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.password(u.getPassword())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.roles(u.getRole())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===29">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">30</span><span class="lesson-mod">Módulo 5 · Seguridad</span></div>
+      <h2 class="lesson-title">JWT en WebFlux</h2>
+      <p class="lesson-sub">Autenticación stateless con tokens JWT usando AuthenticationWebFilter.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ticket" aria-hidden="true"></i></div>
+        <div class="tc-title">AuthenticationWebFilter</div>
+        <div class="tc-body">Filtro que extrae y valida credenciales. Para JWT: extrae el token del header Authorization, valida la firma y crea la Authentication. Se añade a ServerHttpSecurity.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">ServerHttpRequest extracción</div>
+        <div class="tc-body"><code>exchange.getRequest().getHeaders().getFirst("Authorization")</code>. Luego extraer Bearer token y validar con la biblioteca JWT (jjwt, nimbus-jose).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">OAuth2 Resource Server</div>
+        <div class="tc-body">Spring Security built-in: <code>.oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()))</code>. Configura automáticamente el validador JWT con JWKS endpoint o clave pública.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">ReactiveSecurityContextHolder</div>
+        <div class="tc-body">Para obtener el usuario autenticado: <code>ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication)</code>. Propagado vía Reactor Context.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Spring OAuth2 Resource Server con JWT</span></div>
+      <div class="anatomy-line">spring.security.oauth2.resourceserver.jwt.issuer-uri=https://auth.example.com</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Acceder al usuario actual desde el endpoint</span></div>
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(<span class="a-str">"/me"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">String</span>&gt; me(<span class="a-kw">@AuthenticationPrincipal</span> <span class="a-type">Jwt</span> jwt) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">Mono</span>.just(jwt.getSubject());</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===30">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">31</span><span class="lesson-mod">Módulo 5 · Seguridad</span></div>
+      <h2 class="lesson-title">@PreAuthorize Reactivo y CORS</h2>
+      <p class="lesson-sub">Control de acceso a nivel de método y configuración CORS en WebFlux.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">@PreAuthorize reactivo</div>
+        <div class="tc-body">Requiere <code>@EnableReactiveMethodSecurity</code>. Las expresiones SpEL funcionan igual: <code>@PreAuthorize("hasRole('ADMIN')")</code>, <code>@PreAuthorize("hasAuthority('WRITE')")</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">@PostAuthorize</div>
+        <div class="tc-body">Se evalúa DESPUÉS de ejecutar el método. Puede acceder al resultado con <code>returnObject</code>. En contexto reactivo, se evalúa cuando el Mono/Flux emite.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">CORS WebFlux</div>
+        <div class="tc-body">Configurar CORS en WebFluxConfigurer: <code>addCorsMappings(registry)</code>. O por endpoint: <code>@CrossOrigin</code>. O en SecurityWebFilterChain con <code>.cors()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">CorsConfigurationSource</div>
+        <div class="tc-body">@Bean de <code>CorsConfigurationSource</code> con <code>UrlBasedCorsConfigurationSource</code>. Define origins, methods, headers permitidos. Referenciado desde SecurityWebFilterChain.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">@EnableReactiveMethodSecurity</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">MethodSecurityConfig</span> {{ '{' }} {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@PreAuthorize</span>(<span class="a-str">"hasRole('ADMIN')"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">Void</span>&gt; deleteProduct(<span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> repo.deleteById(id);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// CORS global</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Bean</span> <span class="a-kw">public</span> <span class="a-type">CorsConfigurationSource</span> corsSource() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">CorsConfiguration</span> cfg = <span class="a-kw">new</span> <span class="a-type">CorsConfiguration</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;cfg.addAllowedOrigin(<span class="a-str">"https://myfrontend.com"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;cfg.addAllowedMethod(<span class="a-str">"*"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">UrlBasedCorsConfigurationSource</span> src = <span class="a-kw">new</span> <span class="a-type">UrlBasedCorsConfigurationSource</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;src.registerCorsConfiguration(<span class="a-str">"/**"</span>, cfg);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> src;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 5</div>
+
+    <div class="quiz-box" id="wf5q01">
+      <div class="quiz-label">wf5q01</div>
+      <div class="quiz-q">¿Cuál es el equivalente reactivo de <code>HttpSecurity</code> en Spring Security WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q01',false)"><span class="quiz-letter">A</span> ReactiveHttpSecurity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q01',true)"><span class="quiz-letter">B</span> ServerHttpSecurity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q01',false)"><span class="quiz-letter">C</span> WebSecurityConfigurer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q01',false)"><span class="quiz-letter">D</span> SecurityWebFilter</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q01-ok">Correcto — ServerHttpSecurity es el builder reactivo equivalente a HttpSecurity de Spring MVC Security.</div>
+      <div class="quiz-feedback fail" id="wf5q01-fail">Incorrecto — el equivalente reactivo de HttpSecurity es ServerHttpSecurity en Spring WebFlux Security.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q02">
+      <div class="quiz-label">wf5q02</div>
+      <div class="quiz-q">¿Cuál es la firma de <code>ReactiveUserDetailsService</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q02',false)"><span class="quiz-letter">A</span> <code>UserDetails loadUserByUsername(String)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q02',true)"><span class="quiz-letter">B</span> <code>Mono&lt;UserDetails&gt; findByUsername(String)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q02',false)"><span class="quiz-letter">C</span> <code>Flux&lt;UserDetails&gt; loadAll()</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q02',false)"><span class="quiz-letter">D</span> <code>Mono&lt;Authentication&gt; loadUserByUsername(String)</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q02-ok">Correcto — ReactiveUserDetailsService tiene el método findByUsername que retorna Mono&lt;UserDetails&gt;.</div>
+      <div class="quiz-feedback fail" id="wf5q02-fail">Incorrecto — la firma reactiva es findByUsername(String username) → Mono&lt;UserDetails&gt;.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q03">
+      <div class="quiz-label">wf5q03</div>
+      <div class="quiz-q">¿Cómo obtener el usuario autenticado en un endpoint WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q03',false)"><span class="quiz-letter">A</span> SecurityContextHolder.getContext().getAuthentication()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q03',true)"><span class="quiz-letter">B</span> @AuthenticationPrincipal en el parámetro del método o ReactiveSecurityContextHolder.getContext()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q03',false)"><span class="quiz-letter">C</span> request.getAttribute("principal")</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q03',false)"><span class="quiz-letter">D</span> Thread.currentThread().getAuthentication()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q03-ok">Correcto — @AuthenticationPrincipal como parámetro es la forma más limpia. ReactiveSecurityContextHolder.getContext() es la alternativa programática.</div>
+      <div class="quiz-feedback fail" id="wf5q03-fail">Incorrecto — SecurityContextHolder es para Spring MVC (usa ThreadLocal). En WebFlux usa @AuthenticationPrincipal o ReactiveSecurityContextHolder.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q04">
+      <div class="quiz-label">wf5q04</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>authorizeRequests</code> y <code>authorizeExchange</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q04',true)"><span class="quiz-letter">A</span> authorizeRequests es Spring MVC (Servlet); authorizeExchange es WebFlux (reactivo)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q04',false)"><span class="quiz-letter">B</span> authorizeExchange es más antiguo y deprecated</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q04',false)"><span class="quiz-letter">C</span> Son equivalentes, el primero para GET y el segundo para POST</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q04',false)"><span class="quiz-letter">D</span> Solo authorizeRequests soporta roles; authorizeExchange solo soporta authorities</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q04-ok">Correcto — authorizeRequests (HttpSecurity, Servlet) vs authorizeExchange (ServerHttpSecurity, WebFlux).</div>
+      <div class="quiz-feedback fail" id="wf5q04-fail">Incorrecto — authorizeRequests es para Spring MVC/Servlet; authorizeExchange es para WebFlux reactivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q05">
+      <div class="quiz-label">wf5q05</div>
+      <div class="quiz-q">¿Qué anotación se necesita para habilitar @PreAuthorize en WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q05',false)"><span class="quiz-letter">A</span> @EnableMethodSecurity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q05',false)"><span class="quiz-letter">B</span> @EnableGlobalMethodSecurity(prePostEnabled = true)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q05',true)"><span class="quiz-letter">C</span> @EnableReactiveMethodSecurity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q05',false)"><span class="quiz-letter">D</span> @EnableWebFluxSecurity ya lo incluye</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q05-ok">Correcto — @EnableReactiveMethodSecurity habilita @PreAuthorize, @PostAuthorize y @Secured en métodos que retornan Mono/Flux.</div>
+      <div class="quiz-feedback fail" id="wf5q05-fail">Incorrecto — para seguridad a nivel de método en WebFlux se necesita @EnableReactiveMethodSecurity.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q06">
+      <div class="quiz-label">wf5q06</div>
+      <div class="quiz-q">¿Por qué hay que deshabilitar CSRF con .csrf(disable) en APIs REST WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q06',false)"><span class="quiz-letter">A</span> CSRF no es aplicable en WebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q06',true)"><span class="quiz-letter">B</span> Las APIs REST stateless con tokens no necesitan protección CSRF — no usan cookies de sesión</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q06',false)"><span class="quiz-letter">C</span> CSRF consume demasiados recursos en aplicaciones reactivas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q06',false)"><span class="quiz-letter">D</span> CSRF no está implementado en Spring Security WebFlux</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q06-ok">Correcto — CSRF protege contra ataques que explotan cookies de sesión. Las APIs REST con JWT no tienen sesión, por lo que CSRF no aplica.</div>
+      <div class="quiz-feedback fail" id="wf5q06-fail">Incorrecto — las APIs REST con JWT son stateless y no usan cookies de sesión, por eso no necesitan protección CSRF.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q07">
+      <div class="quiz-label">wf5q07</div>
+      <div class="quiz-q">¿Cómo se configura Spring como OAuth2 Resource Server para validar JWT automáticamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q07',true)"><span class="quiz-letter">A</span> Añadir .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults())) y configurar issuer-uri en properties</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q07',false)"><span class="quiz-letter">B</span> Implementar JwtDecoder manualmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q07',false)"><span class="quiz-letter">C</span> Añadir @EnableJwtValidation</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q07',false)"><span class="quiz-letter">D</span> Solo se puede con Authorization Code Flow</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q07-ok">Correcto — Spring Security auto-configura la validación JWT con issuer-uri para obtener las claves públicas del JWKS endpoint del servidor de autorización.</div>
+      <div class="quiz-feedback fail" id="wf5q07-fail">Incorrecto — con oauth2ResourceServer().jwt() + spring.security.oauth2.resourceserver.jwt.issuer-uri, Spring valida JWT automáticamente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q08">
+      <div class="quiz-label">wf5q08</div>
+      <div class="quiz-q">¿Cuándo se evalúa @PostAuthorize en un método que retorna Mono?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q08',false)"><span class="quiz-letter">A</span> Antes de ejecutar el método</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q08',true)"><span class="quiz-letter">B</span> Cuando el Mono emite su valor (onNext o onComplete)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q08',false)"><span class="quiz-letter">C</span> En el thread de suscripción independientemente del valor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q08',false)"><span class="quiz-letter">D</span> Al momento de hacer subscribe()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q08-ok">Correcto — en WebFlux, @PostAuthorize se evalúa cuando el Mono/Flux emite, pudiendo usar el returnObject en la expresión SpEL.</div>
+      <div class="quiz-feedback fail" id="wf5q08-fail">Incorrecto — @PostAuthorize en WebFlux reactivo se evalúa cuando el publisher emite el resultado, no antes de ejecutar.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q09">
+      <div class="quiz-label">wf5q09</div>
+      <div class="quiz-q">¿Qué es <code>MapReactiveUserDetailsService</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q09',true)"><span class="quiz-letter">A</span> Implementación en memoria de ReactiveUserDetailsService para tests/desarrollo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q09',false)"><span class="quiz-letter">B</span> Un Map que almacena usuarios en Redis reactivamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q09',false)"><span class="quiz-letter">C</span> Un adaptador de LDAP reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q09',false)"><span class="quiz-letter">D</span> Una implementación que mapea roles a authorities automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q09-ok">Correcto — MapReactiveUserDetailsService es la implementación en memoria, equivalente al antiguo InMemoryUserDetailsManager para WebFlux.</div>
+      <div class="quiz-feedback fail" id="wf5q09-fail">Incorrecto — MapReactiveUserDetailsService almacena usuarios en un Map en memoria, ideal para tests y prototipos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q10">
+      <div class="quiz-label">wf5q10</div>
+      <div class="quiz-q">¿Cómo se propaga el contexto de seguridad en WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q10',false)"><span class="quiz-letter">A</span> Via ThreadLocal, igual que en Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q10',true)"><span class="quiz-letter">B</span> Via Reactor Context, que se propaga a través del pipeline reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q10',false)"><span class="quiz-letter">C</span> Via el header X-Security-Context en cada petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q10',false)"><span class="quiz-letter">D</span> No se propaga — cada operador accede a SecurityContextHolder individualmente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q10-ok">Correcto — Reactor Context reemplaza a ThreadLocal para propagar información (transacciones, seguridad) en pipelines reactivos.</div>
+      <div class="quiz-feedback fail" id="wf5q10-fail">Incorrecto — en WebFlux, el contexto de seguridad se propaga via Reactor Context, no ThreadLocal.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q11">
+      <div class="quiz-label">wf5q11</div>
+      <div class="quiz-q">¿Qué hace <code>.pathMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q11',true)"><span class="quiz-letter">A</span> Restringe las peticiones DELETE a /admin/** solo para usuarios con rol ADMIN</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q11',false)"><span class="quiz-letter">B</span> Permite solo GET a /admin/** para ADMIN</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q11',false)"><span class="quiz-letter">C</span> Requiere autenticación básica para ADMIN</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q11',false)"><span class="quiz-letter">D</span> Crea automáticamente el endpoint DELETE para el admin</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q11-ok">Correcto — pathMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN") restringe exactamente: método DELETE + path /admin/** + rol ADMIN.</div>
+      <div class="quiz-feedback fail" id="wf5q11-fail">Incorrecto — esta configuración protege las peticiones DELETE a /admin/** requiriendo el rol ADMIN.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q12">
+      <div class="quiz-label">wf5q12</div>
+      <div class="quiz-q">¿Cuál es la clase para configurar CORS de forma global referenciable desde SecurityWebFilterChain?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q12',false)"><span class="quiz-letter">A</span> CorsFilter</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q12',true)"><span class="quiz-letter">B</span> CorsConfigurationSource (UrlBasedCorsConfigurationSource)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q12',false)"><span class="quiz-letter">C</span> CorsWebFilter</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q12',false)"><span class="quiz-letter">D</span> WebFluxConfigurer.addCorsMappings()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q12-ok">Correcto — CorsConfigurationSource implementado como UrlBasedCorsConfigurationSource se puede referenciar desde SecurityWebFilterChain para integrar CORS con seguridad.</div>
+      <div class="quiz-feedback fail" id="wf5q12-fail">Incorrecto — UrlBasedCorsConfigurationSource implementa CorsConfigurationSource y es la forma estándar de configurar CORS globalmente con seguridad.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q13">
+      <div class="quiz-label">wf5q13</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>hasRole("ADMIN")</code> y <code>hasAuthority("ROLE_ADMIN")</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q13',true)"><span class="quiz-letter">A</span> Son equivalentes: hasRole añade el prefijo ROLE_ automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q13',false)"><span class="quiz-letter">B</span> hasRole es para usuarios; hasAuthority es para aplicaciones cliente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q13',false)"><span class="quiz-letter">C</span> hasAuthority solo funciona con JWT; hasRole con username/password</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q13',false)"><span class="quiz-letter">D</span> hasRole verifica múltiples roles; hasAuthority solo uno</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q13-ok">Correcto — hasRole("ADMIN") comprueba la authority "ROLE_ADMIN". Spring Security automáticamente añade el prefijo ROLE_.</div>
+      <div class="quiz-feedback fail" id="wf5q13-fail">Incorrecto — hasRole("ADMIN") y hasAuthority("ROLE_ADMIN") son equivalentes. hasRole añade el prefijo ROLE_ automáticamente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q14">
+      <div class="quiz-label">wf5q14</div>
+      <div class="quiz-q">¿Cuándo usar <code>AuthenticationWebFilter</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q14',true)"><span class="quiz-letter">A</span> Para implementar autenticación personalizada (ej. API Key, JWT custom) fuera de los mecanismos built-in</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q14',false)"><span class="quiz-letter">B</span> Es el único filtro de autenticación en WebFlux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q14',false)"><span class="quiz-letter">C</span> Solo se usa para autenticación básica HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q14',false)"><span class="quiz-letter">D</span> Para deshabilitar la autenticación en ciertos endpoints</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q14-ok">Correcto — AuthenticationWebFilter es el componente para implementar mecanismos de autenticación personalizados en WebFlux.</div>
+      <div class="quiz-feedback fail" id="wf5q14-fail">Incorrecto — AuthenticationWebFilter es para autenticación personalizada. Para JWT estándar, usa oauth2ResourceServer().jwt().</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q15">
+      <div class="quiz-label">wf5q15</div>
+      <div class="quiz-q">¿Qué retorna <code>ReactiveAuthenticationManager.authenticate(authentication)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q15',false)"><span class="quiz-letter">A</span> Authentication directamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q15',true)"><span class="quiz-letter">B</span> Mono&lt;Authentication&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q15',false)"><span class="quiz-letter">C</span> Flux&lt;Authentication&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q15',false)"><span class="quiz-letter">D</span> Mono&lt;Boolean&gt;</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q15-ok">Correcto — ReactiveAuthenticationManager.authenticate() retorna Mono&lt;Authentication&gt; con la autenticación completada, o señal onError si falla.</div>
+      <div class="quiz-feedback fail" id="wf5q15-fail">Incorrecto — la firma reactiva es Mono&lt;Authentication&gt;. Un Mono vacío o con error indica fallo de autenticación.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q16">
+      <div class="quiz-label">wf5q16</div>
+      <div class="quiz-q">¿Cómo deshabilitar la protección CSRF en Spring Security WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q16',true)"><span class="quiz-letter">A</span> <code>.csrf(ServerHttpSecurity.CsrfSpec::disable)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q16',false)"><span class="quiz-letter">B</span> <code>.csrf().disabled(true)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q16',false)"><span class="quiz-letter">C</span> <code>@DisableCsrf</code> en la clase de configuración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q16',false)"><span class="quiz-letter">D</span> <code>security.csrf.enabled=false</code> en properties</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q16-ok">Correcto — el DSL de ServerHttpSecurity usa method references para deshabilitar: .csrf(ServerHttpSecurity.CsrfSpec::disable).</div>
+      <div class="quiz-feedback fail" id="wf5q16-fail">Incorrecto — la forma correcta en el DSL reactivo es .csrf(ServerHttpSecurity.CsrfSpec::disable) o .csrf(spec -&gt; spec.disable()).</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q17">
+      <div class="quiz-label">wf5q17</div>
+      <div class="quiz-q">¿Qué spring property configura el issuer del servidor de autorización para validación JWT?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q17',false)"><span class="quiz-letter">A</span> spring.security.jwt.issuer-uri</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q17',true)"><span class="quiz-letter">B</span> spring.security.oauth2.resourceserver.jwt.issuer-uri</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q17',false)"><span class="quiz-letter">C</span> spring.oauth2.jwt.public-key-location</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q17',false)"><span class="quiz-letter">D</span> spring.webflux.security.jwt.issuer</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q17-ok">Correcto — la propiedad completa es spring.security.oauth2.resourceserver.jwt.issuer-uri apuntando al servidor de autorización.</div>
+      <div class="quiz-feedback fail" id="wf5q17-fail">Incorrecto — la propiedad correcta es spring.security.oauth2.resourceserver.jwt.issuer-uri.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q18">
+      <div class="quiz-label">wf5q18</div>
+      <div class="quiz-q">¿Cuál es el orden correcto en SecurityWebFilterChain para las reglas de acceso?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q18',true)"><span class="quiz-letter">A</span> Las reglas más específicas primero, anyExchange() al final</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q18',false)"><span class="quiz-letter">B</span> El orden no importa — Spring Security elige la regla más específica automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q18',false)"><span class="quiz-letter">C</span> anyExchange() primero para mayor rendimiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q18',false)"><span class="quiz-letter">D</span> Las reglas permissive primero, las restrictivas al final</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q18-ok">Correcto — las reglas se evalúan en orden. Las específicas primero evitan que anyExchange() las cubra. Es el mismo concepto que en Spring MVC Security.</div>
+      <div class="quiz-feedback fail" id="wf5q18-fail">Incorrecto — el orden importa: específico primero, anyExchange() siempre al final para capturar el resto.</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q19">
+      <div class="quiz-label">wf5q19</div>
+      <div class="quiz-q">¿Puede <code>BCryptPasswordEncoder</code> ejecutarse en el Schedulers.parallel() de WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q19',false)"><span class="quiz-letter">A</span> Sí — es completamente reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q19',true)"><span class="quiz-letter">B</span> Técnicamente sí, pero es CPU-intensivo — mejor en boundedElastic() para no saturar parallel()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q19',false)"><span class="quiz-letter">C</span> No — BCrypt no es thread-safe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q19',false)"><span class="quiz-letter">D</span> Solo funciona en el thread principal</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q19-ok">Correcto — BCrypt es thread-safe pero CPU-intensivo. Para no saturar el pool parallel(), es buena práctica ejecutarlo en boundedElastic().</div>
+      <div class="quiz-feedback fail" id="wf5q19-fail">Incorrecto — BCrypt es thread-safe pero es CPU-intensivo. Para operaciones de hashing pesadas, usa subscribeOn(boundedElastic()).</div>
+    </div>
+
+    <div class="quiz-box" id="wf5q20">
+      <div class="quiz-label">wf5q20</div>
+      <div class="quiz-q">¿Qué es CORS y por qué se necesita en APIs REST?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q20',false)"><span class="quiz-letter">A</span> Un protocolo de cifrado de credenciales entre servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf5q20',true)"><span class="quiz-letter">B</span> Cross-Origin Resource Sharing — permite que un frontend en otro dominio acceda a la API</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q20',false)"><span class="quiz-letter">C</span> Un mecanismo de autenticación basado en certificados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf5q20',false)"><span class="quiz-letter">D</span> La configuración de rate limiting por origen</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf5q20-ok">Correcto — CORS permite a los navegadores hacer peticiones cross-origin. Sin configurarlo, el navegador bloquea las peticiones del frontend a la API.</div>
+      <div class="quiz-feedback fail" id="wf5q20-fail">Incorrecto — CORS (Cross-Origin Resource Sharing) es el mecanismo que permite a navegadores hacer peticiones a dominios diferentes al del frontend.</div>
+    </div>
+
+  </div>
+
+</ng-container>

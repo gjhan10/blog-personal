@@ -1,0 +1,281 @@
+<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===37">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">38</span><span class="lesson-mod">E/S</span></div>
+        <h2 class="lesson-title">Lectura y Escritura de Archivos</h2>
+        <p class="lesson-sub">Los streams de I/O se dividen en: <strong>byte streams</strong> (<code>InputStream</code>/<code>OutputStream</code>) y <strong>character streams</strong> (<code>Reader</code>/<code>Writer</code>). Siempre envuelve con <code>Buffered*</code> para rendimiento.</p>
+      </div>
+      <table class="ref-table">
+        <tr><th>Clase</th><th>Tipo</th><th>Uso</th></tr>
+        <tr><td><code>FileReader / FileWriter</code></td><td>Carácter</td><td>Texto simple</td></tr>
+        <tr><td><code>BufferedReader / BufferedWriter</code></td><td>Carácter</td><td>Texto eficiente</td></tr>
+        <tr><td><code>FileInputStream / FileOutputStream</code></td><td>Byte</td><td>Binario</td></tr>
+        <tr><td><code>Files.readAllLines()</code></td><td>NIO.2</td><td>Texto completo</td></tr>
+        <tr><td><code>Files.write()</code></td><td>NIO.2</td><td>Escritura directa</td></tr>
+      </table>
+      <ng-container *ngTemplateOutlet="playground; context:{id:37, file:'ArchivoDemo.java', hint:'Añade más líneas al writer'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===38">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">39</span><span class="lesson-mod">E/S</span></div>
+        <h2 class="lesson-title">NIO.2 &amp; Paths (Java 7+)</h2>
+        <p class="lesson-sub"><code>java.nio.file.Path</code> reemplaza a <code>java.io.File</code>. <code>Files</code> ofrece operaciones atómicas y atributos enriquecidos. <code>WatchService</code> permite vigilar directorios.</p>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:38, file:'NioDemo.java', hint:'Prueba distintas rutas'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===39">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">40</span><span class="lesson-mod">E/S</span></div>
+        <h2 class="lesson-title">Serialización de Objetos</h2>
+        <p class="lesson-sub">Convertir un objeto a bytes (<code>ObjectOutputStream</code>) y restaurarlo (<code>ObjectInputStream</code>). La clase debe implementar <code>Serializable</code>. Los campos <code>transient</code> no se serializan.</p>
+      </div>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Define siempre <code>serialVersionUID</code> para controlar la compatibilidad entre versiones de clase. Nunca serializes contraseñas.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:39, file:'SerializacionDemo.java', hint:'Verifica que original != copia'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m7" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 7 — Entrada/Salida &amp; Archivos</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 20</div>
+          <div class="quiz-q">¿Cuál es la diferencia fundamental entre byte streams y character streams?</div>
+          <div class="quiz-options" id="em7q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><div class="quiz-letter">A</div> No hay diferencia práctica</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q01',true)"><div class="quiz-letter">B</div> Byte streams manejan datos binarios; character streams manejan texto con codificación</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><div class="quiz-letter">C</div> Solo los byte streams usan buffer interno</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q01',false)"><div class="quiz-letter">D</div> Los character streams siempre son más lentos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q01-ok">✓ <code>InputStream/OutputStream</code> → bytes crudos. <code>Reader/Writer</code> → caracteres con codificación (UTF-8, etc.).</div>
+          <div class="quiz-feedback fail" id="em7q01-fail">✗ Byte streams = datos binarios (imágenes, binarios). Character streams = texto con gestión de codificación de caracteres.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 20</div>
+          <div class="quiz-q">¿Para qué sirve envolver un stream con <code>BufferedReader</code>?</div>
+          <div class="quiz-options" id="em7q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><div class="quiz-letter">A</div> Para cifrar los datos leídos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q02',true)"><div class="quiz-letter">B</div> Para mejorar el rendimiento con un buffer interno</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><div class="quiz-letter">C</div> Para ordenar las líneas alfabéticamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q02',false)"><div class="quiz-letter">D</div> Para convertir el texto a formato JSON</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q02-ok">✓ <code>BufferedReader</code> reduce llamadas al sistema leyendo bloques grandes en memoria. Mejora mucho el rendimiento.</div>
+          <div class="quiz-feedback fail" id="em7q02-fail">✗ <code>Buffered*</code> reducea las operaciones de I/O agrupando lecturas/escrituras en bloques. Siempre úsalo para mejor rendimiento.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 20</div>
+          <div class="quiz-q">¿Qué clase de NIO.2 reemplaza a <code>java.io.File</code>?</div>
+          <div class="quiz-options" id="em7q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><div class="quiz-letter">A</div> FilePath</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><div class="quiz-letter">B</div> Directory</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q03',true)"><div class="quiz-letter">C</div> Path</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q03',false)"><div class="quiz-letter">D</div> NioFile</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q03-ok">✓ <code>java.nio.file.Path</code> (Java 7+) reemplaza a <code>File</code> con mejor API, operaciones atómicas y soporte de simbólicos.</div>
+          <div class="quiz-feedback fail" id="em7q03-fail">✗ <code>Path</code> (NIO.2, Java 7) es la API moderna. Usa <code>Paths.get("ruta")</code> o <code>Path.of("ruta")</code> (Java 11+).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>Path.normalize()</code>?</div>
+          <div class="quiz-options" id="em7q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><div class="quiz-letter">A</div> Convierte la ruta a ruta absoluta</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><div class="quiz-letter">B</div> Cambia el separador de plataforma</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q04',true)"><div class="quiz-letter">C</div> Elimina segmentos redundantes como <code>.</code> y <code>..</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q04',false)"><div class="quiz-letter">D</div> Verifica si el archivo existe en disco</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q04-ok">✓ <code>normalize()</code> resuelve <code>./</code> y <code>../</code> léxicamente sin acceder al sistema de archivos.</div>
+          <div class="quiz-feedback fail" id="em7q04-fail">✗ <code>normalize()</code> limpia la ruta de <code>.</code> y <code>..</code>. Para convertir a absoluta, usa <code>toAbsolutePath()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 20</div>
+          <div class="quiz-q">¿Qué interfaz debe implementar un objeto para poder ser serializado en Java?</div>
+          <div class="quiz-options" id="em7q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><div class="quiz-letter">A</div> AutoCloseable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><div class="quiz-letter">B</div> Cloneable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q05',false)"><div class="quiz-letter">C</div> Comparable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q05',true)"><div class="quiz-letter">D</div> Serializable</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q05-ok">✓ <code>implements Serializable</code> es la marca (marker interface) que indica que la clase puede serializarse.</div>
+          <div class="quiz-feedback fail" id="em7q05-fail">✗ Debes implementar <code>java.io.Serializable</code> (interfaz marcador sin métodos) para habilitar la serialización.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 20</div>
+          <div class="quiz-q">¿Para qué sirve declarar <code>serialVersionUID</code> en una clase serializable?</div>
+          <div class="quiz-options" id="em7q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><div class="quiz-letter">A</div> Para cifrar la serialización</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><div class="quiz-letter">B</div> Para identificar el nombre del archivo generado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q06',true)"><div class="quiz-letter">C</div> Para controlar la compatibilidad entre versiones de la clase serializada</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q06',false)"><div class="quiz-letter">D</div> Para comprimir el objeto durante la serialización</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q06-ok">✓ Si la clase cambia sin actualizar <code>serialVersionUID</code>, la deserialización de objetos antiguos lanza <code>InvalidClassException</code>.</div>
+          <div class="quiz-feedback fail" id="em7q06-fail">✗ <code>serialVersionUID</code> es un número de versión. Si no coincide con el del stream, la deserialización falla.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 20</div>
+          <div class="quiz-q">¿Qué hace el modificador <code>transient</code> en un campo?</div>
+          <div class="quiz-options" id="em7q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><div class="quiz-letter">A</div> Hace el campo inmutable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><div class="quiz-letter">B</div> Serializa el campo antes que los demás</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q07',true)"><div class="quiz-letter">C</div> Excluye el campo de la serialización</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q07',false)"><div class="quiz-letter">D</div> Convierte el campo a String automáticamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q07-ok">✓ <code>transient</code> evita que el campo se incluya al serializar. Al deserializar, obtiene el valor por defecto del tipo.</div>
+          <div class="quiz-feedback fail" id="em7q07-fail">✗ <code>transient</code> excluye el campo del proceso de serialización. Útil para contraseñas, caches, o campos no serializables.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 20</div>
+          <div class="quiz-q">¿Qué retorna <code>Files.readAllLines(path)</code>?</div>
+          <div class="quiz-options" id="em7q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><div class="quiz-letter">A</div> Solo la primera línea del archivo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><div class="quiz-letter">B</div> El número de líneas del archivo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q08',true)"><div class="quiz-letter">C</div> Todas las líneas como <code>List&lt;String&gt;</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q08',false)"><div class="quiz-letter">D</div> Un stream de bytes del archivo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q08-ok">✓ <code>Files.readAllLines(path)</code> carga todo el archivo en memoria como lista. Para archivos grandes, usa <code>Files.lines(path)</code> (stream lazy).</div>
+          <div class="quiz-feedback fail" id="em7q08-fail">✗ Retorna <code>List&lt;String&gt;</code>. Para archivos grandes usa <code>Files.lines(path)</code> que no carga todo en memoria.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>path1.relativize(path2)</code>?</div>
+          <div class="quiz-options" id="em7q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><div class="quiz-letter">A</div> Convierte <code>path2</code> a ruta de Unix</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q09',true)"><div class="quiz-letter">B</div> Calcula la ruta relativa de <code>path2</code> respecto a <code>path1</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><div class="quiz-letter">C</div> Normaliza <code>path2</code> eliminando <code>.</code> y <code>..</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q09',false)"><div class="quiz-letter">D</div> Verifica si <code>path2</code> es ruta absoluta</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q09-ok">✓ <code>relativize</code> calcula cómo llegar desde <code>path1</code> hasta <code>path2</code> con una ruta relativa.</div>
+          <div class="quiz-feedback fail" id="em7q09-fail">✗ <code>relativize()</code> devuelve la ruta relativa entre dos paths. Ambas deben ser absolutas o relativas.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 20</div>
+          <div class="quiz-q">¿Cuál clase permite leer objetos Java previamente serializados?</div>
+          <div class="quiz-options" id="em7q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><div class="quiz-letter">A</div> ObjectWriter</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q10',true)"><div class="quiz-letter">B</div> ObjectInputStream</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><div class="quiz-letter">C</div> ByteReader</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q10',false)"><div class="quiz-letter">D</div> FileObjectReader</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q10-ok">✓ <code>ObjectInputStream.readObject()</code> deserializa el objeto. El resultado requiere un cast al tipo esperado.</div>
+          <div class="quiz-feedback fail" id="em7q10-fail">✗ Usa <code>ObjectInputStream</code> para deserializar objetos. Para serializar es <code>ObjectOutputStream</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 20</div>
+          <div class="quiz-q">¿Puede serializarse un campo <code>private</code> de una clase?</div>
+          <div class="quiz-options" id="em7q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><div class="quiz-letter">A</div> No, nunca</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><div class="quiz-letter">B</div> Solo con la anotación <code>@Serializable</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q11',true)"><div class="quiz-letter">C</div> Sí</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q11',false)"><div class="quiz-letter">D</div> Solo si el campo es también <code>final</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q11-ok">✓ La serialización accede a todos los campos (incluyendo <code>private</code>) excepto <code>static</code> y <code>transient</code>.</div>
+          <div class="quiz-feedback fail" id="em7q11-fail">✗ La serialización serializa todos los campos no <code>static</code> y no <code>transient</code>, independientemente de su visibilidad.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 20</div>
+          <div class="quiz-q">¿Qué herramienta de NIO.2 permite monitorizar cambios en un directorio?</div>
+          <div class="quiz-options" id="em7q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><div class="quiz-letter">A</div> PathMonitor</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><div class="quiz-letter">B</div> DirectoryObserver</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q12',true)"><div class="quiz-letter">C</div> WatchService</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q12',false)"><div class="quiz-letter">D</div> FileWatcher</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q12-ok">✓ <code>WatchService</code> (Java 7+) notifica eventos de creación, modificación y borrado en directorios vigilados.</div>
+          <div class="quiz-feedback fail" id="em7q12-fail">✗ <code>WatchService</code> es la API de NIO.2 para vigilar cambios en el sistema de archivos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 20</div>
+          <div class="quiz-q">¿Qué método de <code>BufferedWriter</code> escribe una nueva línea dependiente de la plataforma?</div>
+          <div class="quiz-options" id="em7q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><div class="quiz-letter">A</div> writeLine()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><div class="quiz-letter">B</div> println()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q13',false)"><div class="quiz-letter">C</div> writeNewline()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q13',true)"><div class="quiz-letter">D</div> newLine()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q13-ok">✓ <code>newLine()</code> escribe el separador de línea correcto para el sistema operativo (Windows: <code>\r\n</code>, Unix: <code>\n</code>).</div>
+          <div class="quiz-feedback fail" id="em7q13-fail">✗ <code>newLine()</code> usa el separador de línea del SO. <code>println()</code> es de <code>PrintWriter</code>/<code>PrintStream</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 20</div>
+          <div class="quiz-q">¿Cuál clase permite escribir objetos Java serializados en un stream de bytes?</div>
+          <div class="quiz-options" id="em7q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><div class="quiz-letter">A</div> ObjectWriter</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q14',true)"><div class="quiz-letter">B</div> ObjectOutputStream</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><div class="quiz-letter">C</div> ByteObjectStream</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q14',false)"><div class="quiz-letter">D</div> WriteObjectStream</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q14-ok">✓ <code>ObjectOutputStream.writeObject(obj)</code> serializa el objeto al stream de bytes subyacente.</div>
+          <div class="quiz-feedback fail" id="em7q14-fail">✗ Usa <code>ObjectOutputStream</code> para serializar. El par es <code>ObjectInputStream</code> para deserializar.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 20</div>
+          <div class="quiz-q">¿Qué excepción se lanza al deserializar un objeto cuya clase tiene un <code>serialVersionUID</code> diferente?</div>
+          <div class="quiz-options" id="em7q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><div class="quiz-letter">A</div> Se adapta automáticamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><div class="quiz-letter">B</div> Se ignora la diferencia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q15',false)"><div class="quiz-letter">C</div> Se convierte el objeto antiguamente serializado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q15',true)"><div class="quiz-letter">D</div> Se lanza <code>InvalidClassException</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q15-ok">✓ <code>InvalidClassException</code> indica incompatibilidad entre la clase serializada y la actual. Por eso es crítico definir <code>serialVersionUID</code>.</div>
+          <div class="quiz-feedback fail" id="em7q15-fail">✗ Si el <code>serialVersionUID</code> no coincide, Java lanza <code>InvalidClassException</code> al intentar deserializar.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 20</div>
+          <div class="quiz-q">¿Cuál es el principal beneficio de usar <code>BufferedReader</code> sobre <code>FileReader</code> directamente?</div>
+          <div class="quiz-options" id="em7q16">
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q16',true)"><div class="quiz-letter">A</div> Almacena datos en buffer interno, reduciendo llamadas al sistema operativo (syscalls)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><div class="quiz-letter">B</div> Permite leer archivos binarios en lugar de texto</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><div class="quiz-letter">C</div> Soporta codificación UTF-16 automáticamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q16',false)"><div class="quiz-letter">D</div> Permite lectura concurrente con múltiples hilos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q16-ok">✓ <code>BufferedReader</code> envuelve otro <code>Reader</code> y usa un buffer interno (8KB por defecto). En lugar de acceder al disco en cada <code>read()</code>, lee bloques grandes y los sirve desde memoria, reduciendo syscalls costosas. Mejora dramáticamente el rendimiento en lecturas carácter a carácter.</div>
+          <div class="quiz-feedback fail" id="em7q16-fail">✗ El beneficio de <code>BufferedReader</code> es el <strong>buffering</strong>: acumula datos en memoria y reduce el número de accesos al disco (syscalls). <code>FileReader</code> sin buffer haría un acceso al disco por cada carácter leído.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 20</div>
+          <div class="quiz-q">¿Qué tipo retorna <code>Files.lines(path)</code> y qué consideración importante tiene?</div>
+          <div class="quiz-options" id="em7q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><div class="quiz-letter">A</div> <code>List&lt;String&gt;</code> — carga todo el archivo en memoria</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q17',true)"><div class="quiz-letter">B</div> <code>Stream&lt;String&gt;</code> lazy — debe cerrarse (try-with-resources) para liberar el file descriptor</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><div class="quiz-letter">C</div> <code>Iterator&lt;String&gt;</code> — se cierra automáticamente al terminar</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q17',false)"><div class="quiz-letter">D</div> <code>BufferedReader</code> — envuelto en un generador</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q17-ok">✓ <code>Files.lines()</code> retorna un <code>Stream&lt;String&gt;</code> <strong>lazy</strong> — las líneas se leen bajo demanda. El file descriptor queda abierto hasta que el stream se cierra. Siempre úsalo en try-with-resources: <code>try(Stream&lt;String&gt; lines = Files.lines(p))</code> o llama a <code>.close()</code>.</div>
+          <div class="quiz-feedback fail" id="em7q17-fail">✗ <code>Files.lines()</code> retorna un <code>Stream&lt;String&gt;</code> perezoso. Es OBLIGATORIO cerrarlo (try-with-resources) porque mantiene el archivo abierto. Si no se cierra, hay fuga de file descriptors.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 20</div>
+          <div class="quiz-q">¿Qué riesgo hay al no declarar <code>serialVersionUID</code> en una clase <code>Serializable</code>?</div>
+          <div class="quiz-options" id="em7q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><div class="quiz-letter">A</div> La clase no podrá serializar campos primitivos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q18',true)"><div class="quiz-letter">B</div> El UID se genera automáticamente; si la clase cambia, el UID cambia y los datos serializados anteriores son incompatibles</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><div class="quiz-letter">C</div> El compilador lanzará un error obligando a declararlo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q18',false)"><div class="quiz-letter">D</div> No hay riesgo, es puramente estético</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q18-ok">✓ Si no declaras <code>serialVersionUID</code>, Java lo calcula del hash de la estructura de la clase. Cualquier cambio (añadir campo, cambiar método) genera un nuevo UID. Al deserializar datos antiguos: <code>InvalidClassException: local class incompatible</code>. Declara siempre uno explícito para control.</div>
+          <div class="quiz-feedback fail" id="em7q18-fail">✗ Sin <code>serialVersionUID</code> explícito, Java lo genera automáticamente basado en la estructura de la clase. Si la clase cambia, el UID cambia y la deserialización de datos previos falla con <code>InvalidClassException</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 20</div>
+          <div class="quiz-q">¿Cuál es la ventaja de <code>FileChannel</code> sobre <code>FileInputStream</code>?</div>
+          <div class="quiz-options" id="em7q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><div class="quiz-letter">A</div> <code>FileChannel</code> solo funciona en Windows</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><div class="quiz-letter">B</div> <code>FileChannel</code> es siempre más lento pero más seguro</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q19',true)"><div class="quiz-letter">C</div> Soporta lectura/escritura bidireccional, memory-mapped files y transferencia directa (zero-copy)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q19',false)"><div class="quiz-letter">D</div> Solo permite acceso secuencial como streams</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q19-ok">✓ <code>FileChannel</code> (NIO) ofrece: <strong>acceso aleatorio</strong> (<code>position()</code>), <strong>memory-mapped files</strong> (<code>map()</code> — el SO mapea el archivo directamente a memoria), <strong>transfers directos</strong> (<code>transferTo()</code> zero-copy), y <strong>bloqueo de archivos</strong> (<code>lock()</code>). Ideal para archivos grandes o de alto rendimiento.</div>
+          <div class="quiz-feedback fail" id="em7q19-fail">✗ <code>FileChannel</code> soporta: lectura+escritura bidireccional, acceso aleatorio por posición, memory-mapped files y zero-copy transfers. Significativamente más capaz que <code>FileInputStream</code> para I/O de alto rendimiento.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>path.resolve(other)</code> en la API <code>java.nio.file.Path</code>?</div>
+          <div class="quiz-options" id="em7q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><div class="quiz-letter">A</div> Verifica que el path existe en el sistema de archivos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em7q20',true)"><div class="quiz-letter">B</div> Combina el path base con <code>other</code>: si <code>other</code> es absoluto, retorna <code>other</code>; si es relativo, lo añade al base</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><div class="quiz-letter">C</div> Convierte el path relativo en absoluto usando el directorio actual</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em7q20',false)"><div class="quiz-letter">D</div> Normaliza separadores de ruta según el SO actual</div>
+          </div>
+          <div class="quiz-feedback ok" id="em7q20-ok">✓ <code>path.resolve(other)</code>: si <code>other</code> es relativo, lo añade al final del path base. Si <code>other</code> es absoluto, devuelve <code>other</code> directamente. Contrasta con <code>path.relativize(other)</code> que calcula la ruta relativa entre dos paths, y <code>toAbsolutePath()</code> que ancla al directorio de trabajo.</div>
+          <div class="quiz-feedback fail" id="em7q20-fail">✗ <code>resolve(other)</code> construye un nuevo Path combinando base + other. Si <code>other</code> es absoluto, descarta el base y retorna <code>other</code>. Es equivalente a concatenar segmentos de ruta correctamente.</div>
+        </div>
+      </div>
+
+</ng-container>

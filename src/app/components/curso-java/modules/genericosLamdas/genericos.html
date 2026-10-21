@@ -1,0 +1,385 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===32">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">33</span><span class="lesson-mod">Genéricos</span></div>
+        <h2 class="lesson-title">Genéricos (Generics)</h2>
+        <p class="lesson-sub">Permiten escribir clases, interfaces y métodos que operan sobre <strong>tipos parametrizados</strong>. Proporcionan seguridad de tipos en tiempo de compilación y eliminan el cast manual.</p>
+      </div>
+
+      <h3 class="var-h3">Definición</h3>
+      <ul class="lesson-intro-list">
+        <li>Permiten que una clase puede operar con <strong>cualquier tipo de objeto Java</strong> (no pueden ser primitivos).</li>
+        <li>En la definición de la clase se emplea una letra para hacer referencia de forma genérica al tipo:
+          <div class="compare-code compare-code--light" style="margin-top:8px">
+            <span class="a-kw">class</span> <span class="a-type"> MyClass</span>&lt;<span class="a-type">T</span>&gt;&#123;...&#125;
+          </div>
+        </li>
+        <li>Al crear un objeto de la misma, se debe especificar el tipo concreto con el que se va a trabajar:
+          <div class="compare-code compare-code--light" style="margin-top:8px">
+            <span class="a-type">MyClass</span>&lt;<span class="a-type">String</span>&gt; mc = <span class="a-kw">new</span> <span class="a-type"> MyClass</span>&lt;&gt;();
+          </div>
+        </li>
+      </ul>
+
+      <h3 class="var-h3" style="margin-top:18px">Tipo genérico como parámetro</h3>
+      <ul class="lesson-intro-list">
+        <li>A la hora de definir un parámetro de tipo genérico, se debe emplear el <strong>operador comodín (<code>?</code>)</strong>:
+          <div class="compare-code compare-code--light" style="margin-top:8px">
+            <span class="a-kw">public void</span> <span class="a-fn"> mostrar</span>(<span class="a-type">Caja</span>&lt;?&gt; caja)&#123;<br>
+            &nbsp;&nbsp;System.out.println(caja.<span class="a-fn">getValor</span>());<br>
+            &#125;
+          </div>
+        </li>
+        <li>El método podrá ser llamado con un objeto <code>Caja</code> de cualquier tipo:
+          <div class="compare-code compare-code--light" style="margin-top:8px">
+            <span class="a-type">Caja</span>&lt;<span class="a-type">String</span>&gt; c1 = <span class="a-kw">new </span> <span class="a-type">Caja</span>&lt;&gt;(<span class="a-str">"hola"</span>);<br>
+            <span class="a-type">Caja</span>&lt;<span class="a-type">Integer</span>&gt; c2 = <span class="a-kw">new </span> <span class="a-type">Caja</span>&lt;&gt;(<span class="a-body">42</span>);<br>
+            <span class="a-fn">mostrar</span>(c1);<br>
+            <span class="a-fn">mostrar</span>(c2);
+          </div>
+        </li>
+      </ul>
+
+      <h3 class="var-h3" style="margin-top:18px">Métodos genéricos</h3>
+      <ul class="lesson-intro-list">
+        <li>Una clase <strong>no genérica</strong> puede incluir métodos que utilicen un tipo genérico (en parámetros o como resultado).</li>
+        <li>Se incluirá la expresión <code>&lt;T&gt;</code> en la definición del método:
+          <div class="compare-code compare-code--light" style="margin-top:8px">
+            <span class="a-kw">public</span> &lt;<span class="a-type">T</span>&gt; <span class="a-kw">void</span> <span class="a-fn"> imprimir</span>(<span class="a-type">T</span> item)&#123;...&#125;<br>
+            <span class="a-kw">public</span> &lt;<span class="a-type">T</span> <span class="a-kw"> extends</span> <span class="a-type"> Comparable</span>&lt;<span class="a-type">T</span>&gt;&gt; <span class="a-kw">void</span> <span class="a-fn"> comparar</span>(<span class="a-type">T</span> item)&#123;...&#125;<br>
+            <span class="a-kw">public</span> &lt;<span class="a-type">T</span>&gt; <span class="a-type">T</span> <span class="a-fn"> identidad</span>(<span class="a-type">T</span> item)&#123;...&#125;
+          </div>
+        </li>
+      </ul>
+      <div class="compare-grid" style="grid-template-columns:1fr 1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Definición</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">public class</span> <span class="a-type"> Utilidades</span> &#123;<br>
+            &nbsp;&nbsp;<span class="a-kw">public</span> &lt;<span class="a-type">T</span>&gt; <span class="a-type">String</span> <span class="a-fn"> tipoDe</span>(<span class="a-type">T</span> valor) &#123;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> valor.<span class="a-fn">getClass</span>().<span class="a-fn">getSimpleName</span>();<br>
+            &nbsp;&nbsp;&#125;<br>
+            &#125;
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label">Uso</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-type">Utilidades</span> u = <span class="a-kw">new</span> <span class="a-type"> Utilidades</span>();<br>
+            System.out.println(u.<span class="a-fn">tipoDe</span>(<span class="a-str">"mundo"</span>)); <span class="a-comment">// String</span><br>
+            System.out.println(u.<span class="a-fn">tipoDe</span>(<span class="a-body">99</span>)); &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// Integer</span><br>
+            System.out.println(u.<span class="a-fn">tipoDe</span>(<span class="a-body">3.14</span>)); &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-comment">// Double</span>
+          </div>
+        </div>
+      </div>
+
+      <table class="ref-table">
+        <tr><th>Sintaxis</th><th>Significado</th></tr>
+        <tr><td><code>&lt;T&gt;</code></td><td>Tipo genérico sin restricción</td></tr>
+        <tr><td><code>&lt;T extends Comparable&lt;T&gt;&gt;</code></td><td>T debe implementar Comparable</td></tr>
+        <tr><td><code>&lt;? extends Numero&gt;</code></td><td>Wildcard — cualquier subtipo</td></tr>
+        <tr><td><code>&lt;? super Integer&gt;</code></td><td>Wildcard — cualquier supertipo</td></tr>
+      </table>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:32, file:'GenericsDemo.java', hint:'Crea Caja con otro tipo'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===33">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">34</span><span class="lesson-mod">Lambdas</span></div>
+        <h2 class="lesson-title">Expresiones Lambda (Java 8+)</h2>
+        <p class="lesson-sub">Una lambda es una función anónima que implementa una interfaz funcional (con un único método abstracto). Sintaxis: <code>(params) -&gt; expresión</code>.</p>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-type">Predicate</span><span class="a-paren">&lt;String&gt;</span><span class="a-body"> larga = s -&gt; s.length() &gt; 5;</span></div>
+        <div class="anatomy-line"><span class="a-type">Comparator</span><span class="a-paren">&lt;String&gt;</span><span class="a-body"> porLen = (a, b) -&gt; a.length() - b.length();</span></div>
+        <div class="anatomy-line"><span class="a-type">Runnable</span><span class="a-body"> tarea = () -&gt; System.out.println("¡Lambda!");</span></div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:33, file:'LambdasDemo.java', hint:'Filtra nombres que empiecen por D'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===34">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">35</span><span class="lesson-mod">Lambdas</span></div>
+        <h2 class="lesson-title">Interfaces Funcionales</h2>
+        <p class="lesson-sub">El paquete <code>java.util.function</code> provee las interfaces funcionales más comunes. Con <code>andThen</code> y <code>compose</code> puedes encadenar funciones.</p>
+      </div>
+      <table class="ref-table">
+        <tr><th>Interfaz</th><th>Método</th><th>Descripción</th></tr>
+        <tr><td><code>Function&lt;T,R&gt;</code></td><td><code>apply(T)</code></td><td>T → R</td></tr>
+        <tr><td><code>BiFunction&lt;T,U,R&gt;</code></td><td><code>apply(T,U)</code></td><td>T,U → R</td></tr>
+        <tr><td><code>Predicate&lt;T&gt;</code></td><td><code>test(T)</code></td><td>T → boolean</td></tr>
+        <tr><td><code>Consumer&lt;T&gt;</code></td><td><code>accept(T)</code></td><td>T → void</td></tr>
+        <tr><td><code>Supplier&lt;T&gt;</code></td><td><code>get()</code></td><td>() → T</td></tr>
+      </table>
+      <ng-container *ngTemplateOutlet="playground; context:{id:34, file:'FuncionalDemo.java', hint:'Encadena más funciones'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===35">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">36</span><span class="lesson-mod">Streams</span></div>
+        <h2 class="lesson-title">Stream API (Java 8+)</h2>
+        <p class="lesson-sub">Un <code>Stream</code> es una secuencia de elementos que soporta operaciones funcionales encadenadas: <strong>intermedias</strong> (lazy, retornan Stream) y <strong>terminales</strong> (ejecutan la cadena).</p>
+      </div>
+      <table class="ref-table">
+        <tr><th>Tipo</th><th>Operaciones</th></tr>
+        <tr><td>Intermedias</td><td><code>filter, map, flatMap, distinct, sorted, limit, skip, peek</code></td></tr>
+        <tr><td>Terminales</td><td><code>forEach, collect, count, sum, reduce, findFirst, anyMatch, allMatch</code></td></tr>
+      </table>
+      <ng-container *ngTemplateOutlet="playground; context:{id:35, file:'StreamsDemo.java', hint:'Añade limit(5) antes de count'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===36">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">37</span><span class="lesson-mod">Streams</span></div>
+        <h2 class="lesson-title">Optional (Java 8+)</h2>
+        <p class="lesson-sub"><code>Optional&lt;T&gt;</code> es un contenedor que puede o no tener valor. Elimina los <code>if (x != null)</code> y reduce <code>NullPointerException</code>. Nunca retornes <code>null</code> — retorna <code>Optional.empty()</code>.</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <code>ifPresentOrElse</code> (Java 9), <code>stream()</code> en Optional (Java 9), <code>or(Supplier)</code> (Java 9).</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:36, file:'OptionalDemo.java', hint:'Prueba buscar con distintos prefijos'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m6" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 6 — Genéricos, Lambdas &amp; Streams</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 20</div>
+          <div class="quiz-q">¿Cuántos métodos abstractos debe tener una interfaz funcional?</div>
+          <div class="quiz-options" id="em6q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><div class="quiz-letter">A</div> Cero</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q01',true)"><div class="quiz-letter">B</div> Uno</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><div class="quiz-letter">C</div> Dos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><div class="quiz-letter">D</div> Sin límite</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q01-ok">✓ Una interfaz funcional tiene exactamente UN método abstracto (SAM — Single Abstract Method). Puede tener métodos <code>default</code> y <code>static</code>.</div>
+          <div class="quiz-feedback fail" id="em6q01-fail">✗ Interfaz funcional = exactamente 1 método abstracto. Por eso puede implementarse con una lambda.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 20</div>
+          <div class="quiz-q">¿Qué diferencia hay entre <code>map</code> y <code>flatMap</code> en un Stream?</div>
+          <div class="quiz-options" id="em6q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><div class="quiz-letter">A</div> Son idénticos en comportamiento</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><div class="quiz-letter">B</div> <code>flatMap</code> filtra elementos duplicados</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q02',true)"><div class="quiz-letter">C</div> <code>flatMap</code> aplana streams anidados en uno plano; <code>map</code> transforma uno a uno</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><div class="quiz-letter">D</div> <code>map</code> es siempre más lento</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q02-ok">✓ Si la función devuelve un <code>Stream</code>, <code>flatMap</code> lo aplana a <code>Stream&lt;T&gt;</code>; <code>map</code> daría <code>Stream&lt;Stream&lt;T&gt;&gt;</code>.</div>
+          <div class="quiz-feedback fail" id="em6q02-fail">✗ <code>flatMap</code> aplana streams anidados. <code>map</code> transforma elemento a elemento sin aplanar.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 20</div>
+          <div class="quiz-q">¿Qué símbolo se usa para declarar un parámetro de tipo genérico?</div>
+          <div class="quiz-options" id="em6q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><div class="quiz-letter">A</div> [T]</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><div class="quiz-letter">B</div> (T)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><div class="quiz-letter">C</div> {{ '{' }}T{{ '}' }}</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q03',true)"><div class="quiz-letter">D</div> &lt;T&gt;</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q03-ok">✓ Los genéricos usan los corchetes angulares <code>&lt;T&gt;</code>. Por convención: <code>T</code> tipo, <code>E</code> elemento, <code>K</code> clave, <code>V</code> valor.</div>
+          <div class="quiz-feedback fail" id="em6q03-fail">✗ La sintaxis de generics usa <code>&lt;T&gt;</code>. Ejemplo: <code>class Caja&lt;T&gt;</code> o <code>List&lt;String&gt;</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 20</div>
+          <div class="quiz-q">¿Qué hace el método <code>test(T t)</code> de la interfaz <code>Predicate&lt;T&gt;</code>?</div>
+          <div class="quiz-options" id="em6q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><div class="quiz-letter">A</div> Aplica una transformación a T</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q04',true)"><div class="quiz-letter">B</div> Evalúa una condición y retorna boolean</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><div class="quiz-letter">C</div> Consume el valor sin retornar nada</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><div class="quiz-letter">D</div> Produce un valor sin recibir argumentos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q04-ok">✓ <code>Predicate&lt;T&gt;</code> es para condiciones: <code>Predicate&lt;String&gt; larga = s -&gt; s.length() &gt; 5;</code></div>
+          <div class="quiz-feedback fail" id="em6q04-fail">✗ <code>Predicate.test()</code> retorna <code>boolean</code>. Usa <code>filter(predicate)</code> en streams para filtrar elementos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 20</div>
+          <div class="quiz-q">¿Qué retorna <code>Optional.orElse(valor)</code>?</div>
+          <div class="quiz-options" id="em6q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><div class="quiz-letter">A</div> Siempre retorna un Optional vacío</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><div class="quiz-letter">B</div> Siempre retorna <code>valor</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q05',true)"><div class="quiz-letter">C</div> El valor si está presente; <code>valor</code> si el Optional está vacío</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><div class="quiz-letter">D</div> Lanza NullPointerException si está vacío</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q05-ok">✓ <code>orElse(def)</code> retorna el valor si presente o <code>def</code> si vacío. <code>orElseGet(() -&gt; computar())</code> es lazy.</div>
+          <div class="quiz-feedback fail" id="em6q05-fail">✗ <code>orElse()</code> retorna el valor presente o el alternativo. Usa <code>orElseGet(Supplier)</code> para valores costosos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 20</div>
+          <div class="quiz-q">¿Cuál es la diferencia entre operaciones intermedias y terminales en un Stream?</div>
+          <div class="quiz-options" id="em6q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><div class="quiz-letter">A</div> Las intermedias son más lentas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q06',true)"><div class="quiz-letter">B</div> Las intermedias son lazy (retornan Stream); las terminales ejecutan la cadena</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><div class="quiz-letter">C</div> No hay diferencia relevante</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><div class="quiz-letter">D</div> Las terminales son opcionales</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q06-ok">✓ Las intermedias son lazy: solo se ejecutan cuando hay una terminal. Las terminales (como <code>collect</code>, <code>forEach</code>) consumen el stream.</div>
+          <div class="quiz-feedback fail" id="em6q06-fail">✗ Intermedias = lazy, retornan Stream (<code>filter, map, sorted</code>). Terminales = ejecutan todo (<code>collect, forEach, count</code>).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>Function&lt;T,R&gt;.andThen(g)</code>?</div>
+          <div class="quiz-options" id="em6q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><div class="quiz-letter">A</div> Aplica <code>g</code> antes que la función actual</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><div class="quiz-letter">B</div> Aplica solo <code>g</code> descartando la original</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q07',true)"><div class="quiz-letter">C</div> Aplica la función actual primero, luego <code>g</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><div class="quiz-letter">D</div> Aplica ambas funciones en paralelo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q07-ok">✓ <code>f.andThen(g)</code> = primero aplica <code>f</code>, luego <code>g</code>. <code>compose(g)</code> es el orden inverso.</div>
+          <div class="quiz-feedback fail" id="em6q07-fail">✗ <code>andThen(g)</code>: primero <code>this</code>, luego <code>g</code>. <code>compose(g)</code>: primero <code>g</code>, luego <code>this</code>. Orden contrario.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 20</div>
+          <div class="quiz-q">¿Qué hace la interfaz <code>Consumer&lt;T&gt;</code>?</div>
+          <div class="quiz-options" id="em6q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><div class="quiz-letter">A</div> Retorna un T sin recibir argumentos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><div class="quiz-letter">B</div> Retorna un boolean</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><div class="quiz-letter">C</div> Combina dos valores en un resultado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q08',true)"><div class="quiz-letter">D</div> Acepta T y no retorna nada (void)</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q08-ok">✓ <code>Consumer</code> = recibe T, retorna void. Ejemplo: <code>Consumer&lt;String&gt; print = System.out::println;</code></div>
+          <div class="quiz-feedback fail" id="em6q08-fail">✗ <code>Consumer&lt;T&gt;</code> acepta un argumento y no devuelve nada. Ideal para efectos secundarios como imprimir.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 20</div>
+          <div class="quiz-q">¿Qué hace la interfaz <code>Supplier&lt;T&gt;</code>?</div>
+          <div class="quiz-options" id="em6q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><div class="quiz-letter">A</div> Acepta T y retorna void</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><div class="quiz-letter">B</div> Acepta dos argumentos y retorna un resultado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q09',true)"><div class="quiz-letter">C</div> No acepta argumentos y retorna T</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><div class="quiz-letter">D</div> Acepta T y retorna boolean</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q09-ok">✓ <code>Supplier</code> = fábrica lazy. Ejemplo: <code>Supplier&lt;List&lt;String&gt;&gt; newList = ArrayList::new;</code></div>
+          <div class="quiz-feedback fail" id="em6q09-fail">✗ <code>Supplier&lt;T&gt;</code> no recibe argumento y devuelve T. Es útil para objetos creados bajo demanda (lazy).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>stream.reduce(0, Integer::sum)</code>?</div>
+          <div class="quiz-options" id="em6q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><div class="quiz-letter">A</div> Filtra los elementos cero del stream</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><div class="quiz-letter">B</div> Cuenta cuántos elementos hay</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q10',true)"><div class="quiz-letter">C</div> Reduce el stream sumando todos los elementos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><div class="quiz-letter">D</div> Ordena el stream numéricamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q10-ok">✓ <code>reduce(identidad, acumulador)</code> combina todos los elementos. Con <code>0</code> e <code>Integer::sum</code> calcula la suma total.</div>
+          <div class="quiz-feedback fail" id="em6q10-fail">✗ <code>reduce(0, Integer::sum)</code> acumula sumando todos los elementos del stream, con 0 como valor inicial.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 20</div>
+          <div class="quiz-q">¿Puede modificarse una variable local después de ser capturada por una lambda?</div>
+          <div class="quiz-options" id="em6q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><div class="quiz-letter">A</div> Sí, libremente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q11',true)"><div class="quiz-letter">B</div> No, debe ser efectivamente final</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><div class="quiz-letter">C</div> Solo si es <code>static</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><div class="quiz-letter">D</div> Solo en Java 17+</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q11-ok">✓ Las lambdas solo capturan variables <em>effectively final</em>: variables que no se modifican después de ser asignadas.</div>
+          <div class="quiz-feedback fail" id="em6q11-fail">✗ Las variables capturadas por lambdas deben ser <em>effectively final</em>: no modificadas después de la primera asignación.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 20</div>
+          <div class="quiz-q">¿Qué indica la declaración <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> en un método genérico?</div>
+          <div class="quiz-options" id="em6q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><div class="quiz-letter">A</div> T puede ser cualquier tipo sin restricción</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><div class="quiz-letter">B</div> T debe ser una clase abstracta</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q12',true)"><div class="quiz-letter">C</div> T debe implementar la interfaz <code>Comparable</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><div class="quiz-letter">D</div> T es un supertipo de <code>Comparable</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q12-ok">✓ El límite superior <code>extends Comparable&lt;T&gt;</code> garantiza que podemos llamar a <code>compareTo()</code> sobre T.</div>
+          <div class="quiz-feedback fail" id="em6q12-fail">✗ <code>&lt;T extends Interfaz&gt;</code> limita T a tipos que implementen esa interfaz, permitiendo llamar a sus métodos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>stream.collect(Collectors.joining(", "))</code>?</div>
+          <div class="quiz-options" id="em6q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><div class="quiz-letter">A</div> Cuenta los elementos del stream</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><div class="quiz-letter">B</div> Filtra strings vacíos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q13',true)"><div class="quiz-letter">C</div> Une todos los strings en uno separados por <code>", "</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><div class="quiz-letter">D</div> Agrupa elementos por clave</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q13-ok">✓ <code>Collectors.joining(sep)</code> concatena todos los strings del stream con el separador dado.</div>
+          <div class="quiz-feedback fail" id="em6q13-fail">✗ <code>joining(", ")</code> concatena todos los strings del stream separados por la cadena indicada.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 20</div>
+          <div class="quiz-q">¿Qué significa el wildcard <code>? extends Numero</code> en generics?</div>
+          <div class="quiz-options" id="em6q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><div class="quiz-letter">A</div> Excluye el tipo <code>Numero</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><div class="quiz-letter">B</div> Solo permite exactamente <code>Numero</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q14',true)"><div class="quiz-letter">C</div> Permite <code>Numero</code> y cualquier subtipo de <code>Numero</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><div class="quiz-letter">D</div> Equivale a <code>Object</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q14-ok">✓ <code>? extends T</code> = límite superior (covariant). <code>? super T</code> = límite inferior (contravariant). Principio PECS.</div>
+          <div class="quiz-feedback fail" id="em6q14-fail">✗ <code>? extends Numero</code> acepta <code>Numero</code> y sus subtipos. Principio PECS: Producer Extends, Consumer Super.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 20</div>
+          <div class="quiz-q">¿Cuál de las siguientes operaciones de Stream NO es terminal?</div>
+          <div class="quiz-options" id="em6q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><div class="quiz-letter">A</div> forEach</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><div class="quiz-letter">B</div> collect</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><div class="quiz-letter">C</div> count</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q15',true)"><div class="quiz-letter">D</div> filter</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q15-ok">✓ <code>filter</code> es una operación intermedia (lazy, retorna Stream). <code>forEach</code>, <code>collect</code> y <code>count</code> son terminales.</div>
+          <div class="quiz-feedback fail" id="em6q15-fail">✗ <code>filter</code> es intermedia (retorna Stream). Las terminales son <code>forEach</code>, <code>collect</code>, <code>count</code>, <code>reduce</code>, etc.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 20</div>
+          <div class="quiz-q">¿Qué es el mecanismo de <em>type erasure</em> en Java Generics?</div>
+          <div class="quiz-options" id="em6q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><div class="quiz-letter">A</div> Los genéricos se verifican en tiempo de ejecución con reflection</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q16',true)"><div class="quiz-letter">B</div> Los parámetros de tipo se eliminan en compilación; en bytecode <code>List&lt;String&gt;</code> es simplemente <code>List</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><div class="quiz-letter">C</div> El compilador borra los genéricos solo en clases anónimas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><div class="quiz-letter">D</div> Solo aplica a wildcards <code>?</code>, no a parámetros <code>T</code> concretos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q16-ok">✓ <em>Type erasure</em>: en tiempo de compilación se verifican los tipos genéricos, pero en el bytecode resultante se borran. <code>List&lt;String&gt;</code> se convierte en <code>List</code>. Por eso no puedes hacer <code>new T()</code>, <code>instanceof List&lt;String&gt;</code> ni crear arrays de tipo genérico.</div>
+          <div class="quiz-feedback fail" id="em6q16-fail">✗ Type erasure: los genéricos existen solo en código fuente y compilación. En bytecode/runtime no hay información de tipo genérico. Consecuencia: no se puede hacer <code>instanceof T</code> ni instanciar <code>new T()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 20</div>
+          <div class="quiz-q">¿Qué significa <code>List&lt;? extends Animal&gt;</code> (upper bounded wildcard)?</div>
+          <div class="quiz-options" id="em6q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><div class="quiz-letter">A</div> Puedes añadir elementos que sean <code>Animal</code> o subtipo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q17',true)"><div class="quiz-letter">B</div> Solo puedes leer (producir) de la lista; no puedes añadir elementos (excepto <code>null</code>)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><div class="quiz-letter">C</div> La lista solo puede contener exactamente objetos <code>Animal</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><div class="quiz-letter">D</div> Permite tanto lectura como escritura de cualquier subtipo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q17-ok">✓ Principio PECS (Producer Extends, Consumer Super): <code>? extends T</code> = <strong>producer</strong> → solo leer. No puedes añadir porque el compilador no sabe el tipo exacto (puede ser <code>List&lt;Perro&gt;</code> o <code>List&lt;Gato&gt;</code>). Puedes obtener referencias como <code>Animal</code>.</div>
+          <div class="quiz-feedback fail" id="em6q17-fail">✗ <code>? extends T</code> es upper bounded: el compilador no permite <code>add()</code> porque no sabe el tipo exacto en runtime. Solo puedes <em>leer</em> con el tipo base T. Esto es PECS: Producer Extends.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 20</div>
+          <div class="quiz-q">¿Qué garantiza el método abstracto de <code>Predicate&lt;T&gt;</code>?</div>
+          <div class="quiz-options" id="em6q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><div class="quiz-letter">A</div> <code>T apply(T t)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><div class="quiz-letter">B</div> <code>void accept(T t)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q18',true)"><div class="quiz-letter">C</div> <code>boolean test(T t)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><div class="quiz-letter">D</div> <code>T get()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q18-ok">✓ Las 4 interfaces funcionales core: <code>Function&lt;T,R&gt;</code> → <code>R apply(T)</code>, <code>Consumer&lt;T&gt;</code> → <code>void accept(T)</code>, <code>Supplier&lt;T&gt;</code> → <code>T get()</code>, <code>Predicate&lt;T&gt;</code> → <code>boolean test(T)</code>. Predicado = evaluación booleana de condición.</div>
+          <div class="quiz-feedback fail" id="em6q18-fail">✗ <code>Predicate&lt;T&gt;</code> tiene un único método abstracto: <code>boolean test(T t)</code>. Se usa en Stream <code>filter()</code>, <code>removeIf()</code>, etc. Devuelve siempre <code>boolean</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 20</div>
+          <div class="quiz-q">¿Cuál es la diferencia entre <code>Optional.map()</code> y <code>Optional.flatMap()</code>?</div>
+          <div class="quiz-options" id="em6q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><div class="quiz-letter">A</div> <code>map()</code> trabaja con valores primitivos; <code>flatMap()</code> con objetos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><div class="quiz-letter">B</div> No hay diferencia funcional, son sinónimos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q19',true)"><div class="quiz-letter">C</div> <code>map()</code> aplica función y envuelve en Optional; <code>flatMap()</code> espera una función que ya retorna <code>Optional</code> y evita el doble anidamiento</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><div class="quiz-letter">D</div> <code>flatMap()</code> ejecuta la función incluso si el Optional está vacío</div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q19-ok">✓ <code>map(fn)</code>: aplica <code>fn</code> al valor y envuelve resultado en un nuevo <code>Optional</code>. Si <code>fn</code> ya retorna <code>Optional</code>, obtienes <code>Optional&lt;Optional&lt;T&gt;&gt;</code> — eso lo evita <code>flatMap(fn)</code>, que espera que <code>fn</code> retorne directamente <code>Optional&lt;T&gt;</code> y lo "aplana".</div>
+          <div class="quiz-feedback fail" id="em6q19-fail">✗ <code>map()</code> envuelve el resultado; si tu función ya devuelve <code>Optional</code>, usas <code>flatMap()</code> para evitar <code>Optional&lt;Optional&lt;T&gt;&gt;</code>. Similar a <code>Stream.flatMap()</code>: "aplana" el nivel extra.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 20</div>
+          <div class="quiz-q">¿Qué operación de <code>Stream</code> es una operación terminal que devuelve <code>Optional</code>?</div>
+          <div class="quiz-options" id="em6q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><div class="quiz-letter">A</div> <code>filter()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><div class="quiz-letter">B</div> <code>map()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q20',true)"><div class="quiz-letter">C</div> <code>findFirst()</code> y <code>reduce()</code> (sin identidad)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><div class="quiz-letter">D</div> <code>collect()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em6q20-ok">✓ Operaciones terminales que retornan <code>Optional</code>: <code>findFirst()</code>, <code>findAny()</code>, <code>min()</code>, <code>max()</code>, <code>reduce(BinaryOperator)</code> (sin valor identidad). Retornan <code>Optional</code> porque el stream podría estar vacío.</div>
+          <div class="quiz-feedback fail" id="em6q20-fail">✗ <code>findFirst()</code>, <code>findAny()</code>, <code>min()</code>, <code>max()</code> y <code>reduce(BinaryOperator))</code> retornan <code>Optional</code>. <code>filter()</code> y <code>map()</code> son operaciones intermedias (devuelven Stream). <code>collect()</code> es terminal pero devuelve el tipo del colector.</div>
+        </div>
+      </div>
+
+</ng-container>

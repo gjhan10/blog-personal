@@ -1,0 +1,567 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===0">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">01</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">¿Qué es la Programación Reactiva?</h2>
+      <p class="lesson-sub">Un paradigma orientado a flujos de datos asíncronos y propagación de cambios, diseñado para sistemas altamente concurrentes.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">Reactive Manifesto</div>
+        <div class="tc-body"><strong>Responsive</strong> (responde a tiempo), <strong>Resilient</strong> (falla con gracia), <strong>Elastic</strong> (escala bajo carga), <strong>Message-Driven</strong> (comunicación asíncrona).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Problema del blocking</div>
+        <div class="tc-body">Thread-per-request: cada petición bloquea un hilo esperando I/O. Con 1000 conexiones simultáneas, necesitas 1000 hilos → alta memoria y context-switching.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Event Loop</div>
+        <div class="tc-body">Un hilo gestiona miles de conexiones usando callbacks. Cuando el I/O completa, el callback se ejecuta. Netty usa este modelo. Ningún hilo queda bloqueado esperando.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-droplet" aria-hidden="true"></i></div>
+        <div class="tc-title">Push vs Pull</div>
+        <div class="tc-body">Imperativo: el código <em>solicita</em> datos (pull). Reactivo: los datos <em>fluyen</em> cuando están disponibles (push). El consumidor controla el ritmo mediante backpressure.</div>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Blocking (Spring MVC)</div>
+        <div class="compare-code">Thread bloqueado esperando DB
+1000 req → 1000 threads
+Alto uso de memoria
+Context switching costoso</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Non-Blocking (WebFlux)</div>
+        <div class="compare-code">Thread libre mientras espera DB
+1000 req → pocos threads
+Bajo uso de memoria
+Netty event loop eficiente</div>
+      </div>
+    </div>
+    <div class="info-box">Reactivo NO significa más rápido para una sola petición — significa mejor uso de recursos con miles de peticiones concurrentes.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===1">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">02</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Reactive Streams Specification</h2>
+      <p class="lesson-sub">Estándar de la industria (Java 9 java.util.concurrent.Flow) para streams reactivos interoperables.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></div>
+        <div class="tc-title">Publisher</div>
+        <div class="tc-body"><code>subscribe(Subscriber)</code> — fuente de datos. Implementaciones: Reactor Mono/Flux, RxJava Observable, JDK SubmissionPublisher.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bell" aria-hidden="true"></i></div>
+        <div class="tc-title">Subscriber</div>
+        <div class="tc-body"><code>onSubscribe(s)</code>, <code>onNext(t)</code>, <code>onError(t)</code>, <code>onComplete()</code>. Llama <code>s.request(n)</code> en onSubscribe para solicitar datos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ticket" aria-hidden="true"></i></div>
+        <div class="tc-title">Subscription</div>
+        <div class="tc-body"><code>request(n)</code> para pedir N elementos. <code>cancel()</code> para detener el flujo. Es el mecanismo de backpressure — el consumer controla el ritmo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Processor</div>
+        <div class="tc-body">Extiende Publisher Y Subscriber — es un transformador. En Reactor, está deprecado en favor de operadores encadenados y <code>Sinks</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Regla 1: subscriber.onSubscribe nunca será null</span></div>
+      <div class="anatomy-line"><span class="a-cm">// Regla 2: onNext solo se llama si se solicitaron elementos</span></div>
+      <div class="anatomy-line"><span class="a-cm">// Regla 3: onError/onComplete señalan el fin del stream</span></div>
+      <div class="anatomy-line"><span class="a-cm">// Regla 4: después de cancel(), no más señales</span></div>
+      <div class="anatomy-line"><span class="a-kw">publisher</span>.subscribe(<span class="a-kw">new</span> <span class="a-type">Subscriber</span>&lt;<span class="a-type">Integer</span>&gt;() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> onSubscribe(<span class="a-type">Subscription</span> s) {{ '{' }} s.request(<span class="a-num">10</span>); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> onNext(<span class="a-type">Integer</span> i) {{ '{' }} <span class="a-cm">/* process */</span> {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> onError(<span class="a-type">Throwable</span> t) {{ '{' }} {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> onComplete() {{ '{' }} {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }});</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===2">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">03</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Project Reactor</h2>
+      <p class="lesson-sub">Implementación de Reactive Streams de Pivotal, base de Spring WebFlux. Dos tipos fundamentales: Mono y Flux.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">1️⃣</div>
+        <div class="tc-title">Mono&lt;T&gt;</div>
+        <div class="tc-body">Emite 0 o 1 elemento y completa (o falla). Equivalente a CompletableFuture pero reactivo. Ideal para operaciones que retornan un único resultado o vacío.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-droplet" aria-hidden="true"></i></div>
+        <div class="tc-title">Flux&lt;T&gt;</div>
+        <div class="tc-body">Emite 0 a N elementos, luego completa o falla. Para streams de múltiples elementos. Soporta backpressure completo mediante Reactive Streams spec.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-snowflake" aria-hidden="true"></i></div>
+        <div class="tc-title">Cold Publisher</div>
+        <div class="tc-body">No emite nada hasta que hay un suscriptor. Cada suscriptor recibe el flujo completo desde el inicio. <code>Mono.just()</code> y <code>Flux.fromIterable()</code> son cold.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Dependencia Maven</div>
+        <div class="tc-body"><code>spring-boot-starter-webflux</code> incluye <code>reactor-core</code>, Netty y Spring WebFlux. Sin servlet container — Netty como servidor por defecto.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Mono: 0 o 1 elemento</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">String</span>&gt; mono = <span class="a-type">Mono</span>.just(<span class="a-str">"Hola"</span>);</div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">String</span>&gt; empty = <span class="a-type">Mono</span>.empty();</div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">String</span>&gt; lazy = <span class="a-type">Mono</span>.defer(() -&gt; <span class="a-type">Mono</span>.just(calcular()));</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Flux: 0-N elementos</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>&lt;<span class="a-type">Integer</span>&gt; nums = <span class="a-type">Flux</span>.range(<span class="a-num">1</span>, <span class="a-num">10</span>);</div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>&lt;<span class="a-type">String</span>&gt; items = <span class="a-type">Flux</span>.fromIterable(lista);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Suscripción (necesaria para que emita!)</span></div>
+      <div class="anatomy-line">mono.subscribe(v -&gt; log(v), err -&gt; err.printStackTrace());</div>
+    </div>
+    <div class="warn-box">Sin suscriptor, nada ocurre. Mono y Flux son declaraciones de qué hacer cuando se suscriba — el operador <code>subscribe()</code> desencadena la ejecución.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===3">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">04</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Backpressure</h2>
+      <p class="lesson-sub">Mecanismo por el cual un suscriptor controla el ritmo al que recibe datos, evitando ser sobrepasado.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-arrow-left" aria-hidden="true"></i></div>
+        <div class="tc-title">request(n)</div>
+        <div class="tc-body">El Subscriber llama <code>subscription.request(n)</code> para pedir exactamente N elementos. El Publisher no enviará más que los solicitados.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">BUFFER</div>
+        <div class="tc-body">Almacena elementos que llegan más rápido de lo que se consumen. Por defecto tiene límite — cuando se llena lanza <code>OverflowException</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trash" aria-hidden="true"></i></div>
+        <div class="tc-title">DROP</div>
+        <div class="tc-body">Descarta elementos cuando el downstream no puede consumirlos. Útil para streams de tiempo real donde los datos viejos no importan (p.ej. telemetría).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bell" aria-hidden="true"></i></div>
+        <div class="tc-title">LATEST</div>
+        <div class="tc-body">Conserva sólo el último elemento emitido mientras el downstream no está listo. DROP pero con el elemento más reciente disponible cuando el consumer esté libre.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-type">Flux</span>.range(<span class="a-num">1</span>, <span class="a-num">1000</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.onBackpressureBuffer(<span class="a-num">100</span>)&nbsp;&nbsp;<span class="a-cm">// buffer hasta 100</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-cm">// .onBackpressureDrop()   // descarta extras</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-cm">// .onBackpressureLatest() // solo el último</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.publishOn(<span class="a-type">Schedulers</span>.boundedElastic())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subscribe(i -&gt; procesarLento(i));</div>
+    </div>
+    <div class="info-box">En WebFlux, el backpressure se propaga automáticamente desde el cliente HTTP hasta la fuente de datos. No necesitas gestionarlo manualmente en la mayoría de casos.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===4">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">05</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Cold vs Hot Publishers</h2>
+      <p class="lesson-sub">La diferencia entre publishers que comienzan cuando llega un suscriptor (cold) y los que emiten independientemente (hot).</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label">Cold Publisher</div>
+        <div class="compare-code">Cada suscriptor recibe todos
+los datos desde el principio.
+Ejemplo: Flux.fromIterable(),
+peticiones HTTP, DB queries.
+Suscriptor tarda → datos esperan.</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label">Hot Publisher</div>
+        <div class="compare-code">Emite independientemente.
+Los suscriptores tardíos
+pierden datos previos.
+Ejemplo: eventos UI, WebSocket,
+Sinks.Many multicast.</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-plug" aria-hidden="true"></i></div>
+        <div class="tc-title">ConnectableFlux</div>
+        <div class="tc-body"><code>flux.publish()</code> crea ConnectableFlux. Todos los suscriptores se registran, luego <code>.connect()</code> inicia la emisión para todos simultáneamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">share() / autoConnect()</div>
+        <div class="tc-body"><code>share()</code> = <code>publish().refCount()</code>: empieza cuando hay ≥1 suscriptor, para cuando llega a 0. <code>autoConnect(n)</code>: empieza cuando hay n suscriptores.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Sinks</div>
+        <div class="tc-body">API programática para hot publishers. <code>Sinks.many().multicast().onBackpressureBuffer()</code> para emitir eventos desde código imperativo a flujos reactivos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-monitor" aria-hidden="true"></i></div>
+        <div class="tc-title">Caso de uso real</div>
+        <div class="tc-body">SSE (Server-Sent Events) con WebFlux: una Sink emite eventos del negocio, múltiples clientes HTTP se suscriben al flujo hot y reciben los eventos en tiempo real.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===5">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">06</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Schedulers</h2>
+      <p class="lesson-sub">Controla en qué thread se ejecuta cada parte del pipeline reactivo.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Schedulers.parallel()</div>
+        <div class="tc-body">Pool de threads = número de CPUs. Para operaciones CPU-intensivas NO bloqueantes. NO usar para I/O bloqueante — bloquearía el pool.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Schedulers.boundedElastic()</div>
+        <div class="tc-body">Pool elástico acotado (max 10 * CPUs). Para llamadas bloqueantes (JDBC, servicios legados). Puede crecer bajo carga pero tiene límite superior.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon">1️⃣</div>
+        <div class="tc-title">Schedulers.single()</div>
+        <div class="tc-body">Un único thread reutilizable. Para operaciones que deben ser serializadas (acceso exclusivo a recurso). Similar a un "single-threaded executor".</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">publishOn vs subscribeOn</div>
+        <div class="tc-body"><code>publishOn</code>: cambia el scheduler de los operadores AGUAS ABAJO. <code>subscribeOn</code>: cambia el scheduler de la FUENTE (el primero definido gana).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-type">Flux</span>.fromIterable(ids)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subscribeOn(<span class="a-type">Schedulers</span>.boundedElastic())&nbsp;&nbsp;<span class="a-cm">// fuente en elastic</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.map(id -&gt; callBlockingDb(id))&nbsp;&nbsp;<span class="a-cm">// también en elastic</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.publishOn(<span class="a-type">Schedulers</span>.parallel())&nbsp;&nbsp;<span class="a-cm">// cambia a parallel</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.map(dto -&gt; transform(dto))&nbsp;&nbsp;<span class="a-cm">// ejecuta en parallel</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subscribe();</div>
+    </div>
+    <div class="warn-box">El mayor error en WebFlux: llamar código bloqueante (Thread.sleep, JDBC, RestTemplate) en Schedulers.parallel(). Usa siempre boundedElastic para operaciones blocking.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===6">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">07</span><span class="lesson-mod">Módulo 1 · Programación Reactiva</span></div>
+      <h2 class="lesson-title">Operadores de Composición</h2>
+      <p class="lesson-sub">Combina y transforma flujos reactivos de forma declarativa con los operadores más importantes.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shuffle" aria-hidden="true"></i></div>
+        <div class="tc-title">flatMap</div>
+        <div class="tc-body">Transformación async concurrente. Para cada elemento, crea un inner publisher. Los resultados se intercalan (no garantiza orden). Máxima concurrencia controlable.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">concatMap</div>
+        <div class="tc-body">Como flatMap pero secuencial — espera a que el inner publisher complete antes de procesar el siguiente. Garantiza orden. Menor throughput que flatMap.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">switchMap</div>
+        <div class="tc-body">Cancela el inner publisher anterior cuando llega un nuevo elemento. Útil para "tomar solo el último" (p.ej. búsquedas en tiempo real con debounce).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">zip / merge</div>
+        <div class="tc-body"><code>zip</code>: combina elementos sincronizados (par a par, se detiene en el más corto). <code>merge</code>: suscribe a todos concurrentemente, emite según llegan.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// flatMap: concurrente, sin orden garantizado</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.range(<span class="a-num">1</span>,<span class="a-num">5</span>).flatMap(id -&gt; repo.findById(id))</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// concatMap: secuencial, orden garantizado</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.range(<span class="a-num">1</span>,<span class="a-num">5</span>).concatMap(id -&gt; repo.findById(id))</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// zip: combina par a par</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.zip(getUser(id), getOrders(id))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.map(tuple -&gt; <span class="a-kw">new</span> <span class="a-type">UserDTO</span>(tuple.getT1(), tuple.getT2()))</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 1</div>
+
+    <div class="quiz-box" id="wf1q01">
+      <div class="quiz-label">wf1q01</div>
+      <div class="quiz-q">¿Cuál pilar del Reactive Manifesto permite que el sistema se adapte a cambios en la carga de trabajo?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q01',false)"><span class="quiz-letter">A</span> Responsive</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q01',false)"><span class="quiz-letter">B</span> Resilient</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q01',true)"><span class="quiz-letter">C</span> Elastic</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q01',false)"><span class="quiz-letter">D</span> Message-Driven</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q01-ok">Correcto — Elastic significa que el sistema puede escalar up/down según la carga.</div>
+      <div class="quiz-feedback fail" id="wf1q01-fail">Incorrecto — Elastic permite adaptarse a cambios en la carga. Resilient es recuperarse de fallos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q02">
+      <div class="quiz-label">wf1q02</div>
+      <div class="quiz-q">¿Cuándo empieza a emitir un Cold Publisher?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q02',false)"><span class="quiz-letter">A</span> Inmediatamente al crearse</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q02',true)"><span class="quiz-letter">B</span> Cuando alguien se suscribe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q02',false)"><span class="quiz-letter">C</span> Después de 1 segundo de timeout</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q02',false)"><span class="quiz-letter">D</span> Solo cuando el Scheduler está libre</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q02-ok">Correcto — Cold publishers son lazy: nada ocurre hasta la suscripción, y cada suscriptor recibe datos desde el inicio.</div>
+      <div class="quiz-feedback fail" id="wf1q02-fail">Incorrecto — los Cold publishers comienzan cuando alguien llama subscribe(), cada suscriptor ve todos los datos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q03">
+      <div class="quiz-label">wf1q03</div>
+      <div class="quiz-q">¿Qué hace <code>Subscription.request(Long.MAX_VALUE)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q03',false)"><span class="quiz-letter">A</span> Limita el número máximo de elementos a recibir</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q03',true)"><span class="quiz-letter">B</span> Desactiva el backpressure — solicita todos los elementos sin límite</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q03',false)"><span class="quiz-letter">C</span> Cancela la suscripción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q03',false)"><span class="quiz-letter">D</span> Reinicia el stream desde el inicio</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q03-ok">Correcto — es el equivalente de "dame todo, tan rápido como puedas". Usado por operadores que no aplican backpressure.</div>
+      <div class="quiz-feedback fail" id="wf1q03-fail">Incorrecto — request(Long.MAX_VALUE) solicita todos los elementos, desactivando efectivamente el backpressure.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q04">
+      <div class="quiz-label">wf1q04</div>
+      <div class="quiz-q">¿Cuál es la diferencia clave entre <code>flatMap</code> y <code>concatMap</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q04',false)"><span class="quiz-letter">A</span> flatMap es sincrónico y concatMap es asincrónico</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q04',true)"><span class="quiz-letter">B</span> flatMap es concurrente sin orden garantizado; concatMap es secuencial con orden garantizado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q04',false)"><span class="quiz-letter">C</span> concatMap cancela publishers anteriores; flatMap los acumula</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q04',false)"><span class="quiz-letter">D</span> Son equivalentes con diferente nombre</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q04-ok">Correcto — flatMap maximiza el throughput pero no garantiza orden. concatMap garantiza orden pero es secuencial.</div>
+      <div class="quiz-feedback fail" id="wf1q04-fail">Incorrecto — flatMap procesa concurrentemente (sin orden); concatMap procesa en secuencia garantizando el orden original.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q05">
+      <div class="quiz-label">wf1q05</div>
+      <div class="quiz-q">¿Para qué tipo de operaciones se recomienda <code>Schedulers.boundedElastic()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q05',false)"><span class="quiz-letter">A</span> Operaciones CPU-intensivas no bloqueantes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q05',true)"><span class="quiz-letter">B</span> Llamadas bloqueantes como JDBC, APIs síncronas legacy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q05',false)"><span class="quiz-letter">C</span> Timer y operaciones con delay</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q05',false)"><span class="quiz-letter">D</span> Operaciones que necesitan un único thread serializado</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q05-ok">Correcto — boundedElastic puede escalar sus threads para manejar muchas llamadas bloqueantes sin agotar el pool parallel.</div>
+      <div class="quiz-feedback fail" id="wf1q05-fail">Incorrecto — boundedElastic es para operaciones bloqueantes. parallel() es para CPU-intensivas no bloqueantes.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q06">
+      <div class="quiz-label">wf1q06</div>
+      <div class="quiz-q">¿Dónde en el pipeline tiene efecto <code>publishOn(Schedulers.parallel())</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q06',false)"><span class="quiz-letter">A</span> En todos los operadores del pipeline (aguas arriba y abajo)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q06',true)"><span class="quiz-letter">B</span> Solo en los operadores AGUAS ABAJO de donde está colocado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q06',false)"><span class="quiz-letter">C</span> Solo en la fuente del Flux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q06',false)"><span class="quiz-letter">D</span> Solo en subscribe()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q06-ok">Correcto — publishOn cambia el contexto de ejecución para todos los operadores posteriores en el pipeline.</div>
+      <div class="quiz-feedback fail" id="wf1q06-fail">Incorrecto — publishOn afecta a los operadores downstream (aguas abajo) de donde está ubicado.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q07">
+      <div class="quiz-label">wf1q07</div>
+      <div class="quiz-q">¿Cuál es el comportamiento de <code>switchMap</code> cuando llega un nuevo elemento?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q07',false)"><span class="quiz-letter">A</span> Espera a que el inner publisher actual complete</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q07',true)"><span class="quiz-letter">B</span> Cancela el inner publisher anterior y comienza uno nuevo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q07',false)"><span class="quiz-letter">C</span> Acumula los resultados de todos los inner publishers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q07',false)"><span class="quiz-letter">D</span> Lanza una excepción si hay dos inner publishers activos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q07-ok">Correcto — switchMap cancela el trabajo previo, ideal para búsquedas donde solo interesa el último término.</div>
+      <div class="quiz-feedback fail" id="wf1q07-fail">Incorrecto — switchMap cancela el inner publisher anterior y lanza uno nuevo con el último elemento.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q08">
+      <div class="quiz-label">wf1q08</div>
+      <div class="quiz-q">¿Qué hace <code>share()</code> en un Flux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q08',false)"><span class="quiz-letter">A</span> Comparte el Flux entre múltiples threads del mismo suscriptor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q08',true)"><span class="quiz-letter">B</span> Convierte en hot publisher que inicia con el primer suscriptor y cancela al perder todos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q08',false)"><span class="quiz-letter">C</span> Copia el Flux para que múltiples suscriptores reciban todo desde el inicio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q08',false)"><span class="quiz-letter">D</span> Emite los datos en paralelo a todos los suscriptores simultáneamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q08-ok">Correcto — share() = publish().refCount(). Activa con el 1er suscriptor, desactiva cuando no quedan suscriptores.</div>
+      <div class="quiz-feedback fail" id="wf1q08-fail">Incorrecto — share() crea un hot publisher (publish().refCount()) que gestiona automáticamente la conexión.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q09">
+      <div class="quiz-label">wf1q09</div>
+      <div class="quiz-q">¿Qué es un Processor en Reactive Streams y cuál es su estado en Reactor moderno?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q09',false)"><span class="quiz-letter">A</span> Un thread pool especializado para operaciones reactivas — activo y recomendado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q09',true)"><span class="quiz-letter">B</span> Es tanto Publisher como Subscriber (transformador) — deprecado en Reactor, reemplazado por Sinks y operadores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q09',false)"><span class="quiz-letter">C</span> Un operador que procesa backpressure automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q09',false)"><span class="quiz-letter">D</span> La interfaz principal de Reactive Streams</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q09-ok">Correcto — Processor extiende tanto Publisher como Subscriber. En Reactor se usa Sinks en su lugar.</div>
+      <div class="quiz-feedback fail" id="wf1q09-fail">Incorrecto — Processor es un Publisher+Subscriber, deprecado en favor de Sinks y operadores en Reactor 3.4+.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q10">
+      <div class="quiz-label">wf1q10</div>
+      <div class="quiz-q">¿Cuándo usar <code>Mono.defer()</code> en lugar de <code>Mono.just()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q10',false)"><span class="quiz-letter">A</span> Cuando el tipo T es un primitivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q10',true)"><span class="quiz-letter">B</span> Cuando el valor debe evaluarse en el momento de la suscripción, no al definir el pipeline</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q10',false)"><span class="quiz-letter">C</span> Para valores que nunca cambian</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q10',false)"><span class="quiz-letter">D</span> Solo cuando el Mono puede completar sin emitir</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q10-ok">Correcto — just() evalúa el valor AHORA. defer() evalúa lazy en cada suscripción, capturando el estado actual.</div>
+      <div class="quiz-feedback fail" id="wf1q10-fail">Incorrecto — defer() es para evaluación lazy; just() es eager (el valor se captura al crear el Mono).</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q11">
+      <div class="quiz-label">wf1q11</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>merge()</code> y <code>concat()</code> para múltiples Flux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q11',true)"><span class="quiz-letter">A</span> merge suscribe a todos concurrentemente (intercalado); concat suscribe secuencialmente (espera al anterior)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q11',false)"><span class="quiz-letter">B</span> Son equivalentes pero merge tiene mejor rendimiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q11',false)"><span class="quiz-letter">C</span> concat combina pares de elementos como zip; merge concatena strings</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q11',false)"><span class="quiz-letter">D</span> merge cancela el publisher más lento; concat espera al más rápido</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q11-ok">Correcto — merge = concurrente+intercalado; concat = secuencial+en orden. Usa concat cuando necesitas que el orden sea el de la lista.</div>
+      <div class="quiz-feedback fail" id="wf1q11-fail">Incorrecto — merge es concurrente (elementos interleaved); concat es secuencial (termina el 1º antes del 2º).</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q12">
+      <div class="quiz-label">wf1q12</div>
+      <div class="quiz-q">¿Cuál es el propósito de <code>subscribeOn()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q12',false)"><span class="quiz-letter">A</span> Cambia el scheduler de los operadores aguas abajo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q12',true)"><span class="quiz-letter">B</span> Define el scheduler de la FUENTE del flujo (y aguas arriba)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q12',false)"><span class="quiz-letter">C</span> Cancela el scheduler anterior en el pipeline</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q12',false)"><span class="quiz-letter">D</span> Solo afecta al thread donde se llama subscribe()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q12-ok">Correcto — subscribeOn afecta la fuente y se aplica una sola vez (el primero gana si hay varios en el pipeline).</div>
+      <div class="quiz-feedback fail" id="wf1q12-fail">Incorrecto — subscribeOn define en qué scheduler se suscribe a la fuente y ejecuta la cadena aguas arriba.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q13">
+      <div class="quiz-label">wf1q13</div>
+      <div class="quiz-q">¿Qué estrategia de backpressure conserva solo el elemento más reciente cuando el consumer está ocupado?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q13',false)"><span class="quiz-letter">A</span> BUFFER</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q13',false)"><span class="quiz-letter">B</span> DROP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q13',true)"><span class="quiz-letter">C</span> LATEST</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q13',false)"><span class="quiz-letter">D</span> ERROR</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q13-ok">Correcto — LATEST descarta todos excepto el más reciente, ideal para telemetría en tiempo real.</div>
+      <div class="quiz-feedback fail" id="wf1q13-fail">Incorrecto — LATEST es la estrategia que guarda el elemento más reciente descartando los intermedios.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q14">
+      <div class="quiz-label">wf1q14</div>
+      <div class="quiz-q">¿Cuándo se inicia la emisión en un <code>ConnectableFlux</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q14',false)"><span class="quiz-letter">A</span> Al primer subscribe()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q14',true)"><span class="quiz-letter">B</span> Al llamar explícitamente a connect()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q14',false)"><span class="quiz-letter">C</span> Automáticamente después de un delay</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q14',false)"><span class="quiz-letter">D</span> Cuando el número de suscriptores supera el umbral</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q14-ok">Correcto — ConnectableFlux.connect() inicia la emisión manualmente, permitiendo que múltiples suscriptores estén listos antes de comenzar.</div>
+      <div class="quiz-feedback fail" id="wf1q14-fail">Incorrecto — en ConnectableFlux la emisión no inicia con subscribe(), sino con la llamada explícita a connect().</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q15">
+      <div class="quiz-label">wf1q15</div>
+      <div class="quiz-q">¿Para qué se usa <code>Sinks.many().multicast()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q15',false)"><span class="quiz-letter">A</span> Crear un Flux que solo acepta un suscriptor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q15',true)"><span class="quiz-letter">B</span> Emitir programáticamente eventos a múltiples suscriptores (hot publisher imperativo)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q15',false)"><span class="quiz-letter">C</span> Dividir un Flux en múltiples streams paralelos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q15',false)"><span class="quiz-letter">D</span> Reemplazar publishOn con múltiples schedulers</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q15-ok">Correcto — Sinks.many().multicast() permite emitir eventos desde código imperativo a un hot Flux con múltiples suscriptores.</div>
+      <div class="quiz-feedback fail" id="wf1q15-fail">Incorrecto — Sinks.many().multicast() es la API para hot publishers programáticos que emiten a múltiples suscriptores.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q16">
+      <div class="quiz-label">wf1q16</div>
+      <div class="quiz-q">¿Qué ocurre cuando el pool de <code>Schedulers.parallel()</code> recibe una operación bloqueante?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q16',false)"><span class="quiz-letter">A</span> Automáticamente escala el pool</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q16',true)"><span class="quiz-letter">B</span> El thread se bloquea, degradando la concurrencia de todo el pool (bug crítico)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q16',false)"><span class="quiz-letter">C</span> Lanza BlockingOperationException automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q16',false)"><span class="quiz-letter">D</span> La operación bloqueante se pone en cola sin afectar el pool</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q16-ok">Correcto — bloquear un thread en parallel() es un bug grave que reduce la concurrencia disponible para todas las operaciones.</div>
+      <div class="quiz-feedback fail" id="wf1q16-fail">Incorrecto — el thread del pool se bloquea, reduciendo la capacidad de procesar otras operaciones reactivas.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q17">
+      <div class="quiz-label">wf1q17</div>
+      <div class="quiz-q">¿Qué hace el operador <code>cache()</code> en un Flux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q17',false)"><span class="quiz-letter">A</span> Almacena resultados en Redis</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q17',true)"><span class="quiz-letter">B</span> Convierte en hot publisher que almacena los elementos emitidos para reproducirlos a nuevos suscriptores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q17',false)"><span class="quiz-letter">C</span> Hace que el pipeline se ejecute una sola vez por JVM</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q17',false)"><span class="quiz-letter">D</span> Fuerza la suscripción inmediata sin llamar subscribe()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q17-ok">Correcto — cache() almacena los elementos emitidos y los reproduce a los suscriptores futuros sin re-ejecutar la fuente.</div>
+      <div class="quiz-feedback fail" id="wf1q17-fail">Incorrecto — cache() cachea los datos emitidos en memoria y los reproduced a cada nuevo suscriptor sin volver a ejecutar la fuente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q18">
+      <div class="quiz-label">wf1q18</div>
+      <div class="quiz-q">¿Qué propósito tiene la interfaz <code>Subscription</code> en Reactive Streams?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q18',false)"><span class="quiz-letter">A</span> Definir el tipo de datos del Publisher</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q18',true)"><span class="quiz-letter">B</span> Representar el vínculo entre Publisher y Subscriber; permite solicitar datos (request) y cancelar (cancel)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q18',false)"><span class="quiz-letter">C</span> Configurar el Scheduler del stream</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q18',false)"><span class="quiz-letter">D</span> Transformar elementos entre Publisher y Subscriber</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q18-ok">Correcto — Subscription es el token de control entregado en onSubscribe() para gestionar el backpressure.</div>
+      <div class="quiz-feedback fail" id="wf1q18-fail">Incorrecto — Subscription conecta Publisher con Subscriber y es el mecanismo de backpressure (request/cancel).</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q19">
+      <div class="quiz-label">wf1q19</div>
+      <div class="quiz-q">¿Cuándo se recomienda usar <code>Schedulers.single()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q19',false)"><span class="quiz-letter">A</span> Para operaciones CPU-intensivas que requieren máxima concurrencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q19',true)"><span class="quiz-letter">B</span> Cuando necesitas serializar el acceso a un recurso no thread-safe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q19',false)"><span class="quiz-letter">C</span> Para cada petición HTTP individual</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q19',false)"><span class="quiz-letter">D</span> Reemplaza a boundedElastic en aplicaciones pequeñas</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q19-ok">Correcto — single() garantiza ejecución serializada en un solo thread, útil para recursos que no son thread-safe.</div>
+      <div class="quiz-feedback fail" id="wf1q19-fail">Incorrecto — single() serializa ejecución en un thread; es útil para acceso exclusivo a recursos no thread-safe.</div>
+    </div>
+
+    <div class="quiz-box" id="wf1q20">
+      <div class="quiz-label">wf1q20</div>
+      <div class="quiz-q">¿Qué hace <code>Mono.zip(monoA, monoB)</code> cuando uno de los Mono está vacío (empty)?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q20',false)"><span class="quiz-letter">A</span> Devuelve el resultado del otro Mono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf1q20',true)"><span class="quiz-letter">B</span> El resultado es también empty — zip cancela si cualquier fuente es vacía</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q20',false)"><span class="quiz-letter">C</span> Lanza NoSuchElementException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf1q20',false)"><span class="quiz-letter">D</span> El zip espera indefinidamente al Mono vacío</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf1q20-ok">Correcto — si cualquier fuente de zip es vacía, el resultado es vacío. Usa zipWhen o defaultIfEmpty para manejar este caso.</div>
+      <div class="quiz-feedback fail" id="wf1q20-fail">Incorrecto — Mono.zip completa empty si cualquiera de sus fuentes es empty. Usa switchIfEmpty para manejar este caso.</div>
+    </div>
+  </div>
+
+</ng-container>

@@ -1,0 +1,436 @@
+﻿<ng-container>
+  <div class="lesson-card" *ngIf="globalLesson===19">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">20</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">JPA & Hibernate</h2>
+      <p class="lesson-sub">JPA es la especificación Java para ORM; Hibernate es su implementación más popular. Spring Data JPA añade repositorios y una capa de abstracción encima.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-folder" aria-hidden="true"></i></div>
+        <div class="tc-title">Persistence Context</div>
+        <div class="tc-body">Cache de primer nivel gestionada por el <code>EntityManager</code>. Todas las entidades cargadas en la misma transacción son idénticas (misma referencia). Los cambios se sincronizan al hacer flush.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">N+1 Problem</div>
+        <div class="tc-body">Cargar 1 entidad + N consultas para sus relaciones LAZY. Solución: <code>JOIN FETCH</code> en JPQL, <code>@EntityGraph</code>, o proyecciones DTO con una sola query.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Niveles de Caché</div>
+        <div class="tc-body">1er nivel: per-session (gratis, siempre activo). 2do nivel: cross-session compartida, requiere configuración (EHCache, Caffeine). Reduce queries a BD para datos que no cambian frecuentemente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Estados de Entidad</div>
+        <div class="tc-body"><strong>Transient</strong>: nuevo, no en BD ni en contexto. <strong>Managed</strong>: en contexto, cambios detectados. <strong>Detached</strong>: fue managed, ya no. <strong>Removed</strong>: marcado para eliminar.</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> El problema N+1 es la causa más común de problemas de rendimiento en apps JPA. Identifícalo con <code>spring.jpa.show-sql=true</code> o Hibernate statistics.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===20">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">21</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">@Entity & @Table</h2>
+      <p class="lesson-sub">Las entidades JPA son clases Java que se mapean a tablas en la base de datos. La configuración se hace con anotaciones.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Entity</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Table</span>(name = <span class="a-str">"productos"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Producto</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Id</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GeneratedValue</span>(strategy = <span class="a-type">GenerationType</span>.IDENTITY)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">Long</span> id;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Column</span>(name = <span class="a-str">"nombre"</span>, nullable = <span class="a-kw">false</span>, length = <span class="a-num">100</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> nombre;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Embedded</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">Direccion</span> direccion;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">GenerationType.IDENTITY</div>
+        <div class="tc-body">La BD genera el ID (AUTO_INCREMENT). Sencillo pero no optimizable en inserts por lote (batch) ya que Hibernate no puede predecir el ID.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">GenerationType.SEQUENCE</div>
+        <div class="tc-body">Usa una secuencia de BD. Permite a Hibernate obtener IDs por adelantado (allocationSize), habilitando batch inserts eficientes.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">GenerationType.UUID</div>
+        <div class="tc-body">Java 21+: <code>@GeneratedValue(strategy = GenerationType.UUID)</code>. Genera un UUID v4 sin consultar la BD. Ideal para sistemas distribuidos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===21">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">22</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">CrudRepository & JpaRepository</h2>
+      <p class="lesson-sub">Spring Data JPA genera implementaciones automáticas a partir del nombre del método, eliminando el código CRUD repetitivo.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">public interface</span> <span class="a-type">ProductoRepository</span> <span class="a-kw">extends</span> <span class="a-type">JpaRepository</span>&lt;<span class="a-type">Producto</span>, <span class="a-type">Long</span>&gt; {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">List</span>&lt;<span class="a-type">Producto</span>&gt; findByNombreContainingIgnoreCase(<span class="a-type">String</span> nombre);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Optional</span>&lt;<span class="a-type">Producto</span>&gt; findByIdAndActivoTrue(<span class="a-type">Long</span> id);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">boolean</span> existsByNombre(<span class="a-type">String</span> nombre);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">long</span> countByActivo(<span class="a-kw">boolean</span> activo);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> JpaRepository extiende PagingAndSortingRepository que extiende CrudRepository. Añade: flush(), saveAndFlush(), deleteAllInBatch() y soporte para paginación.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===22">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">23</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">JPQL & @Query</h2>
+      <p class="lesson-sub">JPQL opera sobre entidades y sus campos Java, no sobre tablas SQL. <code>@Query</code> permite escribir JPQL o SQL nativo en el repositorio.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Query</span>(<span class="a-str">"SELECT p FROM Producto p WHERE p.precio BETWEEN :min AND :max ORDER BY p.precio"</span>)</div>
+      <div class="anatomy-line"><span class="a-type">List</span>&lt;<span class="a-type">Producto</span>&gt; findByRangoPrecio(<span class="a-kw">@Param</span>(<span class="a-str">"min"</span>) <span class="a-type">BigDecimal</span> min, <span class="a-kw">@Param</span>(<span class="a-str">"max"</span>) <span class="a-type">BigDecimal</span> max);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Modifying</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Transactional</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Query</span>(<span class="a-str">"UPDATE Producto p SET p.precio = p.precio * :factor WHERE p.categoria = :cat"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">int</span> actualizarPreciosPorCategoria(<span class="a-kw">@Param</span>(<span class="a-str">"factor"</span>) <span class="a-type">BigDecimal</span> factor, <span class="a-kw">@Param</span>(<span class="a-str">"cat"</span>) <span class="a-type">String</span> cat);</div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> @Modifying requiere @Transactional. Añade clearAutomatically=true para limpiar el contexto de persistencia después de la actualización masiva.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===23">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">24</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">Relaciones JPA</h2>
+      <p class="lesson-sub">Las relaciones entre entidades se mapean con <code>@OneToMany</code>, <code>@ManyToOne</code>, <code>@ManyToMany</code>. La gestión del FetchType es crítica para el rendimiento.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">FetchType.EAGER (evitar)</div>
+        <div class="compare-code">Carga SIEMPRE la colección<br>Queries automáticas e inesperadas<br>N+1 problem garantizado<br>@ManyToOne es EAGER por defecto</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">FetchType.LAZY (preferir)</div>
+        <div class="compare-code">Carga solo cuando se accede<br>Control total sobre las queries<br>Requiere transacción activa<br>@OneToMany es LAZY por defecto</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@OneToMany</span>(mappedBy = <span class="a-str">"pedido"</span>, cascade = <span class="a-type">CascadeType</span>.ALL, orphanRemoval = <span class="a-kw">true</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">private</span> <span class="a-type">List</span>&lt;<span class="a-type">LineaPedido</span>&gt; lineas = <span class="a-kw">new</span> <span class="a-type">ArrayList</span>&lt;&gt;();</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Usa <code>Set</code> en lugar de <code>List</code> para @ManyToMany. Hibernate usa una query más eficiente para gestionar la tabla intermedia con Sets.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===24">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">25</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">Pagination & Sorting</h2>
+      <p class="lesson-sub">Spring Data JPA integra paginación y ordenación mediante <code>Pageable</code> y <code>Page&lt;T&gt;</code> sin código adicional.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Page</span>&lt;<span class="a-type">Producto</span>&gt; listar(<span class="a-kw">@PageableDefault</span>(size = <span class="a-num">20</span>, sort = <span class="a-str">"nombre"</span>) <span class="a-type">Pageable</span> pageable) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> repo.findAll(pageable);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// GET /productos?page=0&amp;size=10&amp;sort=precio,desc</span></div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">Page&lt;T&gt;</div>
+        <div class="tc-body">Incluye los datos, número de página, total de elementos y total de páginas. Ejecuta dos queries: una para los datos y otra COUNT.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">Slice&lt;T&gt;</div>
+        <div class="tc-body">Solo sabe si hay una página siguiente. Sin COUNT query. Ideal para scroll infinito cuando no necesitas el total.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===25">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">26</span><span class="lesson-mod">Módulo 4</span></div>
+      <h2 class="lesson-title">@Transactional</h2>
+      <p class="lesson-sub">Las transacciones garantizan atomicidad (ACID). Spring gestiona transacciones declarativamente con <code>@Transactional</code>, sin código boilerplate.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">REQUIRED (defecto)</div>
+        <div class="tc-body">Usa la transacción existente o crea una nueva si no hay. El 95% de los casos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-sparkle" aria-hidden="true"></i></div>
+        <div class="tc-title">REQUIRES_NEW</div>
+        <div class="tc-body">Suspende la transacción actual y crea una nueva independiente. Útil para auditoría o logs que deben persistir aunque la tx principal falle.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">readOnly=true</div>
+        <div class="tc-body">Optimización para queries de solo lectura: deshabilita dirty checking de Hibernate, puede usar réplica de lectura en algunos drivers.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Self-invocation Problem</div>
+        <div class="tc-body">Llamar un método @Transactional desde el mismo objeto (this.metodo()) no activa la transacción porque Spring no intercepta llamadas internas al proxy.</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> @Transactional no funciona en métodos privados ni en llamadas directas dentro de la misma clase. Spring AOP solo intercepta llamadas externas al proxy.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-m4" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 4 — Spring Data JPA</div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Qué son los cuatro estados posibles de una entidad JPA?</div>
+      <div class="quiz-options" id="em4q01">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q01',true)"><div class="quiz-letter">A</div> Transient, Managed, Detached, Removed</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">B</div> New, Persisted, Modified, Deleted</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">C</div> Created, Active, Stale, Expired</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q01',false)"><div class="quiz-letter">D</div> Pending, Saved, Cached, Removed</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q01-ok">✓ Transient=nueva sin ID ni contexto. Managed=en contexto y BD. Detached=fue managed, desconectada. Removed=marcada para DELETE.</div>
+      <div class="quiz-feedback fail" id="em4q01-fail">✗ Los estados JPA son: Transient (nueva), Managed (en contexto), Detached (desconectada del contexto), Removed (marcada para eliminar).</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Por qué GenerationType.SEQUENCE es preferible a IDENTITY para inserción en lote?</div>
+      <div class="quiz-options" id="em4q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">A</div> SEQUENCE genera IDs más cortos que IDENTITY</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q02',true)"><div class="quiz-letter">B</div> SEQUENCE permite obtener IDs en bloques (allocationSize) sin ir a la BD por cada insert</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">C</div> SEQUENCE es el único tipo compatible con PostgreSQL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q02',false)"><div class="quiz-letter">D</div> IDENTITY no es compatible con Hibernate 6</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q02-ok">✓ SEQUENCE con allocationSize=50 obtiene 50 IDs con una sola query a la secuencia, habilitando batch inserts eficientes en Hibernate.</div>
+      <div class="quiz-feedback fail" id="em4q02-fail">✗ Con IDENTITY, Hibernate necesita hacer INSERT + SELECT LAST_ID por cada fila, imposibilitando el batch. SEQUENCE con allocationSize pre-asigna bloques de IDs.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Qué solución elimina el problema N+1 más eficientemente en una query JPQL?</div>
+      <div class="quiz-options" id="em4q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">A</div> Cambiar FetchType a EAGER en la relación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q03',true)"><div class="quiz-letter">B</div> Usar JOIN FETCH en la query JPQL o @EntityGraph</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">C</div> Añadir @BatchSize(size=100) siempre resuelve el N+1</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q03',false)"><div class="quiz-letter">D</div> El N+1 no puede resolverse sin cambiar el esquema de la BD</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q03-ok">✓ JOIN FETCH carga la relación en una sola query SQL. @EntityGraph es la alternativa declarativa. Ambos evitan las N queries adicionales.</div>
+      <div class="quiz-feedback fail" id="em4q03-fail">✗ EAGER empeora el problema. La solución es JOIN FETCH (JPQL), @EntityGraph, o DTO projection. @BatchSize mitiga el N+1 pero no lo elimina.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Qué hace clearAutomatically=true en @Modifying?</div>
+      <div class="quiz-options" id="em4q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">A</div> Limpia la caché de segundo nivel de Hibernate</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q04',true)"><div class="quiz-letter">B</div> Limpia el contexto de persistencia (caché de primer nivel) después de la bulk update</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">C</div> Hace rollback automático si la query falla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q04',false)"><div class="quiz-letter">D</div> Elimina todas las entidades del tipo modificado de la BD</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q04-ok">✓ Las bulk updates van directo a BD sin pasar por el contexto. clearAutomatically evita que el contexto tenga datos obsoletos después de la actualización.</div>
+      <div class="quiz-feedback fail" id="em4q04-fail">✗ clearAutomatically=true limpia el primer nivel de caché (persistence context) para evitar datos stale tras una bulk update que bypasea el contexto.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Page&lt;T&gt; y Slice&lt;T&gt; en Spring Data?</div>
+      <div class="quiz-options" id="em4q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">A</div> Page solo funciona con JPA; Slice con cualquier base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q05',true)"><div class="quiz-letter">B</div> Page ejecuta una query COUNT adicional; Slice solo sabe si hay siguiente página sin COUNT</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">C</div> Son equivalentes, solo difiere el nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q05',false)"><div class="quiz-letter">D</div> Slice devuelve todos los resultados; Page los pagina</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q05-ok">✓ Page necesita el total para calcular el número de páginas (COUNT query). Slice solo consulta size+1 para saber si hay más resultados. Slice es más eficiente.</div>
+      <div class="quiz-feedback fail" id="em4q05-fail">✗ Page = datos + COUNT total (2 queries). Slice = datos + si hay siguiente (1 query con limit+1). Slice para scroll infinito, Page para paginación numerada.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué ocurre cuando se llama un método @Transactional desde el mismo bean (this.metodo())?</div>
+      <div class="quiz-options" id="em4q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">A</div> La transacción se crea normalmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q06',true)"><div class="quiz-letter">B</div> La anotación @Transactional es ignorada porque Spring AOP no intercepta llamadas internas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">C</div> Spring lanza una excepción de auto-referencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q06',false)"><div class="quiz-letter">D</div> La transacción se crea solo si el método tiene @Transactional(propagation=REQUIRES_NEW)</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q06-ok">✓ Spring AOP usa proxies. Las llamadas internas (this.xxx()) no pasan por el proxy, por lo que @Transactional y otros aspectos son ignorados.</div>
+      <div class="quiz-feedback fail" id="em4q06-fail">✗ Self-invocation bypasea el proxy de Spring AOP. @Transactional en el método llamado es ignorado. Solución: inyectar el propio bean o usar AspectJ.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué hace orphanRemoval=true en @OneToMany?</div>
+      <div class="quiz-options" id="em4q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">A</div> Elimina el padre si todos los hijos son eliminados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q07',true)"><div class="quiz-letter">B</div> Elimina los hijos de la BD cuando se quitan de la colección del padre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">C</div> Impide que los hijos existan sin un padre (FK constraint)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q07',false)"><div class="quiz-letter">D</div> Solo funciona con cascade=ALL</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q07-ok">✓ orphanRemoval=true: si haces lineas.remove(linea), Hibernate genera DELETE automáticamente. No necesitas llamar al repositorio de LineaPedido.</div>
+      <div class="quiz-feedback fail" id="em4q07-fail">✗ orphanRemoval elimina el hijo de la BD cuando se desvincula de la colección del padre. Úsalo cuando el hijo no tiene sentido sin el padre.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Cuándo conviene usar @Transactional(readOnly=true)?</div>
+      <div class="quiz-options" id="em4q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">A</div> Solo en métodos que nunca acceden a la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q08',true)"><div class="quiz-letter">B</div> En métodos de solo lectura: deshabilita dirty checking y puede enrutar a réplica de lectura</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">C</div> En todos los métodos para mejorar el rendimiento general</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q08',false)"><div class="quiz-letter">D</div> Solo en métodos con @Query que usan SQL nativo</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q08-ok">✓ readOnly=true desactiva el dirty checking de Hibernate (no compara estados de entidades), reduce memoria y puede usar routing a réplica de lectura en setups con AbstractRoutingDataSource.</div>
+      <div class="quiz-feedback fail" id="em4q08-fail">✗ readOnly=true en consultas: sin dirty checking (Hibernate no registra estado original), optimización de flush, posible routing a réplica. Úsalo en todos tus métodos findAll/findBy.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Qué anotación JPA implementa el bloqueo optimista?</div>
+      <div class="quiz-options" id="em4q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">A</div> @Lock(LockModeType.PESSIMISTIC_WRITE)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q09',true)"><div class="quiz-letter">B</div> @Version en un campo de la entidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">C</div> @OptimisticLock(excluded=true)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q09',false)"><div class="quiz-letter">D</div> @RowVersion en la entidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q09-ok">✓ @Version en un campo Long o Integer: Hibernate incrementa la versión en cada UPDATE. Si dos transacciones modifican la misma versión, la segunda lanza OptimisticLockException.</div>
+      <div class="quiz-feedback fail" id="em4q09-fail">✗ @Version implementa bloqueo optimista: campo de versión en la entidad. Hibernate añade WHERE version=N al UPDATE. Segunda modificación lanza OptimisticLockException.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Por qué se recomienda usar Set en lugar de List para @ManyToMany?</div>
+      <div class="quiz-options" id="em4q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">A</div> Set es más eficiente en memoria que List</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q10',true)"><div class="quiz-letter">B</div> Con Set, Hibernate usa DELETE+INSERT específicos; con List hace DELETE ALL + re-INSERT de todos los elementos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">C</div> List no puede mapear tablas intermedias en JPA</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q10',false)"><div class="quiz-letter">D</div> Son equivalentes en rendimiento para @ManyToMany</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q10-ok">✓ Con List, al eliminar un elemento de @ManyToMany, Hibernate borra TODA la tabla intermedia y re-inserta todo menos el eliminado. Con Set, solo el DELETE específico.</div>
+      <div class="quiz-feedback fail" id="em4q10-fail">✗ List en @ManyToMany: al eliminar 1 elemento → DELETE ALL + INSERT todos-1. Con Set: solo 1 DELETE específico. Enorme diferencia en colecciones grandes.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué son las projection interfaces en Spring Data JPA?</div>
+      <div class="quiz-options" id="em4q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">A</div> Interfaces que extienden JpaRepository para queries personalizadas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q11',true)"><div class="quiz-letter">B</div> Interfaces con getters que mapean solo las columnas necesarias, evitando cargar entidades completas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">C</div> Vistas de base de datos mapeadas a interfaces Java</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q11',false)"><div class="quiz-letter">D</div> Clases abstractas que implementan parcialmente los métodos CRUD</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q11-ok">✓ Las projections permiten SELECT solo de columnas específicas. Spring Data genera un proxy que implementa la interfaz. Más eficiente que cargar entidades completas.</div>
+      <div class="quiz-feedback fail" id="em4q11-fail">✗ Projections = interfaces con getters que reflejan columnas. Spring Data genera SELECT solo de esos campos. Ideal para DTOs de vista sin mapear la entidad completa.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre CascadeType.PERSIST y CascadeType.ALL?</div>
+      <div class="quiz-options" id="em4q12">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q12',true)"><div class="quiz-letter">A</div> PERSIST solo cascadea persist(); ALL cascadea persist, merge, remove, refresh y detach</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">B</div> Son idénticos en la práctica moderna</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">C</div> ALL incluye también el borrado de la tabla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q12',false)"><div class="quiz-letter">D</div> PERSIST incluye REMOVE automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q12-ok">✓ CascadeType.ALL es shorthand para todos los tipos: PERSIST, MERGE, REMOVE, REFRESH, DETACH. Úsalo con cuidado: el REMOVE en cascada puede borrar datos no deseados.</div>
+      <div class="quiz-feedback fail" id="em4q12-fail">✗ PERSIST solo propaga el persist(). ALL propaga todas las operaciones (PERSIST, MERGE, REMOVE, REFRESH, DETACH). CascadeType.REMOVE puede ser peligroso en relaciones compartidas.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué es el dirty checking en Hibernate?</div>
+      <div class="quiz-options" id="em4q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">A</div> Detectar entidades con datos inválidos según las constraints de la BD</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q13',true)"><div class="quiz-letter">B</div> Comparar el estado actual de entidades managed con su snapshot inicial para generar UPDATEs automáticos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">C</div> Detectar consultas SQL que no usan índices</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q13',false)"><div class="quiz-letter">D</div> Verificar que las FK no tienen datos huérfanos</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q13-ok">✓ Hibernate guarda una copia (snapshot) de cada entidad managed al cargarla. Al hacer flush, compara el estado actual con el snapshot y genera UPDATEs para los cambios.</div>
+      <div class="quiz-feedback fail" id="em4q13-fail">✗ Dirty checking: Hibernate guarda snapshot de entidades al cargarlas. En flush, compara y genera UPDATE si hay diferencias. readOnly=true desactiva esto por optimización.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Qué hace @Transactional(propagation=REQUIRES_NEW)?</div>
+      <div class="quiz-options" id="em4q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">A</div> Requiere que exista una transacción activa, lanza excepción si no hay</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q14',true)"><div class="quiz-letter">B</div> Suspende la transacción actual y crea una nueva independiente que puede commit/rollback por separado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">C</div> Crea una nueva transacción anidada dentro de la actual</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q14',false)"><div class="quiz-letter">D</div> Es equivalente a REQUIRED pero con un nombre diferente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q14-ok">✓ REQUIRES_NEW es útil para auditoría o logging que debe persistir aunque la transacción principal haga rollback.</div>
+      <div class="quiz-feedback fail" id="em4q14-fail">✗ REQUIRES_NEW suspende la tx actual, abre una nueva, hace commit o rollback independientemente. Ideal para operaciones que deben persistir aunque la tx principal falle.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué anotación habilita la auditoría automática (fechas de creación/modificación) en Spring Data JPA?</div>
+      <div class="quiz-options" id="em4q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">A</div> @EnableAuditLog en la clase de configuración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q15',true)"><div class="quiz-letter">B</div> @EnableJpaAuditing + @EntityListeners(AuditingEntityListener.class) + @CreatedDate / @LastModifiedDate</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">C</div> @AutoAudit en la entidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q15',false)"><div class="quiz-letter">D</div> @AuditTable en la entidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q15-ok">✓ Configuración completa: @EnableJpaAuditing en @Configuration, @EntityListeners(AuditingEntityListener.class) en la entidad, @CreatedDate/@LastModifiedDate en los campos.</div>
+      <div class="quiz-feedback fail" id="em4q15-fail">✗ Pasos: 1) @EnableJpaAuditing en config, 2) @EntityListeners(AuditingEntityListener.class) en entidad, 3) @CreatedDate/@LastModifiedDate/@CreatedBy/@LastModifiedBy en campos.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué es una Specification en Spring Data JPA?</div>
+      <div class="quiz-options" id="em4q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">A</div> Un archivo XML que describe el schema de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q16',true)"><div class="quiz-letter">B</div> Una interfaz funcional que construye predicados JPA Criteria API para queries dinámicas combinables</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">C</div> Una anotación que define el tipo de índice en la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q16',false)"><div class="quiz-letter">D</div> Una clase que especifica las validaciones de una entidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q16-ok">✓ Specification implementa toPredicate(root, query, cb). Se combinan con Specification.where().and().or() para queries dinámicas seguras en tipos.</div>
+      <div class="quiz-feedback fail" id="em4q16-fail">✗ Specification = @FunctionalInterface que genera predicados JPA Criteria. El repositorio extiende JpaSpecificationExecutor. Ideal para búsquedas con filtros opcionales.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué hace la anotación @BatchSize(size=50) en una relación LAZY?</div>
+      <div class="quiz-options" id="em4q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">A</div> Limita el número máximo de resultados en queries</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q17',true)"><div class="quiz-letter">B</div> Carga hasta 50 colecciones LAZY en una sola query usando IN, mitigando el N+1</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">C</div> Activa el procesamiento por lotes de los inserts</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q17',false)"><div class="quiz-letter">D</div> Pagina automáticamente los resultados de la colección</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q17-ok">✓ @BatchSize mitiga N+1: en lugar de 1 query por colección, agrupa hasta 50 ids en un WHERE IN (...), reduciendo N queries a ceil(N/50) queries.</div>
+      <div class="quiz-feedback fail" id="em4q17-fail">✗ @BatchSize en relaciones: Hibernate usa WHERE id IN (id1,id2,...,idN) para cargar hasta N colecciones en 1 query. Reduce N+1 pero no lo elimina completamente.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Cuándo se ejecuta un flush del contexto de persistencia en Spring Data JPA?</div>
+      <div class="quiz-options" id="em4q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">A</div> Solo al hacer saveAll() explícitamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q18',true)"><div class="quiz-letter">B</div> Antes de ejecutar queries JPQL (FlushMode.AUTO) y al hacer commit de la transacción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">C</div> En cada llamada a save() del repositorio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q18',false)"><div class="quiz-letter">D</div> Solo al cerrar el EntityManager</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q18-ok">✓ FlushMode.AUTO: Hibernate hace flush antes de queries JPQL relacionadas y al commit de la transacción, garantizando consistencia entre el contexto y la BD.</div>
+      <div class="quiz-feedback fail" id="em4q18-fail">✗ FlushMode.AUTO (por defecto): flush antes de queries JPQL que afectan la misma tabla y al commit. FlushMode.COMMIT solo hace flush al commit.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Qué es @EmbeddedId y en qué difiere de @IdClass?</div>
+      <div class="quiz-options" id="em4q19">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q19',true)"><div class="quiz-letter">A</div> @EmbeddedId usa una clase @Embeddable como clave compuesta; @IdClass duplica los campos en la entidad y en una clase separada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">B</div> Son equivalentes, solo difiere en la sintaxis</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">C</div> @IdClass es para Spring Data; @EmbeddedId es para JPA puro</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q19',false)"><div class="quiz-letter">D</div> @EmbeddedId solo soporta dos campos como máximo</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q19-ok">✓ @EmbeddedId encapsula la PK en un objeto @Embeddable (entity.id.campo). @IdClass mantiene los campos en la entidad pero usa una clase separada para equals/hashCode.</div>
+      <div class="quiz-feedback fail" id="em4q19-fail">✗ @EmbeddedId = clase @Embeddable dentro de la entidad (entity.pk.campo). @IdClass = campos duplicados en entidad y en clase PK. Ambos para claves compuestas.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué método de JpaRepository ejecuta una query y luego hace flush en la misma operación?</div>
+      <div class="quiz-options" id="em4q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">A</div> saveAll()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em4q20',true)"><div class="quiz-letter">B</div> saveAndFlush()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">C</div> persistAndCommit()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em4q20',false)"><div class="quiz-letter">D</div> save() siempre hace flush automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="em4q20-ok">✓ saveAndFlush() persiste la entidad y hace flush inmediato. Útil en tests o cuando necesitas el ID generado antes del commit de la transacción.</div>
+      <div class="quiz-feedback fail" id="em4q20-fail">✗ saveAndFlush() = save() + flush() inmediato. Útil cuando necesitas que los cambios sean visibles para queries dentro de la misma transacción sin esperar al commit.</div>
+    </div>
+  </div>
+</ng-container>

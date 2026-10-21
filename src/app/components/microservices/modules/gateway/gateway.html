@@ -1,0 +1,481 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===24">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">25</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">API Gateway con Spring Cloud Gateway</h2>
+      <p class="lesson-sub">El API Gateway es el punto de entrada único para todos los clientes. Centraliza cross-cutting concerns: autenticación, autorización, rate limiting, routing, load balancing y observabilidad. Spring Cloud Gateway (reactivo, Netty) reemplaza al obsoleto Zuul.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-door" aria-hidden="true"></i></div>
+        <div class="tc-title">Single Entry Point</div>
+        <div class="tc-body">Los clientes solo conocen la URL del gateway. El routing interno a los servicios es transparente. Simplifica el descubrimiento de servicios para clientes externos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Predicates & Filters</div>
+        <div class="tc-body">Predicate: condición de routing (path, header, method). Filter: transformación pre/post request. Hay 30+ filtros built-in: AddRequestHeader, StripPrefix, CircuitBreaker, RateLimiter.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Reactivo con Netty</div>
+        <div class="tc-body">Spring Cloud Gateway usa Netty (non-blocking). Puede manejar miles de conexiones concurrentes con pocos threads. Ideal para gateway con alta concurrencia.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Service Discovery</div>
+        <div class="tc-body">Integra con Eureka/Consul para routing dinámico por nombre de servicio: <code>lb://order-service</code>. Spring Cloud LoadBalancer distribuye entre instancias disponibles.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml — rutas con predicates y filters</span></div>
+      <div class="anatomy-line">spring.cloud.gateway.routes:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;- id: order-service</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;uri: lb://order-service</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;predicates:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Path=/api/orders/**</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;filters:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- StripPrefix=1</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: CircuitBreaker</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args: {{ '{' }} name: orderCB, fallbackUri: forward:/fallback/orders {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name: RequestRateLimiter</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args: {{ '{' }} redis-rate-limiter.replenishRate: 10, redis-rate-limiter.burstCapacity: 20 {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===25">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">26</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">JWT Centralizado en el Gateway</h2>
+      <p class="lesson-sub">Centralizar la validación JWT en el gateway elimina la necesidad de que cada microservicio valide tokens. El gateway valida el token, extrae claims y los propaga como headers a los servicios downstream.</p>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Cliente envía request con <code>Authorization: Bearer &lt;JWT&gt;</code> al gateway.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Gateway filter intercepta y valida la firma del JWT contra la clave pública del Authorization Server.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Si válido, extrae claims (userId, roles, tenantId) y los añade como headers: <code>X-User-Id</code>, <code>X-Roles</code>.</div></div>
+      <div class="step"><span class="step-n">4</span><div>El request enrutado al servicio downstream incluye estos headers. El servicio confía en ellos (tráfico internal-only).</div></div>
+      <div class="step"><span class="step-n">5</span><div>Los servicios internos NO deben ser accesibles desde internet; solo el gateway puede llamarlos.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Global filter de autenticación JWT</span></div>
+      <div class="anatomy-line">@Component</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">JwtAuthenticationFilter</span> <span class="a-kw">implements</span> <span class="a-type">GlobalFilter</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">Void</span>&gt; filter(<span class="a-type">ServerWebExchange</span> exchange, <span class="a-type">GatewayFilterChain</span> chain) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">String</span> token = extractToken(exchange.getRequest());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Claims</span> claims = jwtValidator.validate(token);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ServerWebExchange</span> mutated = exchange.mutate()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.request(r -&gt; r.header(<span class="a-str">"X-User-Id"</span>, claims.getSubject()))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.build();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> chain.filter(mutated);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===26">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">27</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">OAuth2 & OpenID Connect</h2>
+      <p class="lesson-sub">OAuth2 es el protocolo de autorización estándar. OpenID Connect (OIDC) añade autenticación sobre OAuth2. En microservicios, el Authorization Server (Keycloak, Auth0) emite tokens JWT que el gateway y los servicios validan.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-key" aria-hidden="true"></i> OAuth2 (Autorización)</div>
+        <ul>
+          <li>¿Qué puede hacer el cliente?</li>
+          <li>Access Token (opaco o JWT)</li>
+          <li>Scopes: read:orders, write:inventory</li>
+          <li>Client Credentials Flow (M2M)</li>
+          <li>Authorization Code Flow (usuarios)</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-idcard" aria-hidden="true"></i> OIDC (Autenticación)</div>
+        <ul>
+          <li>¿Quién es el usuario?</li>
+          <li>ID Token (siempre JWT)</li>
+          <li>Claims: sub, email, name, picture</li>
+          <li>UserInfo endpoint</li>
+          <li>SSO entre aplicaciones</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Gateway como Resource Server</span></div>
+      <div class="anatomy-line">spring.security.oauth2.resourceserver.jwt:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;issuer-uri: https://keycloak:8080/realms/myrealm</div>
+      <div class="anatomy-line">&nbsp;&nbsp;jwk-set-uri: https://keycloak:8080/realms/myrealm/protocol/openid-connect/certs</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Servicio interno — valida rol sin re-validar token</span></div>
+      <div class="anatomy-line">@PreAuthorize(<span class="a-str">"hasRole('ADMIN')"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span> adminAction() {{ '{' }} ... {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===27">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">28</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">mTLS entre Microservicios</h2>
+      <p class="lesson-sub">El mTLS (Mutual TLS) autentica tanto el servidor como el cliente mediante certificados X.509. En microservicios, garantiza que solo servicios autorizados puedan comunicarse entre sí, incluso dentro de la red interna.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">TLS unidireccional vs mTLS</div>
+        <div class="tc-body">TLS normal: el cliente verifica el certificado del servidor. mTLS: el servidor también verifica el certificado del cliente. Autenticación mutua basada en PKI.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">PKI interna (CA propia)</div>
+        <div class="tc-body">Se usa una Certificate Authority interna (cert-manager en K8s, Vault PKI) para emitir certificados a cada microservicio. Los certificados tienen TTL corto y se rotan automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Zero Trust Networking</div>
+        <div class="tc-body">mTLS es el pilar del Zero Trust: "nunca confiar, siempre verificar". Incluso tráfico interno de la red corporativa debe autenticarse. Un servicio comprometido no puede suplantar a otro.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Service Mesh lo gestiona</div>
+        <div class="tc-body">Istio/Linkerd inyectan un sidecar proxy (Envoy) que maneja mTLS transparentemente. El código de la aplicación no necesita gestionar certificados. PeerAuthentication: STRICT activa mTLS obligatorio.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Con Istio en modo STRICT, todo el tráfico entre pods usa mTLS automáticamente. Sin certificado válido = conexión rechazada. Auditoría completa de quién llamó a quién.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===28">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">29</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">Rate Limiting en el Gateway</h2>
+      <p class="lesson-sub">El rate limiting en el gateway protege todos los servicios downstream de un solo punto. Redis es el backend estándar para rate limiting distribuido en Spring Cloud Gateway, manteniendo contadores compartidos entre instancias del gateway.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-user" aria-hidden="true"></i></div>
+        <div class="tc-title">By User (KeyResolver)</div>
+        <div class="tc-body">Limitar por usuario autenticado: <code>X-User-Id</code> header. Cada usuario tiene su propio contador. Previene que un usuario abuse sin afectar a los demás.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">By IP Address</div>
+        <div class="tc-body">Para endpoints no autenticados, usar la IP como key. Útil para prevenir abuso de endpoints de login o public APIs. CUIDADO: IP puede ser compartida en NAT.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">By API Key</div>
+        <div class="tc-body">Para APIs de terceros, usar el API key del cliente. Cada key tiene su propio tier de límites (free: 100 req/min, pro: 1000 req/min).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Headers de respuesta</div>
+        <div class="tc-body">El gateway añade headers estándar: <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Replenish-Rate</code>. Los clientes pueden saber cuántas peticiones les quedan.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// KeyResolver por usuario autenticado</span></div>
+      <div class="anatomy-line">@Bean</div>
+      <div class="anatomy-line"><span class="a-type">KeyResolver</span> userKeyResolver() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> exchange -&gt; <span class="a-type">Mono</span>.justOrEmpty(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;exchange.getRequest().getHeaders().getFirst(<span class="a-str">"X-User-Id"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===29">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">30</span><span class="lesson-mod">M5 · API Gateway y Seguridad</span></div>
+      <h2 class="lesson-title">Service Mesh con Istio</h2>
+      <p class="lesson-sub">Un Service Mesh gestiona la comunicación entre microservicios a nivel de infraestructura: mTLS, observabilidad, traffic management y políticas de seguridad, sin modificar el código de los servicios. Istio usa Envoy como sidecar proxy.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-puzzle" aria-hidden="true"></i></div>
+        <div class="tc-title">Control Plane vs Data Plane</div>
+        <div class="tc-body">Control plane (Istiod): configura y distribuye políticas a todos los proxies. Data plane (Envoy sidecars): intercepta y gestiona todo el tráfico de red del pod.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-signal" aria-hidden="true"></i></div>
+        <div class="tc-title">Traffic Management</div>
+        <div class="tc-body">VirtualService: reglas de routing, canary (90/10), A/B testing. DestinationRule: circuit breaker, connection pool, mTLS policy por servicio destino.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shield" aria-hidden="true"></i></div>
+        <div class="tc-title">AuthorizationPolicy</div>
+        <div class="tc-body">Políticas fine-grained: "solo el servicio orders puede llamar al servicio payments". Basado en identidad de servicio (SPIFFE/X.509), no en IPs que pueden cambiar.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trend" aria-hidden="true"></i></div>
+        <div class="tc-title">Observabilidad automática</div>
+        <div class="tc-body">Métricas HTTP (latencia, error rate, throughput) automáticas para cada servicio. Trazas distribuidas con Jaeger/Zipkin sin instrumentar el código. Golden signals out of the box.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-alert" aria-hidden="true"></i> Istio añade latencia (sidecar overhead ~1-3ms por hop) y complejidad operacional. Evalúa si necesitas sus capacidades o si Spring Cloud ya cubre tus necesidades antes de adoptarlo.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m5" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 5 — API Gateway y Seguridad</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuáles son los principales beneficios de centralizar cross-cutting concerns en el API Gateway?</div>
+      <div class="quiz-options" id="msm5q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q01',false)"><div class="quiz-letter">A</div> Elimina la necesidad de tener múltiples microservicios</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q01',true)"><div class="quiz-letter">B</div> Evitar duplicar lógica de autenticación, rate limiting y observabilidad en cada servicio, simplificando los servicios y asegurando aplicación consistente de políticas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q01',false)"><div class="quiz-letter">C</div> Reemplaza la base de datos de cada microservicio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q01',false)"><div class="quiz-letter">D</div> Garantiza transacciones ACID entre todos los servicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q01-ok">✓ Sin gateway: cada servicio implementa JWT validation, rate limiting, CORS, logging. Con gateway: un solo lugar para estas responsabilidades. Los servicios se enfocan en lógica de negocio.</div>
+      <div class="quiz-feedback fail" id="msm5q01-fail">✗ El gateway centraliza: autenticación/autorización, rate limiting, logging/métricas, SSL termination, CORS, request/response transformation. Evita duplicación y garantiza aplicación consistente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Por qué Spring Cloud Gateway usa Netty en lugar de un servidor Servlet (Tomcat)?</div>
+      <div class="quiz-options" id="msm5q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q02',false)"><div class="quiz-letter">A</div> Porque Tomcat no soporta HTTPS en un gateway</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q02',true)"><div class="quiz-letter">B</div> Netty es non-blocking y puede manejar miles de conexiones concurrentes con pocos threads, fundamental para un gateway que actúa como proxy de alto throughput</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q02',false)"><div class="quiz-letter">C</div> Netty tiene mejor soporte para Spring MVC annotations</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q02',false)"><div class="quiz-letter">D</div> Tomcat no permite configurar timeouts de conexión</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q02-ok">✓ Un gateway es I/O bound: recibe petición, la enruta, espera respuesta. Con Netty non-blocking: 1 thread puede manejar miles de conexiones esperando. Con Tomcat: 1 thread por conexión, se agota pronto.</div>
+      <div class="quiz-feedback fail" id="msm5q02-fail">✗ Gateway pattern: alta concurrencia, mayormente I/O waiting. Netty event loop: N threads manejan miles de conexiones async. Servlet thread-per-request: 200 threads = 200 conexiones máx simultáneas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Cuál es el flujo correcto de validación JWT centralizada en el gateway?</div>
+      <div class="quiz-options" id="msm5q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q03',false)"><div class="quiz-letter">A</div> El gateway reenvía el JWT a cada servicio para que lo valide individualmente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q03',true)"><div class="quiz-letter">B</div> Gateway valida el JWT, extrae claims y los propaga como headers internos. Los servicios downstream confían en los headers X-User-Id y X-Roles sin re-validar el token</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q03',false)"><div class="quiz-letter">C</div> El gateway almacena el JWT en Redis y cada servicio consulta Redis</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q03',false)"><div class="quiz-letter">D</div> El gateway convierte el JWT a una cookie de sesión para los servicios internos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q03-ok">✓ Gateway: valida firma JWT → extrae sub, roles → añade X-User-Id, X-Roles headers → enruta al servicio. Servicio: lee X-User-Id del header, confía en él (solo tráfico del gateway llega al servicio).</div>
+      <div class="quiz-feedback fail" id="msm5q03-fail">✗ Flujo: JWT validado en gateway → claims extraídos → propagados como headers confiables. Servicios internos no son accesibles desde internet, solo del gateway. Headers internos = trusted context.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre OAuth2 y OpenID Connect?</div>
+      <div class="quiz-options" id="msm5q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q04',false)"><div class="quiz-letter">A</div> Son idénticos; OpenID Connect es el nuevo nombre de OAuth2</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q04',true)"><div class="quiz-letter">B</div> OAuth2 es un framework de autorización (¿qué puede hacer el cliente?). OpenID Connect es una capa de identidad sobre OAuth2 (¿quién es el usuario?) que añade el ID Token</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q04',false)"><div class="quiz-letter">C</div> OAuth2 es para APIs; OpenID Connect solo para aplicaciones web</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q04',false)"><div class="quiz-letter">D</div> OpenID Connect es más inseguro porque expone claims del usuario</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q04-ok">✓ OAuth2: Access Token con scopes (read:orders). OIDC: añade ID Token JWT con claims de identidad (sub, email, name). OIDC = OAuth2 + autenticación estandarizada.</div>
+      <div class="quiz-feedback fail" id="msm5q04-fail">✗ OAuth2: ¿qué puede hacer el cliente? (access token, scopes). OIDC: ¿quién es el usuario? (id token, claims). OIDC es un profile de OAuth2 que añade autenticación sobre el flujo de autorización.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es el flujo OAuth2 recomendado para comunicación Máquina-a-Máquina (M2M) entre microservicios?</div>
+      <div class="quiz-options" id="msm5q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q05',false)"><div class="quiz-letter">A</div> Authorization Code Flow con PKCE</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q05',true)"><div class="quiz-letter">B</div> Client Credentials Flow: el servicio se autentica con su client_id + client_secret y obtiene un Access Token directamente sin usuario</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q05',false)"><div class="quiz-letter">C</div> Implicit Flow con token en la URL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q05',false)"><div class="quiz-letter">D</div> Resource Owner Password Credentials con credenciales del admin</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q05-ok">✓ Client Credentials: serviceA obtiene token con su propio client_id/secret. No hay usuario involucrado. El token incluye el scope del servicio (e.g., inventory:read). Ideal para comunicación interna entre servicios.</div>
+      <div class="quiz-feedback fail" id="msm5q05-fail">✗ M2M: Client Credentials Flow. POST /token con grant_type=client_credentials + client_id + client_secret → access token. Sin user involvement. Scopes definen qué puede hacer el servicio llamante.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué diferencia al mTLS del TLS estándar y por qué es importante en microservicios?</div>
+      <div class="quiz-options" id="msm5q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q06',false)"><div class="quiz-letter">A</div> mTLS usa un algoritmo de cifrado más fuerte</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q06',true)"><div class="quiz-letter">B</div> En TLS, solo el cliente verifica el servidor. En mTLS, ambos se autentican mutuamente con certificados X.509. Garantiza que solo servicios autorizados puedan comunicarse</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q06',false)"><div class="quiz-letter">C</div> mTLS solo funciona en redes locales; TLS funciona en internet</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q06',false)"><div class="quiz-letter">D</div> mTLS requiere más puertos de red que TLS estándar</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q06-ok">✓ TLS: cliente verifica certificado del servidor (HTTPS normal). mTLS: servidor también verifica certificado del cliente. En microservicios: el servicio payments solo acepta conexiones de servicios con certificado de tu CA interna.</div>
+      <div class="quiz-feedback fail" id="msm5q06-fail">✗ mTLS = mutual authentication. Servidor presenta cert → cliente verifica. Cliente presenta cert → servidor verifica. Solo servicios con certificado válido de tu CA interna pueden conectarse. Zero Trust en la red interna.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué es el principio Zero Trust en el contexto de seguridad de microservicios?</div>
+      <div class="quiz-options" id="msm5q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q07',false)"><div class="quiz-letter">A</div> No confiar en ningún usuario externo y bloquear todo el tráfico de internet</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q07',true)"><div class="quiz-letter">B</div> "Nunca confiar, siempre verificar": incluso el tráfico interno de la red corporativa debe autenticarse y autorizarse. La posición en la red no implica confianza</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q07',false)"><div class="quiz-letter">C</div> Usar 0 dependencias de terceros en el código de seguridad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q07',false)"><div class="quiz-letter">D</div> No guardar datos de usuario en bases de datos locales</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q07-ok">✓ Zero Trust: si un servicio interno es comprometido, no puede automáticamente llamar a cualquier otro servicio. Cada llamada se autentica (mTLS) y autoriza (AuthorizationPolicy). La red perimetral no es suficiente.</div>
+      <div class="quiz-feedback fail" id="msm5q07-fail">✗ Zero Trust: la red interna no es implícitamente segura. Un atacante dentro de la red (o un servicio comprometido) debe ser contenido. mTLS + AuthorizationPolicy en Istio implementan Zero Trust.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Por qué Redis es el backend estándar para rate limiting distribuido en Spring Cloud Gateway?</div>
+      <div class="quiz-options" id="msm5q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q08',false)"><div class="quiz-letter">A</div> Porque Redis es el único datastore que soporta el protocolo del gateway</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q08',true)"><div class="quiz-letter">B</div> Redis permite compartir contadores de rate limiting entre múltiples instancias del gateway con latencia de sub-milisegundo, garantizando límites globales precisos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q08',false)"><div class="quiz-letter">C</div> Redis tiene soporte nativo para JWT validation integrado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q08',false)"><div class="quiz-letter">D</div> Sin Redis, Spring Cloud Gateway no puede iniciarse en modo cluster</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q08-ok">✓ Con 3 instancias del gateway, el contador de rate limiting debe ser compartido. Redis centralizado garantiza que el usuario A no haga 100 req a cada instancia (300 total). Redis scripts Lua garantizan atomicidad.</div>
+      <div class="quiz-feedback fail" id="msm5q08-fail">✗ Sin Redis distribuido: cada instancia del gateway tiene su propio contador → usuario puede hacer N*límite peticiones. Redis compartido + Lua scripts atómicos = contadores globales precisos y consistentes.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Qué hace el filtro <code>StripPrefix=1</code> en Spring Cloud Gateway?</div>
+      <div class="quiz-options" id="msm5q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q09',false)"><div class="quiz-letter">A</div> Elimina el último segmento de la URL antes de enrutar</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q09',true)"><div class="quiz-letter">B</div> Elimina el primer segmento de path antes de enrutar: /api/orders/123 → /orders/123</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q09',false)"><div class="quiz-letter">C</div> Elimina el prefijo del nombre del servicio en el header</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q09',false)"><div class="quiz-letter">D</div> Elimina el primer query parameter de la URL</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q09-ok">✓ Path externo: /api/orders/123. Predicate: Path=/api/orders/**. StripPrefix=1 elimina '/api'. El servicio recibe /orders/123. Permite que los servicios internos no necesiten el prefijo /api.</div>
+      <div class="quiz-feedback fail" id="msm5q09-fail">✗ StripPrefix=1: elimina el primer segmento del path. /api/orders/123 → /orders/123 (strip '/api'). StripPrefix=2 → elimina los 2 primeros segmentos. Útil para separar el prefijo del gateway del path del servicio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Control Plane y Data Plane en Istio?</div>
+      <div class="quiz-options" id="msm5q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q10',false)"><div class="quiz-letter">A</div> El Control Plane maneja tráfico HTTP; el Data Plane maneja tráfico TCP</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q10',true)"><div class="quiz-letter">B</div> Control Plane (Istiod): gestiona configuración y la distribuye a los proxies. Data Plane (Envoy sidecars): intercepta y procesa el tráfico real de red de cada pod</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q10',false)"><div class="quiz-letter">C</div> Control Plane está en la nube; Data Plane está on-premise</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q10',false)"><div class="quiz-letter">D</div> Son equivalentes con diferente terminología según el vendor</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q10-ok">✓ Istiod (Control Plane): Certificate Authority, configuración xDS, service discovery. Envoy Sidecar (Data Plane): intercepta todo el tráfico del pod, aplica mTLS, circuit breaking, collects telemetry.</div>
+      <div class="quiz-feedback fail" id="msm5q10-fail">✗ Control Plane (Istiod): distribuye configuración (routing rules, policies, certificates) a los proxies. Data Plane (Envoy): ejecuta las políticas, intercepta el tráfico real, genera telemetría. Separación de responsabilidades.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Cuándo elegirías mTLS sobre validación JWT para autenticar servicios internos?</div>
+      <div class="quiz-options" id="msm5q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q11',false)"><div class="quiz-letter">A</div> mTLS es solo para comunicación con bases de datos externas</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q11',true)"><div class="quiz-letter">B</div> mTLS es preferible cuando necesitas Zero Trust en la capa de transporte sin modificar el código; JWT es mejor cuando necesitas claims de identidad específicos del servicio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q11',false)"><div class="quiz-letter">C</div> mTLS solo funciona con gRPC; JWT solo con REST</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q11',false)"><div class="quiz-letter">D</div> Son mutuamente excluyentes; no se pueden usar juntos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q11-ok">✓ mTLS (Istio): transparente al código, nivel de transporte, identidad basada en certificado SPIFFE. JWT: claims de identidad específicos (userId, tenantId). Combinados: mTLS para transport auth + JWT para application auth.</div>
+      <div class="quiz-feedback fail" id="msm5q11-fail">✗ mTLS: autenticación en nivel de red/transporte, transparente, basado en certificados de servicio. JWT: autenticación a nivel de aplicación, lleva contexto de usuario/claims. Muchos sistemas usan ambos en capas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Qué es un VirtualService en Istio y para qué se usa?</div>
+      <div class="quiz-options" id="msm5q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q12',false)"><div class="quiz-letter">A</div> Un servicio Kubernetes que existe solo en memoria, sin pods reales</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q12',true)"><div class="quiz-letter">B</div> Un recurso de Istio que define reglas de routing: canary deployments (90/10), A/B testing por header, retries y fault injection</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q12',false)"><div class="quiz-letter">C</div> Un load balancer virtual sin IP fija para servicios stateful</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q12',false)"><div class="quiz-letter">D</div> La configuración de DNS virtual de Istio para resolver nombres de servicio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q12-ok">✓ VirtualService: enviar el 90% del tráfico a v1 y 10% a v2 (canary). O: si header X-Beta=true → v2 (A/B testing). O: timeout y retries. VirtualService + DestinationRule = traffic management completo.</div>
+      <div class="quiz-feedback fail" id="msm5q12-fail">✗ VirtualService: reglas de routing del tráfico. weight: 90 → v1, weight: 10 → v2. match: headers[x-version]=canary → v2. También: timeout, retries, fault injection para chaos engineering.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué riesgo existe si los microservicios internos son accesibles directamente desde internet (sin pasar por el gateway)?</div>
+      <div class="quiz-options" id="msm5q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q13',false)"><div class="quiz-letter">A</div> Que los servicios respondan más lento por la sobrecarga de conexiones</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q13',true)"><div class="quiz-letter">B</div> Se bypasean todos los controles del gateway (autenticación, rate limiting, WAF) y se exponen servicios que pueden tener vulnerabilidades asumiendo que el tráfico es de confianza</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q13',false)"><div class="quiz-letter">C</div> Los servicios consumen más CPU al manejar conexiones directas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q13',false)"><div class="quiz-letter">D</div> Solo hay riesgo si el servicio maneja datos de tarjetas de crédito</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q13-ok">✓ Los servicios internos confían en headers como X-User-Id. Si son accesibles directamente, un atacante puede enviar X-User-Id: admin y obtener acceso total. El gateway es la última barrera de control.</div>
+      <div class="quiz-feedback fail" id="msm5q13-fail">✗ Servicios internos asumen tráfico confiable (X-User-Id headers son "verdad"). Expuestos a internet: attacker envía headers fabricados, bypasea auth, explota endpoints no endurecidos. Network policy en K8s para impedirlo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cuál es la ventaja de que Istio gestione el mTLS transparentemente en lugar de implementarlo en cada servicio?</div>
+      <div class="quiz-options" id="msm5q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q14',false)"><div class="quiz-letter">A</div> Permite a los desarrolladores ignorar completamente la seguridad en el código</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q14',true)"><div class="quiz-letter">B</div> Los servicios no necesitan gestionar certificados, keystores ni rotación de claves. El sidecar Envoy maneja todo automáticamente, reduciendo la carga cognitiva de los equipos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q14',false)"><div class="quiz-letter">C</div> Istio solo puede gestionar mTLS; para otros protocolos se necesita código</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q14',false)"><div class="quiz-letter">D</div> Es más rápido que implementar mTLS en la aplicación</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q14-ok">✓ Sin Istio: cada servicio gestiona keystores, certificados, rotación manual. Con Istio: cert-manager + Istiod emiten y rotan certs automáticamente, Envoy los aplica. Los devs solo escriben lógica de negocio.</div>
+      <div class="quiz-feedback fail" id="msm5q14-fail">✗ Gestión manual de mTLS: configurar keystores en cada servicio, rotar certificados manualmente, riesgo de cert expirado. Istio: SPIFFE workload identity, rotación automática de certs, zero code changes. Menor superficie de error.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre PeerAuthentication y AuthorizationPolicy en Istio?</div>
+      <div class="quiz-options" id="msm5q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q15',false)"><div class="quiz-letter">A</div> PeerAuthentication gestiona usuarios externos; AuthorizationPolicy gestiona servicios internos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q15',true)"><div class="quiz-letter">B</div> PeerAuthentication configura el modo mTLS (STRICT/PERMISSIVE). AuthorizationPolicy define qué servicios pueden llamar a qué endpoints (control de acceso fine-grained)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q15',false)"><div class="quiz-letter">C</div> Son sinónimos; Istio usa ambos nombres indistintamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q15',false)"><div class="quiz-letter">D</div> PeerAuthentication es para Kubernetes 1.25+; AuthorizationPolicy es legacy</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q15-ok">✓ PeerAuthentication STRICT: todo el tráfico al servicio debe ser mTLS. AuthorizationPolicy: solo el servicio 'orders' puede llamar al servicio 'payments' (basado en service account). Authn + Authz por separado.</div>
+      <div class="quiz-feedback fail" id="msm5q15-fail">✗ PeerAuthentication: configura si mTLS es requerido (STRICT), opcional (PERMISSIVE) o deshabilitado. AuthorizationPolicy: RBAC para servicios (from: service_account='orders', to: paths=['/payments/**']).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué son los "predicates" en Spring Cloud Gateway y cómo se usan?</div>
+      <div class="quiz-options" id="msm5q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q16',false)"><div class="quiz-letter">A</div> Métodos Java que validan el cuerpo del request antes de procesarlo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q16',true)"><div class="quiz-letter">B</div> Condiciones que determinan si una ruta aplica a un request dado: path, method, header, query param, host, peso. Si el predicate es verdadero, se aplica esa ruta</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q16',false)"><div class="quiz-letter">C</div> Funciones que transforman el response antes de enviarlo al cliente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q16',false)"><div class="quiz-letter">D</div> Las anotaciones de Spring Security que protegen cada ruta</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q16-ok">✓ Predicates built-in: Path=/api/**, Method=POST, Header=X-API-Version:2, Host=api.example.com, Weight(groupA,80). Se pueden combinar con AND. Si el predicate match → aplica esa ruta.</div>
+      <div class="quiz-feedback fail" id="msm5q16-fail">✗ Predicate = condición de matching. Path=/orders/**, Method=GET, Header=version=v2. Si true → se aplica la ruta y sus filters. Múltiples predicates en una ruta = todos deben ser verdaderos (AND implícito).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Cómo implementa Istio canary deployments con VirtualService?</div>
+      <div class="quiz-options" id="msm5q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q17',false)"><div class="quiz-letter">A</div> Creando dos clusters Kubernetes separados con distinto DNS</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q17',true)"><div class="quiz-letter">B</div> Usando weight en el VirtualService: 90% del tráfico a subset v1 y 10% a subset v2, con DestinationRule definiendo los subsets por labels del pod</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q17',false)"><div class="quiz-letter">C</div> Cambiando el número de réplicas de cada versión proporcionalmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q17',false)"><div class="quiz-letter">D</div> Usando Kubernetes HPA para escalar la versión canary automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q17-ok">✓ DestinationRule: subset v1 (label version=v1), subset v2 (label version=v2). VirtualService: route weight 90 → v1, weight 10 → v2. Proporcional sin importar el número de réplicas.</div>
+      <div class="quiz-feedback fail" id="msm5q17-fail">✗ VirtualService + DestinationRule: los subsets (v1/v2) se identifican por pod labels. VirtualService distribuye: 90 a v1, 10 a v2. El tráfico es independiente del número de pods de cada versión.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Cuál es el overhead principal de usar Istio con sidecars Envoy?</div>
+      <div class="quiz-options" id="msm5q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q18',false)"><div class="quiz-letter">A</div> Requiere reescribir el código de los servicios para usar la API de Istio</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q18',true)"><div class="quiz-letter">B</div> Latencia adicional por hop (~1-3ms por llamada), consumo de memoria del sidecar (~50-100MB por pod) y complejidad operacional del control plane</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q18',false)"><div class="quiz-letter">C</div> No puede funcionar con más de 100 microservicios simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q18',false)"><div class="quiz-letter">D</div> Solo soporta HTTP/1.1, no HTTP/2 ni gRPC</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q18-ok">✓ Cada llamada pasa por 2 sidecars (caller + callee). ~1-3ms adicionales. En microservicios con 10 hops, puede ser 20-30ms. Además: ~50-100MB RAM por pod extra. Evaluar si el beneficio justifica el costo.</div>
+      <div class="quiz-feedback fail" id="msm5q18-fail">✗ Sidecar overhead: latencia adicional por cada hop (ms), CPU/memoria extra por pod, complejidad del control plane (Istiod, cert management). Para servicios con latencia SLA estricto, esto importa.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cómo se diferencia el Authorization Code Flow con PKCE del Authorization Code Flow original?</div>
+      <div class="quiz-options" id="msm5q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q19',false)"><div class="quiz-letter">A</div> PKCE permite obtener tokens sin client_secret en aplicaciones confidenciales</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q19',true)"><div class="quiz-letter">B</div> PKCE añade un code_verifier/code_challenge para prevenir ataques de interceptación del authorization code, esencial para SPAs y aplicaciones móviles que no pueden guardar secretos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q19',false)"><div class="quiz-letter">C</div> PKCE usa tokens de menor duración que el flujo original</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q19',false)"><div class="quiz-letter">D</div> PKCE solo funciona con OpenID Connect, no con OAuth2 estándar</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q19-ok">✓ Sin PKCE: si el authorization code es interceptado, puede usarse para obtener tokens. Con PKCE: el code_verifier (secreto del cliente) prueba que quien intercambió el code es quien inició el flow. Sin client_secret para public clients.</div>
+      <div class="quiz-feedback fail" id="msm5q19-fail">✗ PKCE: cliente genera code_verifier aleatorio + code_challenge = hash(code_verifier). Envía challenge en el auth request. Al intercambiar el code, envía el verifier. El AS verifica hash(verifier)==challenge. El code interceptado es inútil sin el verifier.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué es un "KeyResolver" en Spring Cloud Gateway Rate Limiter y por qué es importante?</div>
+      <div class="quiz-options" id="msm5q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q20',false)"><div class="quiz-letter">A</div> El componente que resuelve el nombre del servicio destino en el registro</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm5q20',true)"><div class="quiz-letter">B</div> Una función que extrae la clave para el contador de rate limiting (userId, IP, API key). Determina el granularity del límite: por usuario, por IP o por cliente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q20',false)"><div class="quiz-letter">C</div> El componente que cifra los tokens JWT antes de almacenarlos en Redis</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm5q20',false)"><div class="quiz-letter">D</div> La configuración de SSL/TLS del gateway para cada ruta</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm5q20-ok">✓ KeyResolver(exchange → Mono.just(userId)) → cada usuario tiene su propio bucket de tokens. KeyResolver(exchange → Mono.just(remoteIP)) → por IP. La key determina la granularidad y aislamiento del límite.</div>
+      <div class="quiz-feedback fail" id="msm5q20-fail">✗ KeyResolver extrae la "key" del request para el bucket de rate limiting. user123 tiene su propio bucket de 100 tokens/min. Si todos comparten la misma key, el límite es global. La key define la granularidad del rate limit.</div>
+    </div>
+  </div>
+
+</ng-container>

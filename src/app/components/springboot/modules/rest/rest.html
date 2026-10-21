@@ -1,0 +1,721 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===12">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">13</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">REST &amp; HTTP</h2>
+      <p class="lesson-sub">REST (Representational State Transfer) es un estilo arquitectónico que usa HTTP como protocolo de comunicación. Los conceptos clave son los verbos HTTP, los códigos de estado y las propiedades de seguridad e idempotencia.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-download" aria-hidden="true"></i></div>
+        <div class="tc-title">GET</div>
+        <div class="tc-body">Recupera un recurso. <strong>Seguro</strong> (no modifica estado) e <strong>idempotente</strong> (repetir produce el mismo resultado). Cacheable. Nunca usar para operaciones que modifiquen datos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-upload" aria-hidden="true"></i></div>
+        <div class="tc-title">POST</div>
+        <div class="tc-body">Crea un recurso o ejecuta una operación. <strong>No seguro</strong> y <strong>no idempotente</strong>: dos POST iguales crean dos recursos distintos. Devuelve 201 Created con <code>Location</code> header.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">PUT</div>
+        <div class="tc-body">Reemplaza completamente un recurso. <strong>No seguro</strong> pero <strong>idempotente</strong>: repetirlo múltiples veces deja el recurso en el mismo estado. Requiere el recurso completo en el body.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">PATCH</div>
+        <div class="tc-body">Actualización parcial de un recurso. <strong>No seguro</strong> y <strong>generalmente no idempotente</strong> (depende de la semántica). Solo envía los campos a modificar en el body.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trash" aria-hidden="true"></i></div>
+        <div class="tc-title">DELETE</div>
+        <div class="tc-body">Elimina un recurso. <strong>No seguro</strong> pero <strong>idempotente</strong>: eliminar un recurso ya eliminado devuelve 404 pero no cambia el estado del servidor de forma diferente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">HEAD &amp; OPTIONS</div>
+        <div class="tc-body"><code>HEAD</code>: igual que GET pero sin body en la respuesta. Idempotente y seguro. <code>OPTIONS</code>: devuelve los métodos permitidos. Base del preflight CORS. Seguro e idempotente.</div>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Seguro (Safe)</div>
+        <div class="compare-code">No modifica el estado del servidor<br>Solo lectura<br>Métodos: GET, HEAD, OPTIONS<br>Cacheable por proxies y navegadores</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Idempotente</div>
+        <div class="compare-code">Repetir N veces = resultado igual a 1 vez<br>No implica que sea seguro<br>Métodos: GET, HEAD, PUT, DELETE, OPTIONS<br>POST y PATCH NO son idempotentes</div>
+      </div>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">2xx</span><div><strong>Éxito:</strong> 200 OK, 201 Created, 204 No Content, 206 Partial Content.</div></div>
+      <div class="step"><span class="step-n">3xx</span><div><strong>Redirección:</strong> 301 Moved Permanently, 302 Found, 304 Not Modified.</div></div>
+      <div class="step"><span class="step-n">4xx</span><div><strong>Error cliente:</strong> 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 409 Conflict, 422 Unprocessable Entity.</div></div>
+      <div class="step"><span class="step-n">5xx</span><div><strong>Error servidor:</strong> 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Mapa de verbo → operación CRUD</span></div>
+      <div class="anatomy-line"><span class="a-type">GET</span>    /productos        <span class="a-cm">→ listar todos (200)</span></div>
+      <div class="anatomy-line"><span class="a-type">GET</span>    /productos/{{ '{' }}id{{ '}' }}  <span class="a-cm">→ obtener uno (200 / 404)</span></div>
+      <div class="anatomy-line"><span class="a-type">POST</span>   /productos        <span class="a-cm">→ crear (201 + Location)</span></div>
+      <div class="anatomy-line"><span class="a-type">PUT</span>    /productos/{{ '{' }}id{{ '}' }}  <span class="a-cm">→ reemplazar (200 / 204)</span></div>
+      <div class="anatomy-line"><span class="a-type">PATCH</span>  /productos/{{ '{' }}id{{ '}' }}  <span class="a-cm">→ actualizar parcial (200)</span></div>
+      <div class="anatomy-line"><span class="a-type">DELETE</span> /productos/{{ '{' }}id{{ '}' }}  <span class="a-cm">→ eliminar (204 / 404)</span></div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> La idempotencia es una garantía del cliente, no del servidor. Si el servidor no la implementa correctamente (ej. POST duplicado sin clave de idempotencia), la responsabilidad recae en el diseño de la API.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===13">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">14</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">@RestController</h2>
+      <p class="lesson-sub"><code>@RestController</code> combina <code>@Controller</code> y <code>@ResponseBody</code>. Todos los métodos del controlador devuelven datos directamente en el cuerpo HTTP, serializados por Jackson a JSON (o XML) según la negociación de contenido.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">@GetMapping</div>
+        <div class="tc-body">Atajo de <code>@RequestMapping(method=GET)</code>. Mapea peticiones HTTP GET a un método del controlador. El más frecuente en APIs REST de solo lectura.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-plus" aria-hidden="true"></i></div>
+        <div class="tc-title">@PostMapping</div>
+        <div class="tc-body">Atajo de <code>@RequestMapping(method=POST)</code>. Crea recursos. El método debe devolver 201 Created con el recurso creado y el header <code>Location</code> apuntando al nuevo recurso.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">@PutMapping / @PatchMapping</div>
+        <div class="tc-body">Atajos para PUT y PATCH respectivamente. PUT reemplaza el recurso completo. PATCH aplica una modificación parcial. Ambos requieren el id en la URL.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trash" aria-hidden="true"></i></div>
+        <div class="tc-title">@DeleteMapping</div>
+        <div class="tc-body">Atajo para DELETE. Normalmente devuelve 204 No Content sin body al eliminar con éxito, o 404 Not Found si el recurso no existe.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">Content Negotiation</div>
+        <div class="tc-body">Spring elige el <code>HttpMessageConverter</code> según el header <code>Accept</code> del cliente y el atributo <code>produces</code> del mapping. Por defecto <code>application/json</code> via Jackson.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">@CrossOrigin</div>
+        <div class="tc-body">Habilita CORS a nivel de controlador o método. Configura los orígenes permitidos, métodos, headers y tiempo de caché del preflight. Alternativa global: <code>CorsConfigurationSource</code> en <code>SecurityFilterChain</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@RestController</span></div>
+      <div class="anatomy-line"><span class="a-kw">@RequestMapping</span>(<span class="a-str">"/api/v1/productos"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ProductoController</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@GetMapping</span>             <span class="a-cm">// GET /api/v1/productos</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">List</span>&lt;<span class="a-type">ProductoDTO</span>&gt; listar() {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@PostMapping</span>            <span class="a-cm">// POST /api/v1/productos</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ResponseStatus</span>(<span class="a-type">HttpStatus</span>.CREATED)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">ProductoDTO</span> crear(<span class="a-kw">@RequestBody</span> <span class="a-type">ProductoDTO</span> dto) {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@DeleteMapping</span>(<span class="a-str">"/{{ '{' }}id{{ '}' }}"</span>)  <span class="a-cm">// DELETE /api/v1/productos/42</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ResponseStatus</span>(<span class="a-type">HttpStatus</span>.NO_CONTENT)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> eliminar(<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> id) {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">@Controller (MVC clásico)</div>
+        <div class="compare-code">Devuelve nombre de vista (String)<br>El resolver busca la plantilla HTML<br>@ResponseBody necesario para JSON<br>Úsalo con Thymeleaf / FreeMarker</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">@RestController (API REST)</div>
+        <div class="compare-code">Devuelve objetos Java → serializa a JSON<br>No hay vista, solo datos<br>@ResponseBody implícito en todos los métodos<br>Úsalo para APIs consumidas por clientes JS/móvil</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> <code>produces = "application/json"</code> en <code>@RequestMapping</code> garantiza que el endpoint devuelva JSON aunque haya otros converters registrados. Sin él, un cliente con <code>Accept: application/xml</code> y JAXB en classpath recibiría XML.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===14">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">15</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">@PathVariable &amp; @RequestParam</h2>
+      <p class="lesson-sub">Spring MVC permite capturar valores de la URL de tres formas: variables de path (<code>@PathVariable</code>), parámetros de query (<code>@RequestParam</code>) y cabeceras HTTP (<code>@RequestHeader</code>). Cada una tiene semántica y casos de uso distintos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">@PathVariable</div>
+        <div class="tc-body">Extrae un segmento de la URL. <code>/usuarios/{{ '{' }}id{{ '}' }}</code> → <code>@PathVariable Long id</code>. Es obligatorio por defecto. Puede ser opcional con <code>required=false</code> usando <code>Optional&lt;T&gt;</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-help" aria-hidden="true"></i></div>
+        <div class="tc-title">@RequestParam</div>
+        <div class="tc-body">Extrae un parámetro de query string. <code>?pagina=2&amp;tamaño=10</code> → <code>@RequestParam(defaultValue="0") int pagina</code>. Con <code>required=false</code> y <code>defaultValue</code> puede ser opcional.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-send" aria-hidden="true"></i></div>
+        <div class="tc-title">@RequestHeader</div>
+        <div class="tc-body">Extrae una cabecera HTTP. <code>@RequestHeader("X-Tenant-Id") String tenantId</code>. Útil para multi-tenancy, tokens de correlación y negociación de versión por header.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">@MatrixVariable</div>
+        <div class="tc-body">Extrae variables de matriz de un segmento de path: <code>/carros/color=rojo;marca=ford</code>. Menos común, requiere activar <code>removeSemicolonContent=false</code> en la configuración MVC.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// @PathVariable — segmento de URL</span></div>
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(<span class="a-str">"/usuarios/{{ '{' }}id{{ '}' }}/pedidos/{{ '{' }}pedidoId{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">PedidoDTO</span> getPedido(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> id,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> pedidoId) {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// @RequestParam — query string con defecto</span></div>
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(<span class="a-str">"/productos"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Page</span>&lt;<span class="a-type">ProductoDTO</span>&gt; listar(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestParam</span>(defaultValue = <span class="a-str">"0"</span>) <span class="a-type">int</span> pagina,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestParam</span>(defaultValue = <span class="a-str">"20"</span>) <span class="a-type">int</span> tamaño,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestParam</span>(required = <span class="a-str">false</span>) <span class="a-type">String</span> buscar) {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// @RequestHeader — cabecera HTTP</span></div>
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(<span class="a-str">"/datos"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">DatosDTO</span>&gt; getDatos(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestHeader</span>(<span class="a-str">"X-Api-Version"</span>) <span class="a-type">String</span> version,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestHeader</span>(value = <span class="a-str">"X-Tenant"</span>, required = <span class="a-kw">false</span>) <span class="a-type">String</span> tenant) {{ '{' }} ... {{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">@PathVariable — identidad del recurso</div>
+        <div class="compare-code">/usuarios/42<br>/productos/laptop-pro<br>Identifica inequívocamente un recurso<br>Parte de la URL canónica (REST puro)</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">@RequestParam — filtro / paginación</div>
+        <div class="compare-code">/productos?categoria=tech&amp;precio=max<br>/pedidos?estado=pendiente&amp;pagina=2<br>Modifica la colección devuelta<br>Opcional con valores por defecto</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Cuando el nombre del parámetro Java coincide con el nombre en la URL puedes omitir el valor: <code>@PathVariable Long id</code> en lugar de <code>@PathVariable("id") Long id</code>. Solo funciona si el código se compila con <code>-parameters</code> (por defecto en Spring Boot).</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===15">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">16</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">@RequestBody &amp; DTOs</h2>
+      <p class="lesson-sub"><code>@RequestBody</code> instruye a Spring para deserializar el cuerpo HTTP en un objeto Java usando Jackson. El patrón DTO (Data Transfer Object) separa la API pública de las entidades de dominio, evitando exponer detalles de persistencia.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">@RequestBody</div>
+        <div class="tc-body">Lee el body de la petición HTTP y lo deserializa al tipo Java indicado. Requiere <code>Content-Type: application/json</code>. Jackson mapea automáticamente camelCase JSON a campos Java.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></div>
+        <div class="tc-title">Patrón DTO</div>
+        <div class="tc-body">Clase simple que representa lo que el cliente envía o recibe. Desacopla la API del modelo de dominio: puedes cambiar la base de datos sin afectar el contrato de la API.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">Record DTOs (Java 16+)</div>
+        <div class="tc-body"><code>record ProductoRequest(String nombre, BigDecimal precio) {{ '{' }}{{ '}' }}</code>. Inmutable, conciso, genera <code>equals/hashCode/toString</code>. Jackson los serializa/deserializa automáticamente desde Spring Boot 2.7.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Jackson Config</div>
+        <div class="tc-body"><code>@JsonProperty("nombre_campo")</code> mapea nombres distintos. <code>@JsonIgnore</code> excluye campos sensibles. <code>@JsonFormat</code> formatea fechas. Configura globalmente en <code>ObjectMapper</code> bean.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// DTO clásico (class)</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ProductoRequest</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@JsonProperty</span>(<span class="a-str">"nombre_producto"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> nombre;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">BigDecimal</span> precio;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-cm">// getters / setters</span></div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// DTO moderno (record)</span></div>
+      <div class="anatomy-line"><span class="a-kw">public record</span> <span class="a-type">ProductoRequest</span>(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@JsonProperty</span>(<span class="a-str">"nombre_producto"</span>) <span class="a-type">String</span> nombre,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">BigDecimal</span> precio) {{ '{' }}{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Endpoint usando el DTO</span></div>
+      <div class="anatomy-line"><span class="a-kw">@PostMapping</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">ProductoResponse</span>&gt; crear(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@RequestBody</span> <span class="a-type">ProductoRequest</span> request) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">ProductoResponse</span> resp = service.crear(request);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">ResponseEntity</span>.created(location(resp.id())).body(resp);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Exponer la entidad JPA directamente</div>
+        <div class="compare-code">Acopla API con esquema de BBDD<br>Riesgo de serialización infinita (bidireccionales)<br>Campos sensibles expuestos (@Password)<br>Cambios de BBDD rompen la API</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">DTO separado de la entidad</div>
+        <div class="compare-code">Contrato de API estable e independiente<br>Solo los campos necesarios para el cliente<br>Validaciones específicas de la API<br>Mapeo explícito (MapStruct / manual)</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Si el JSON no puede deserializarse al tipo esperado, Jackson lanza <code>HttpMessageNotReadableException</code> y Spring responde automáticamente con 400 Bad Request. No necesitas try-catch: manéjalo en un <code>@ExceptionHandler</code> global.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===16">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">17</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">Bean Validation</h2>
+      <p class="lesson-sub">Bean Validation (Jakarta Validation 3.x) permite anotar DTOs con restricciones declarativas. <code>@Valid</code> en el parámetro del controlador activa la validación automática. Los errores se capturan con <code>MethodArgumentNotValidException</code>.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">@NotNull / @NotBlank</div>
+        <div class="tc-body"><code>@NotNull</code>: el valor no puede ser null. <code>@NotBlank</code>: String no puede ser null, vacío ni solo espacios. Usa <code>@NotBlank</code> para cadenas de texto en lugar de <code>@NotNull</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ruler" aria-hidden="true"></i></div>
+        <div class="tc-title">@Size / @Min / @Max</div>
+        <div class="tc-body"><code>@Size(min=2, max=100)</code>: longitud de String, array, colección. <code>@Min(0)</code> / <code>@Max(9999)</code>: rango numérico. <code>@DecimalMin</code> / <code>@DecimalMax</code> para <code>BigDecimal</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-mail" aria-hidden="true"></i></div>
+        <div class="tc-title">@Email / @Pattern</div>
+        <div class="tc-body"><code>@Email</code>: valida formato de correo electrónico. <code>@Pattern(regexp="...")</code>: valida contra expresión regular. Ambas aplican solo si el valor no es null (<code>@NotNull</code> es independiente).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">@Positive / @Future</div>
+        <div class="tc-body"><code>@Positive</code> / <code>@PositiveOrZero</code>: números positivos. <code>@Past</code> / <code>@Future</code>: fechas en el pasado o futuro. <code>@PastOrPresent</code> para fechas de nacimiento.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">public record</span> <span class="a-type">ProductoRequest</span>(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@NotBlank</span>(message = <span class="a-str">"El nombre es obligatorio"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Size</span>(min = <span class="a-num">2</span>, max = <span class="a-num">100</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">String</span> nombre,</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@NotNull</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@DecimalMin</span>(<span class="a-str">"0.01"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">BigDecimal</span> precio,</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Email</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">String</span> emailProveedor) {{ '{' }}{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Activar validación en el controlador</span></div>
+      <div class="anatomy-line"><span class="a-kw">@PostMapping</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">ProductoDTO</span>&gt; crear(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@Valid</span> <span class="a-kw">@RequestBody</span> <span class="a-type">ProductoRequest</span> req) {{ '{' }} ... {{ '}' }}</div>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Spring MVC recibe la petición y deserializa el body a <code>ProductoRequest</code> con Jackson.</div></div>
+      <div class="step"><span class="step-n">2</span><div>Al ver <code>@Valid</code>, Spring delega en el <code>Validator</code> de Jakarta para comprobar todas las restricciones.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Si hay violaciones, lanza <code>MethodArgumentNotValidException</code> antes de entrar al método.</div></div>
+      <div class="step"><span class="step-n">4</span><div>El <code>@ExceptionHandler</code> captura la excepción y construye la respuesta 400 con los detalles de los errores de campo.</div></div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">@Valid (JSR-303)</div>
+        <div class="compare-code">Activación básica de validación<br>Usa el Validator por defecto<br>Solo en parámetros de método<br>No soporta grupos de validación</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">@Validated (Spring)</div>
+        <div class="compare-code">Extiende @Valid con grupos<br>@Validated({{ '{' }}Create.class{{ '}' }}) para flujos distintos<br>Funciona en @Service (métodos de servicio)<br>Permite validaciones condicionales por contexto</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <code>BindingResult</code> como parámetro inmediatamente después de <code>@Valid</code> captura los errores de validación sin lanzar excepción. Úsalo cuando quieras manejar los errores manualmente dentro del método del controlador.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===17">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">18</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">@ExceptionHandler &amp; @ControllerAdvice</h2>
+      <p class="lesson-sub"><code>@ExceptionHandler</code> captura excepciones lanzadas dentro de un controlador. <code>@ControllerAdvice</code> extiende ese manejo a toda la aplicación. Spring Boot 3 introduce <code>ProblemDetail</code> conforme al RFC 9457.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">@ExceptionHandler local</div>
+        <div class="tc-body">Método dentro del propio controlador. Solo captura excepciones del mismo controlador. El método recibe la excepción como parámetro y devuelve la respuesta apropiada.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">@ControllerAdvice global</div>
+        <div class="tc-body">Clase anotada con <code>@ControllerAdvice</code> o <code>@RestControllerAdvice</code>. Sus <code>@ExceptionHandler</code> aplican a todos los controladores. Centraliza el manejo de errores.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">ProblemDetail (RFC 9457)</div>
+        <div class="tc-body">Formato estándar para respuestas de error en APIs HTTP. Campos: <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, <code>instance</code>. Spring Boot 3 lo soporta nativamente con <code>ProblemDetail.forStatus()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">ResponseEntityExceptionHandler</div>
+        <div class="tc-body">Clase base que maneja las excepciones estándar de Spring MVC (<code>MethodArgumentNotValidException</code>, <code>HttpMessageNotReadableException</code>, etc.). Extiéndela para personalizar esas respuestas.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@RestControllerAdvice</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">GlobalExceptionHandler</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">extends</span> <span class="a-type">ResponseEntityExceptionHandler</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ExceptionHandler</span>(<span class="a-type">RecursoNoEncontradoException</span>.<span class="a-kw">class</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">ProblemDetail</span> handleNotFound(<span class="a-type">RecursoNoEncontradoException</span> ex,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">HttpServletRequest</span> req) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ProblemDetail</span> pd = <span class="a-type">ProblemDetail</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.forStatusAndDetail(<span class="a-type">HttpStatus</span>.NOT_FOUND, ex.getMessage());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;pd.setType(<span class="a-type">URI</span>.create(<span class="a-str">"https://api.example.com/errors/not-found"</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;pd.setInstance(<span class="a-type">URI</span>.create(req.getRequestURI()));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> pd;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Override</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">Object</span>&gt; handleMethodArgumentNotValid(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">MethodArgumentNotValidException</span> ex, ...) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ProblemDetail</span> pd = <span class="a-type">ProblemDetail</span>.forStatus(<span class="a-num">422</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;pd.setProperty(<span class="a-str">"errors"</span>, buildErrors(ex.getBindingResult()));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> ResponseEntity.unprocessableEntity().body(pd);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>El controlador lanza una excepción (negocio, validación, etc.).</div></div>
+      <div class="step"><span class="step-n">2</span><div>Spring busca un <code>@ExceptionHandler</code> en el propio controlador primero.</div></div>
+      <div class="step"><span class="step-n">3</span><div>Si no existe, busca en las clases <code>@ControllerAdvice</code> registradas en el contexto.</div></div>
+      <div class="step"><span class="step-n">4</span><div>El handler construye la respuesta de error (ProblemDetail, JSON custom, etc.).</div></div>
+      <div class="step"><span class="step-n">5</span><div>Si no hay ningún handler, <code>DefaultHandlerExceptionResolver</code> devuelve 500.</div></div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Si hay múltiples clases <code>@ControllerAdvice</code>, usa <code>@Order(1)</code> para controlar la precedencia. Sin orden, Spring los aplica en orden de registro del bean, lo que puede ser impredecible.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===18">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">19</span><span class="lesson-mod">Módulo 3</span></div>
+      <h2 class="lesson-title">ResponseEntity</h2>
+      <p class="lesson-sub"><code>ResponseEntity&lt;T&gt;</code> es la respuesta HTTP completa: código de estado, headers y body. Proporciona control total sobre la respuesta y es preferible a <code>@ResponseStatus</code> cuando necesitas ajustar headers dinámicamente.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></div>
+        <div class="tc-title">API Fluida</div>
+        <div class="tc-body"><code>ResponseEntity.ok(body)</code>, <code>.created(uri)</code>, <code>.noContent()</code>, <code>.notFound()</code>. El método estático devuelve un <code>BodyBuilder</code> al que se encadenan <code>.header()</code>, <code>.contentType()</code> y <code>.body()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-send" aria-hidden="true"></i></div>
+        <div class="tc-title">HttpHeaders</div>
+        <div class="tc-body">Clase que encapsula los headers HTTP. Permite añadir <code>Location</code>, <code>Content-Disposition</code>, <code>Cache-Control</code>, <code>ETag</code>, etc. Usada con <code>ResponseEntity.headers(headers).body(body)</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">HttpStatus enum</div>
+        <div class="tc-body"><code>HttpStatus.OK</code> (200), <code>CREATED</code> (201), <code>NO_CONTENT</code> (204), <code>BAD_REQUEST</code> (400), <code>NOT_FOUND</code> (404), <code>UNPROCESSABLE_ENTITY</code> (422). Úsalo sobre valores literales enteros.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-scale" aria-hidden="true"></i></div>
+        <div class="tc-title">vs @ResponseStatus</div>
+        <div class="tc-body"><code>@ResponseStatus</code> es estático: fija el código en compile-time. <code>ResponseEntity</code> es dinámico: el código depende de la lógica (ej. 200 si actualizado, 201 si creado, 204 si eliminado).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// GET — 200 OK con body / 404 Not Found</span></div>
+      <div class="anatomy-line"><span class="a-kw">@GetMapping</span>(<span class="a-str">"/{{ '{' }}id{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">ProductoDTO</span>&gt; get(<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> service.findById(id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.map(<span class="a-type">ResponseEntity</span>::ok)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.orElse(<span class="a-type">ResponseEntity</span>.notFound().build());</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// POST — 201 Created con Location header</span></div>
+      <div class="anatomy-line"><span class="a-kw">@PostMapping</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">ProductoDTO</span>&gt; crear(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@Valid</span> <span class="a-kw">@RequestBody</span> <span class="a-type">ProductoRequest</span> req,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">UriComponentsBuilder</span> ucb) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">ProductoDTO</span> creado = service.crear(req);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">URI</span> location = ucb.path(<span class="a-str">"/api/v1/productos/{{ '{' }}id{{ '}' }}"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.buildAndExpand(creado.id()).toUri();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">ResponseEntity</span>.created(location).body(creado);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// DELETE — 204 No Content</span></div>
+      <div class="anatomy-line"><span class="a-kw">@DeleteMapping</span>(<span class="a-str">"/{{ '{' }}id{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">ResponseEntity</span>&lt;<span class="a-type">Void</span>&gt; eliminar(<span class="a-kw">@PathVariable</span> <span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;service.eliminar(id);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">ResponseEntity</span>.noContent().build();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">@ResponseStatus (estático)</div>
+        <div class="compare-code">Código fijo en tiempo de compilación<br>No permite headers dinámicos<br>Código más limpio para casos simples<br>No se puede cambiar según la lógica</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">ResponseEntity (dinámico)</div>
+        <div class="compare-code">Código según la lógica de negocio<br>Headers dinámicos (Location, ETag, etc.)<br>Control total sobre la respuesta HTTP<br>Recomendado para APIs REST complejas</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <code>ResponseEntity.BodyBuilder</code> admite encadenar múltiples llamadas: <code>ResponseEntity.status(201).contentType(MediaType.APPLICATION_JSON).header("X-Custom","valor").body(dto)</code>. El body es el último paso: cierra el builder.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-m3" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 3 — Spring MVC REST</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un método HTTP <em>seguro</em> (safe) y uno <em>idempotente</em>?</div>
+      <div class="quiz-options" id="em3q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">A</div> Son sinónimos: safe e idempotente significan lo mismo en HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q01',true)"><div class="quiz-letter">B</div> Safe significa que no modifica el estado del servidor; idempotente significa que repetir la operación N veces produce el mismo resultado que hacerla una sola vez</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">C</div> Safe significa que la respuesta es cacheable; idempotente que siempre devuelve 200</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">D</div> Todo método idempotente es también seguro</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q01-ok">✓ Safe implica no modificar estado (GET, HEAD, OPTIONS). Idempotente implica que repetir produce el mismo resultado (GET, PUT, DELETE). DELETE es idempotente pero no safe. POST no es ninguno de los dos.</div>
+      <div class="quiz-feedback fail" id="em3q01-fail">✗ Safe = no modifica estado del servidor. Idempotente = repetir N veces = repetir 1 vez. DELETE es idempotente (borrar algo ya borrado da el mismo estado) pero no safe (modifica estado). PUT es idempotente pero no safe.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Cómo decide Spring MVC qué <code>HttpMessageConverter</code> usar para serializar la respuesta?</div>
+      <div class="quiz-options" id="em3q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">A</div> Siempre usa Jackson sin importar el header Accept del cliente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q02',true)"><div class="quiz-letter">B</div> Negocia el tipo de media comparando el header <code>Accept</code> del cliente con el atributo <code>produces</code> del mapping y los converters disponibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">C</div> Usa el primer converter registrado independientemente del tipo de media</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">D</div> Depende exclusivamente del <code>Content-Type</code> de la petición entrante</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q02-ok">✓ La negociación de contenido compara el header Accept del cliente con los media types soportados por los converters disponibles y el atributo produces del endpoint. Si no hay match: 406 Not Acceptable.</div>
+      <div class="quiz-feedback fail" id="em3q02-fail">✗ Spring recorre la lista de HttpMessageConverters y elige el primero que soporta el tipo del objeto de retorno Y el media type del Accept header del cliente. Si produces está definido, limita los candidatos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿En qué orden aplica Spring los manejadores de <code>@ControllerAdvice</code> cuando hay varios?</div>
+      <div class="quiz-options" id="em3q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">A</div> Siempre en orden alfabético por nombre de clase</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q03',true)"><div class="quiz-letter">B</div> Según <code>@Order</code> / <code>Ordered</code>; sin ellos, en orden indeterminado de registro de bean</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">C</div> El último declarado en el contexto siempre tiene mayor prioridad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">D</div> Spring solo permite un @ControllerAdvice por aplicación</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q03-ok">✓ Sin @Order el orden es impredecible. Con @Order(1) en el advice más específico y @Order(2) en el genérico se garantiza que el más específico se consulta primero. También puedes implementar Ordered.</div>
+      <div class="quiz-feedback fail" id="em3q03-fail">✗ Cuando hay múltiples @ControllerAdvice, Spring usa @Order o la interfaz Ordered para determinar precedencia. Sin ellos, el orden es dependiente del contexto y no debe asumirse.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Qué hace <code>@CrossOrigin(origins = "https://app.example.com")</code> en un controlador?</div>
+      <div class="quiz-options" id="em3q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">A</div> Redirige todas las peticiones al origen indicado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q04',true)"><div class="quiz-letter">B</div> Configura los headers CORS para permitir peticiones cross-origin desde el origen especificado, incluyendo la respuesta al preflight OPTIONS</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">C</div> Valida que las peticiones entrantes vengan del origen indicado y rechaza las demás con 401</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">D</div> Establece un proxy inverso hacia el origen indicado</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q04-ok">✓ @CrossOrigin añade los headers CORS (Access-Control-Allow-Origin, etc.) a las respuestas del controlador. Para CORS global, usa CorsConfigurationSource en el SecurityFilterChain o WebMvcConfigurer.addCorsMappings().</div>
+      <div class="quiz-feedback fail" id="em3q04-fail">✗ @CrossOrigin configura la política CORS del servidor: indica qué orígenes, métodos y headers están permitidos. Spring responde automáticamente al preflight OPTIONS con los headers CORS apropiados.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Para qué se usa <code>@RequestPart</code> en lugar de <code>@RequestParam</code> en endpoints multipart?</div>
+      <div class="quiz-options" id="em3q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">A</div> Son equivalentes y pueden usarse indistintamente para multipart</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q05',true)"><div class="quiz-letter">B</div> <code>@RequestPart</code> permite recibir partes de tipo complejo (JSON, XML) deserializadas por un HttpMessageConverter; <code>@RequestParam</code> solo maneja texto plano y archivos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">C</div> <code>@RequestPart</code> solo acepta archivos; <code>@RequestParam</code> acepta JSON</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">D</div> <code>@RequestPart</code> desactiva la validación Bean Validation en la parte recibida</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q05-ok">✓ @RequestPart aplica HttpMessageConverters a la parte multipart. Puedes enviar un JSON como parte junto con un archivo: @RequestPart ProductoRequest datos, @RequestPart MultipartFile imagen.</div>
+      <div class="quiz-feedback fail" id="em3q05-fail">✗ @RequestParam trata el contenido como String o bytes. @RequestPart usa el Content-Type de la parte para elegir el converter adecuado, permitiendo deserializar JSON u otros tipos complejos de una parte multipart.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia funcional principal entre <code>@Valid</code> y <code>@Validated</code> de Spring?</div>
+      <div class="quiz-options" id="em3q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">A</div> @Validated lanza RuntimeException; @Valid lanza checked Exception</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q06',true)"><div class="quiz-letter">B</div> @Validated soporta grupos de validación y puede usarse en métodos de @Service; @Valid es el estándar Jakarta sin grupos ni soporte fuera de controladores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">C</div> Son funcionalmente idénticos; @Validated solo es un alias de @Valid</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">D</div> @Valid aplica validaciones de base de datos; @Validated solo valida el formato</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q06-ok">✓ @Validated es de Spring y permite @Validated({{ '{' }}CreateGroup.class{{ '}' }}) para validar solo las restricciones de ese grupo. También habilita validación de métodos en @Service mediante AOP.</div>
+      <div class="quiz-feedback fail" id="em3q06-fail">✗ La diferencia clave: @Validated soporta grupos de validación y validación de métodos en beans Spring (no solo controladores). @Valid es la anotación estándar Jakarta sin grupos, válida en parámetros de método en controladores.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué interfaz debes implementar para crear una restricción de validación personalizada con lógica compleja?</div>
+      <div class="quiz-options" id="em3q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">A</div> <code>Validator</code> de <code>org.springframework.validation</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q07',true)"><div class="quiz-letter">B</div> <code>ConstraintValidator&lt;A extends Annotation, T&gt;</code> de Jakarta Validation</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">C</div> <code>BeanValidator</code> de Spring Boot Autoconfigure</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">D</div> <code>ConstraintHandler</code> de Hibernate Validator</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q07-ok">✓ ConstraintValidator&lt;MiAnotacion, String&gt; implementa initialize() para configuración y isValid() para la lógica. La anotación personalizada debe referenciar el validator con @Constraint(validatedBy = MiValidator.class).</div>
+      <div class="quiz-feedback fail" id="em3q07-fail">✗ Para validaciones personalizadas: 1) Crea una anotación con @Constraint(validatedBy=...). 2) Implementa ConstraintValidator&lt;TuAnotacion, TipoDato&gt; con el método isValid(). El validador puede inyectar beans Spring.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Cuáles son los campos estándar del formato <code>ProblemDetail</code> según RFC 9457?</div>
+      <div class="quiz-options" id="em3q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">A</div> code, message, timestamp, path</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q08',true)"><div class="quiz-letter">B</div> type, title, status, detail, instance</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">C</div> error, description, httpCode, uri</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">D</div> errorType, shortMessage, statusCode, requestPath</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q08-ok">✓ RFC 9457 define: type (URI de referencia del tipo de problema), title (resumen legible), status (código HTTP), detail (descripción específica), instance (URI de la ocurrencia). Se pueden añadir campos extra con setProperty().</div>
+      <div class="quiz-feedback fail" id="em3q08-fail">✗ ProblemDetail RFC 9457 define: type (URI), title (título legible), status (código HTTP numérico), detail (descripción del caso concreto), instance (URI de la instancia del error). Todos son opcionales excepto status.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Para qué sirve registrar un <code>HttpMessageConverter</code> personalizado en Spring MVC?</div>
+      <div class="quiz-options" id="em3q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">A</div> Para interceptar peticiones antes de que lleguen al controlador</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q09',true)"><div class="quiz-letter">B</div> Para serializar/deserializar tipos de media personalizados (ej. application/x-msgpack, CSV) o sobreescribir el comportamiento por defecto de Jackson</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">C</div> Para convertir tipos de parámetros de URL a objetos Java</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">D</div> Para transformar los headers HTTP de la petición antes de procesarla</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q09-ok">✓ HttpMessageConverter maneja la lectura (request body) y escritura (response body) para un media type. Úsalo para soportar MessagePack, CSV, YAML, Protobuf o personalizar la serialización JSON globalmente.</div>
+      <div class="quiz-feedback fail" id="em3q09-fail">✗ HttpMessageConverter es responsable de convertir entre HTTP messages y objetos Java. Implementa canRead/canWrite para declarar qué tipos soporta y read/write para la conversión real. Se registra en WebMvcConfigurer.configureMessageConverters().</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Cuándo deberías devolver HTTP 422 (Unprocessable Entity) en lugar de 400 (Bad Request)?</div>
+      <div class="quiz-options" id="em3q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">A</div> Son intercambiables; usa cualquiera para errores del cliente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q10',true)"><div class="quiz-letter">B</div> 400 para errores sintácticos (JSON malformado, tipo incorrecto); 422 cuando la sintaxis es correcta pero falla la validación semántica (campos con valores inválidos según reglas de negocio)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">C</div> 422 es para errores de autenticación; 400 para errores de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">D</div> 400 es obsoleto en HTTP/2; usa siempre 422</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q10-ok">✓ 400 Bad Request: la petición está malformada (JSON inválido, tipo incorrecto). 422 Unprocessable Entity: la petición es sintácticamente correcta pero falla Bean Validation o reglas de negocio. Spring Boot 3 usa 422 para MethodArgumentNotValidException por defecto.</div>
+      <div class="quiz-feedback fail" id="em3q10-fail">✗ La distinción semántica: 400 = petición que el servidor no puede procesar por sintaxis incorrecta. 422 = petición bien formada pero con errores de validación del contenido. Spring Boot 3 cambió a 422 para errores de Bean Validation.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Cuándo es preferible <code>@ResponseStatus</code> sobre devolver <code>ResponseEntity</code>?</div>
+      <div class="quiz-options" id="em3q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">A</div> @ResponseStatus nunca es preferible; siempre usa ResponseEntity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q11',true)"><div class="quiz-letter">B</div> @ResponseStatus es preferible cuando el código de estado es fijo y no necesitas añadir headers dinámicos ni variar el status según la lógica</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">C</div> @ResponseStatus solo se puede usar en excepciones, no en métodos de controlador</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">D</div> @ResponseStatus es más eficiente en rendimiento que ResponseEntity</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q11-ok">✓ @ResponseStatus es conciso para casos simples: @DeleteMapping + @ResponseStatus(NO_CONTENT). ResponseEntity es necesario cuando el código varía, cuando añades headers dinámicos (Location, ETag) o cuando el body puede ser null o de tipo diferente.</div>
+      <div class="quiz-feedback fail" id="em3q11-fail">✗ @ResponseStatus(HttpStatus.CREATED) en un método de controlador fija el código estáticamente. Úsalo para endpoints donde el código nunca cambia. ResponseEntity te da control total pero es más verboso. Combínalos según el caso.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>@ControllerAdvice</code> y <code>@RestControllerAdvice</code>?</div>
+      <div class="quiz-options" id="em3q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">A</div> @RestControllerAdvice solo captura excepciones de @RestController, no de @Controller</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q12',true)"><div class="quiz-letter">B</div> @RestControllerAdvice = @ControllerAdvice + @ResponseBody: los métodos @ExceptionHandler devuelven datos serializados en el body en lugar de nombres de vista</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">C</div> @RestControllerAdvice tiene mayor prioridad en la cadena de resolución de excepciones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">D</div> Son equivalentes; @RestControllerAdvice es solo un alias de @ControllerAdvice</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q12-ok">✓ @RestControllerAdvice = @ControllerAdvice + @ResponseBody. Sus @ExceptionHandler escriben el valor de retorno directamente en el response body (serializado como JSON). Con @ControllerAdvice puro el retorno se interpreta como nombre de vista.</div>
+      <div class="quiz-feedback fail" id="em3q12-fail">✗ @RestControllerAdvice añade @ResponseBody implícito a todos los @ExceptionHandler. Así puedes devolver objetos Java (ProblemDetail, Map, etc.) que Jackson serializa a JSON, sin necesitar ResponseEntity en cada handler.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué ocurre cuando usas <code>@Valid</code> sobre una propiedad de tipo objeto anidado dentro de un DTO?</div>
+      <div class="quiz-options" id="em3q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">A</div> La validación se ignora en objetos anidados; solo valida el nivel raíz</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q13',true)"><div class="quiz-letter">B</div> Se activa la validación en cascada: el validador también comprueba las restricciones del objeto anidado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">C</div> Spring lanza una excepción de configuración porque @Valid no puede anidarse</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">D</div> El objeto anidado se valida solo si implementa la interfaz Validatable</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q13-ok">✓ @Valid sobre una propiedad activa la validación en cascada (cascaded validation). Las restricciones de ese objeto anidado también se evalúan. Útil para DTOs con sub-objetos como DireccionDTO dentro de ClienteDTO.</div>
+      <div class="quiz-feedback fail" id="em3q13-fail">✗ Poniendo @Valid sobre una propiedad del tipo anidado, le dices al validador que también valide ese objeto. Ejemplo: @Valid DireccionDTO direccion en ClienteDTO. Sin @Valid, las restricciones de DireccionDTO se ignoran.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cuál es el uso correcto de <code>@JsonProperty</code> y <code>@JsonIgnore</code> en un DTO?</div>
+      <div class="quiz-options" id="em3q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">A</div> @JsonProperty excluye el campo de la serialización; @JsonIgnore le asigna un nombre alternativo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q14',true)"><div class="quiz-letter">B</div> @JsonProperty("nombre") mapea el campo Java a un nombre JSON distinto; @JsonIgnore excluye el campo completamente de serialización y deserialización</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">C</div> @JsonProperty solo funciona en la serialización (respuesta); @JsonIgnore solo en la deserialización (petición)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">D</div> Son idénticos y producen el mismo resultado</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q14-ok">✓ @JsonProperty("primer_nombre") en un campo String primerNombre hace que el JSON use "primer_nombre" en vez de "primerNombre". @JsonIgnore excluye el campo (ej. contraseñas). Para excluir solo en respuesta: @JsonProperty(access = WRITE_ONLY).</div>
+      <div class="quiz-feedback fail" id="em3q14-fail">✗ @JsonProperty mapea el nombre Java al nombre JSON (útil para snake_case <i class="ico ico-arrows" aria-hidden="true"></i> camelCase). @JsonIgnore excluye el campo en ambas direcciones. Para control fino usa @JsonProperty(access = READ_ONLY/WRITE_ONLY).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué efecto tienen los atributos <code>produces</code> y <code>consumes</code> en <code>@RequestMapping</code>?</div>
+      <div class="quiz-options" id="em3q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">A</div> Son alias de <code>method</code> y <code>path</code> respectivamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q15',true)"><div class="quiz-letter">B</div> <code>produces</code> filtra por el header <code>Accept</code> del cliente; <code>consumes</code> filtra por el header <code>Content-Type</code> de la petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">C</div> <code>produces</code> indica el tipo de body que el método acepta; <code>consumes</code> el tipo que devuelve</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">D</div> Solo se aplican a nivel de clase, no de método</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q15-ok">✓ produces = el endpoint solo responde si Accept coincide (o Accept es */*). consumes = el endpoint solo se activa si Content-Type coincide. Si no hay match: 406 Not Acceptable (produces) o 415 Unsupported Media Type (consumes).</div>
+      <div class="quiz-feedback fail" id="em3q15-fail">✗ produces limita qué media types puede devolver el endpoint (coteja con Accept). consumes limita qué Content-Type acepta la petición entrante. Incumplirlos resulta en 406 o 415 respectivamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué ocurre cuando usas <code>@RequestBody(required = false)</code> en un endpoint?</div>
+      <div class="quiz-options" id="em3q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">A</div> Spring lanza una excepción de configuración porque @RequestBody siempre es obligatorio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q16',true)"><div class="quiz-letter">B</div> Si la petición no incluye body, el parámetro recibe null en lugar de lanzar HttpMessageNotReadableException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">C</div> Spring ignora el body aunque se envíe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">D</div> La validación @Valid se desactiva automáticamente cuando required=false</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q16-ok">✓ Con required=false, si no hay body el parámetro es null. Debes manejar el null en el código. Útil para endpoints que admiten body opcional. Combínalo con Optional&lt;T&gt; como tipo del parámetro para evitar NPE.</div>
+      <div class="quiz-feedback fail" id="em3q16-fail">✗ @RequestBody(required=false) hace que el body sea opcional. Sin body, el parámetro vale null. Sin este atributo, si no hay body Spring lanza HttpMessageNotReadableException (400). Útil en endpoints PATCH donde no todos los campos son obligatorios.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Para qué se usa <code>@RequestAttribute</code> en un método de controlador?</div>
+      <div class="quiz-options" id="em3q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">A</div> Para leer un atributo del header HTTP de la petición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q17',true)"><div class="quiz-letter">B</div> Para acceder a atributos establecidos en el ámbito de la petición HTTP (HttpServletRequest.setAttribute), típicamente establecidos por un Filter o HandlerInterceptor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">C</div> Para leer parámetros de query string con nombres especiales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">D</div> Es un alias de @SessionAttribute para atributos de sesión</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q17-ok">✓ @RequestAttribute("usuarioId") String usuarioId recupera el atributo puesto en el request scope por un Filter (ej. JWT filter que decodifica el token y almacena el userId). Diferente de @RequestParam (query string) y @RequestHeader (header HTTP).</div>
+      <div class="quiz-feedback fail" id="em3q17-fail">✗ @RequestAttribute lee de HttpServletRequest.getAttribute(). Los Filters e Interceptors establecen atributos ahí para pasarlos a los controladores. Es la forma limpia de compartir datos entre la cadena de filtros y el controlador sin acoplarse a HttpServletRequest.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué es <code>@MatrixVariable</code> y qué configuración adicional requiere?</div>
+      <div class="quiz-options" id="em3q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">A</div> Extrae parámetros de matrices en álgebra lineal; no requiere configuración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q18',true)"><div class="quiz-letter">B</div> Extrae variables de segmentos de path en formato <code>clave=valor</code> separadas por punto y coma; requiere deshabilitar <code>removeSemicolonContent</code> en la configuración MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">C</div> Extrae parámetros de query string con valores separados por coma; no requiere configuración especial</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">D</div> Es exclusivo de Spring WebFlux y no funciona en Spring MVC</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q18-ok">✓ URL ejemplo: /coches/color=rojo;marca=ford. @MatrixVariable String color extraería "rojo". Requiere setRemoveSemicolonContent(false) en RequestMappingHandlerMapping. Poco frecuente en APIs modernas, pero válido en REST.</div>
+      <div class="quiz-feedback fail" id="em3q18-fail">✗ @MatrixVariable maneja el estilo de URI ;clave=valor en segmentos de path. Por defecto Spring elimina el contenido después del punto y coma, por lo que debes configurar WebMvcConfigurer para preservarlo: configurer.setRemoveSemicolonContent(false).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cuál es el orden de prioridad en el que Spring MVC selecciona un <code>HttpMessageConverter</code> al serializar la respuesta?</div>
+      <div class="quiz-options" id="em3q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">A</div> Selecciona aleatoriamente entre los converters compatibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q19',true)"><div class="quiz-letter">B</div> Recorre la lista de converters en orden de registro y usa el primero que soporta el tipo de objeto Y el media type del Accept header; los converters de mayor especificidad deben registrarse antes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">C</div> Siempre elige el converter con mayor especificidad independientemente de su posición en la lista</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">D</div> La selección depende del tamaño estimado de la respuesta</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q19-ok">✓ Spring itera la lista en orden. El primero que devuelve true en canWrite(clase, mediaType) gana. Por eso, si agregas un converter personalizado con extendMessageConverters(), ponlo al principio de la lista para mayor prioridad.</div>
+      <div class="quiz-feedback fail" id="em3q19-fail">✗ La lista de converters se recorre en orden. El primero compatible (canWrite devuelve true para el tipo + mediaType) serializa la respuesta. Al agregar converters, usa configureMessageConverters() (reemplaza la lista) o extendMessageConverters() (añade al final).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre devolver un objeto con <code>@ResponseBody</code> y devolver <code>ResponseEntity&lt;T&gt;</code>?</div>
+      <div class="quiz-options" id="em3q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">A</div> @ResponseBody siempre devuelve 200 OK; ResponseEntity siempre devuelve 201 Created</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q20',true)"><div class="quiz-letter">B</div> @ResponseBody serializa el objeto como body con 200 OK (o el status de @ResponseStatus); ResponseEntity envuelve cuerpo, headers y código de estado dando control total sobre la respuesta HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">C</div> ResponseEntity solo puede usarse en métodos anotados con @ExceptionHandler</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">D</div> Son completamente equivalentes en términos de la respuesta HTTP generada</div>
+      </div>
+      <div class="quiz-feedback ok" id="em3q20-ok">✓ @ResponseBody escribe el objeto en el body con el status de @ResponseStatus (o 200 por defecto). ResponseEntity te permite variar el status dinámicamente, añadir headers (Location, ETag, Cache-Control) y construir respuestas condicionales en tiempo de ejecución.</div>
+      <div class="quiz-feedback fail" id="em3q20-fail">✗ Con @ResponseBody (implícito en @RestController), el status es fijo (200 o el de @ResponseStatus). ResponseEntity permite cambiar el status según la lógica, añadir headers dinámicos y devolver null body con 204. Úsalo cuando necesitas más control sobre la respuesta HTTP.</div>
+    </div>
+
+  </div>
+
+</ng-container>

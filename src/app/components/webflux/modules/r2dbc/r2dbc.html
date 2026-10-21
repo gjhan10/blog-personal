@@ -1,0 +1,463 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===21">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">22</span><span class="lesson-mod">Módulo 4 · R2DBC</span></div>
+      <h2 class="lesson-title">R2DBC vs JDBC</h2>
+      <p class="lesson-sub">El driver de base de datos reactivo que sustituye a JDBC en aplicaciones WebFlux.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">JDBC (bloqueante)</div>
+        <div class="compare-code">Hilo bloqueado durante la query
+ResultSet síncrono
+No compatible con Reactor
+Requiere boundedElastic wrapper
+No soporta backpressure</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">R2DBC (reactivo)</div>
+        <div class="compare-code">Retorna Mono/Flux directamente
+No bloquea ningún hilo
+Compatible con Netty event loop
+Backpressure end-to-end
+Drivers: H2, PostgreSQL, MySQL, MSSQL</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Dependencia</div>
+        <div class="tc-body"><code>spring-boot-starter-data-r2dbc</code> + driver reactivo: <code>io.r2dbc:r2dbc-postgresql</code> o <code>r2dbc-h2</code> para tests.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">Connection Pool</div>
+        <div class="tc-body">R2DBC Pool (<code>r2dbc-pool</code>) gestiona conexiones. Configurable con <code>spring.r2dbc.pool.initial-size</code>, <code>max-size</code>. Mucho menor que pool JDBC.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">ConnectionFactory</div>
+        <div class="tc-body">La abstracción central de R2DBC equivalente a DataSource. Auto-configurada por Spring Boot con <code>spring.r2dbc.url</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Sin JPA</div>
+        <div class="tc-body">JPA/Hibernate no es compatible con R2DBC. Usa Spring Data R2DBC que proporciona repositorios reactivos pero sin lazy loading, cascades ni first-level cache de JPA.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.properties</span></div>
+      <div class="anatomy-line">spring.r2dbc.url=r2dbc:postgresql://localhost:5432/mydb</div>
+      <div class="anatomy-line">spring.r2dbc.username=user</div>
+      <div class="anatomy-line">spring.r2dbc.password=pass</div>
+      <div class="anatomy-line">spring.r2dbc.pool.max-size=20</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===22">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">23</span><span class="lesson-mod">Módulo 4 · R2DBC</span></div>
+      <h2 class="lesson-title">ReactiveCrudRepository</h2>
+      <p class="lesson-sub">La interfaz de repositorio reactivo de Spring Data R2DBC.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Table</span>(<span class="a-str">"products"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Product</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Id</span> <span class="a-kw">private</span> <span class="a-type">Long</span> id;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> name;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">BigDecimal</span> price;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">public interface</span> <span class="a-type">ProductRepository</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">extends</span> <span class="a-type">ReactiveCrudRepository</span>&lt;<span class="a-type">Product</span>, <span class="a-type">Long</span>&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; findByNameContaining(<span class="a-type">String</span> name);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; findByPriceLessThan(<span class="a-type">BigDecimal</span> max);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Mono</span>&lt;<span class="a-type">Product</span>&gt; findFirstByName(<span class="a-type">String</span> name);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">Métodos heredados</div>
+        <div class="tc-body"><code>save(entity)</code> → Mono&lt;T&gt;, <code>findById(id)</code> → Mono&lt;T&gt;, <code>findAll()</code> → Flux&lt;T&gt;, <code>deleteById(id)</code> → Mono&lt;Void&gt;, <code>count()</code> → Mono&lt;Long&gt;.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">ReactiveSortingRepository</div>
+        <div class="tc-body">Extiende ReactiveCrudRepository añadiendo <code>findAll(Sort)</code>. Para paginación usa <code>ReactivePagingAndSortingRepository</code> con <code>findAll(Pageable)</code>.</div>
+      </div>
+    </div>
+    <div class="warn-box">Las entidades R2DBC usan <code>@Table</code>, <code>@Column</code>, <code>@Id</code> de Spring Data (no JPA). No se anotan con <code>@Entity</code>.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===23">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">24</span><span class="lesson-mod">Módulo 4 · R2DBC</span></div>
+      <h2 class="lesson-title">Queries y @Query Reactivas</h2>
+      <p class="lesson-sub">Consultas personalizadas con SQL nativo reactivo en Spring Data R2DBC.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Query</span>(<span class="a-str">"SELECT * FROM products WHERE category = :cat ORDER BY price"</span>)</div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; findByCategoryOrdered(<span class="a-kw">@Param</span>(<span class="a-str">"cat"</span>) <span class="a-type">String</span> category);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Modifying</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Query</span>(<span class="a-str">"UPDATE products SET price = :price WHERE id = :id"</span>)</div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">Integer</span>&gt; updatePrice(<span class="a-kw">@Param</span>(<span class="a-str">"id"</span>) <span class="a-type">Long</span> id, <span class="a-kw">@Param</span>(<span class="a-str">"price"</span>) <span class="a-type">BigDecimal</span> price);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// R2dbcEntityTemplate para queries dinámicas</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Autowired</span> <span class="a-type">R2dbcEntityTemplate</span> template;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>&lt;<span class="a-type">Product</span>&gt; search = template.select(<span class="a-type">Product</span>.class)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.matching(<span class="a-type">Query</span>.query(<span class="a-type">Criteria</span>.where(<span class="a-str">"price"</span>).lessThan(maxPrice)))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.all();</div>
+    </div>
+    <div class="info-box">R2DBC usa SQL nativo (no JPQL). Las queries derivadas como <code>findByNameAndPrice</code> son generadas automáticamente por Spring Data, igual que en JPA.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===24">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">25</span><span class="lesson-mod">Módulo 4 · R2DBC</span></div>
+      <h2 class="lesson-title">Transacciones Reactivas</h2>
+      <p class="lesson-sub">Gestión de transacciones en contexto reactivo con @Transactional y TransactionalOperator.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">@Transactional reactivo</div>
+        <div class="tc-body">Spring propaga la transacción a través del contexto de Reactor (no ThreadLocal). Funciona automáticamente si el método retorna Mono/Flux y está anotado con @Transactional.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">TransactionalOperator</div>
+        <div class="tc-body">Para transacciones programáticas. <code>transactionalOperator.transactional(flux)</code> o <code>.execute(callback)</code>. Útil cuando @Transactional no es suficiente (conditional tx).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Contexto de Reactor</div>
+        <div class="tc-body">Spring usa <code>Context</code> de Reactor (no ThreadLocal) para propagar la transacción. No funciona si cambias el scheduler dentro de la transacción sin gestión especial.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Rollback reactivo</div>
+        <div class="tc-body">Si el Mono/Flux retornado completa con error, Spring hace rollback automáticamente (igual que en Spring MVC, pero el error debe propagarse reactivamente).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Transactional</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Mono</span>&lt;<span class="a-type">Order</span>&gt; createOrder(<span class="a-type">OrderDTO</span> dto) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> inventoryRepo.decreaseStock(dto.productId(), dto.qty())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.then(orderRepo.save(dto.toEntity()));&nbsp;<span class="a-cm">// tx abarca ambas ops</span></div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===25">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">26</span><span class="lesson-mod">Módulo 4 · R2DBC</span></div>
+      <h2 class="lesson-title">Redis Reactivo con Lettuce</h2>
+      <p class="lesson-sub">Acceso reactivo a Redis usando el driver Lettuce y ReactiveRedisTemplate.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Lettuce</div>
+        <div class="tc-body">Driver Redis asíncrono y reactivo. Es el driver por defecto de Spring Data Redis cuando se usa WebFlux. Usa Netty internamente para conexiones non-blocking.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">ReactiveRedisTemplate</div>
+        <div class="tc-body">Template reactivo para operaciones Redis. Métodos: <code>opsForValue()</code> (strings), <code>opsForHash()</code>, <code>opsForSet()</code>, <code>opsForList()</code>, <code>opsForZSet()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Caché reactiva</div>
+        <div class="tc-body">Patrón: <code>redis.get(key).switchIfEmpty(db.query().flatMap(v -&gt; redis.set(key,v).thenReturn(v)))</code>. Cache-aside reactivo sin bloquear.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-megaphone" aria-hidden="true"></i></div>
+        <div class="tc-title">Pub/Sub reactivo</div>
+        <div class="tc-body"><code>ReactiveRedisMessageListenerContainer</code> para suscribirse a canales Redis como Flux. Mensajes llegan como stream reactivo a los suscriptores.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-type">ReactiveValueOperations</span>&lt;<span class="a-type">String</span>,<span class="a-type">Product</span>&gt; ops =</div>
+      <div class="anatomy-line">&nbsp;&nbsp;redisTemplate.opsForValue();</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>&lt;<span class="a-type">Product</span>&gt; getProduct(<span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">String</span> key = <span class="a-str">"product:"</span> + id;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> ops.get(key)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.switchIfEmpty(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repo.findById(id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.flatMap(p -&gt; ops.set(key, p, <span class="a-type">Duration</span>.ofMinutes(<span class="a-num">10</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.thenReturn(p)));</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 4</div>
+
+    <div class="quiz-box" id="wf4q01">
+      <div class="quiz-label">wf4q01</div>
+      <div class="quiz-q">¿Por qué no se puede usar JPA/Hibernate con R2DBC?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q01',false)"><span class="quiz-letter">A</span> Por incompatibilidad de licencias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q01',true)"><span class="quiz-letter">B</span> JPA está diseñado sobre JDBC bloqueante y usa ThreadLocal para el contexto de persistencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q01',false)"><span class="quiz-letter">C</span> R2DBC solo funciona con NoSQL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q01',false)"><span class="quiz-letter">D</span> Spring Data R2DBC ya incluye JPA con adaptaciones</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q01-ok">Correcto — JPA usa ThreadLocal para el EntityManager, incompatible con el modelo de Reactor donde el mismo operador puede ejecutarse en distintos threads.</div>
+      <div class="quiz-feedback fail" id="wf4q01-fail">Incorrecto — JPA/Hibernate está construido sobre JDBC síncrono y usa ThreadLocal, incompatible con el modelo reactivo de Reactor.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q02">
+      <div class="quiz-label">wf4q02</div>
+      <div class="quiz-q">¿Qué anotación usan las entidades R2DBC en lugar de <code>@Entity</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q02',false)"><span class="quiz-letter">A</span> @R2dbcEntity</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q02',true)"><span class="quiz-letter">B</span> @Table (Spring Data)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q02',false)"><span class="quiz-letter">C</span> @Document</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q02',false)"><span class="quiz-letter">D</span> @Persistent</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q02-ok">Correcto — Spring Data R2DBC usa @Table para mapear entidades. No usa las anotaciones de JPA (@Entity, @ManyToOne, etc.).</div>
+      <div class="quiz-feedback fail" id="wf4q02-fail">Incorrecto — R2DBC usa @Table de Spring Data. No hay @Entity ni lazy loading de JPA.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q03">
+      <div class="quiz-label">wf4q03</div>
+      <div class="quiz-q">¿Qué retorna <code>ReactiveCrudRepository.findAll()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q03',false)"><span class="quiz-letter">A</span> List&lt;T&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q03',false)"><span class="quiz-letter">B</span> Mono&lt;List&lt;T&gt;&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q03',true)"><span class="quiz-letter">C</span> Flux&lt;T&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q03',false)"><span class="quiz-letter">D</span> Observable&lt;T&gt;</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q03-ok">Correcto — findAll() retorna Flux&lt;T&gt; para streaming reactivo de todos los elementos, con backpressure.</div>
+      <div class="quiz-feedback fail" id="wf4q03-fail">Incorrecto — ReactiveCrudRepository.findAll() retorna Flux&lt;T&gt;, no List ni Mono&lt;List&gt;.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q04">
+      <div class="quiz-label">wf4q04</div>
+      <div class="quiz-q">¿Para qué sirve <code>@Modifying</code> en una @Query de R2DBC?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q04',true)"><span class="quiz-letter">A</span> Indica que la query es INSERT, UPDATE o DELETE (no SELECT) — cambia el tipo de retorno a Mono&lt;Integer&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q04',false)"><span class="quiz-letter">B</span> Hace la operación transaccional automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q04',false)"><span class="quiz-letter">C</span> Permite parámetros de tipo Collection</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q04',false)"><span class="quiz-letter">D</span> Marca la entidad como inmutable</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q04-ok">Correcto — @Modifying indica operación DML. El método puede retornar Mono&lt;Integer&gt; (filas afectadas) o Mono&lt;Void&gt;.</div>
+      <div class="quiz-feedback fail" id="wf4q04-fail">Incorrecto — @Modifying indica que la query modifica datos (INSERT/UPDATE/DELETE) y cambia cómo Spring Data procesa el resultado.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q05">
+      <div class="quiz-label">wf4q05</div>
+      <div class="quiz-q">¿Cómo propaga Spring @Transactional en contexto reactivo?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q05',false)"><span class="quiz-letter">A</span> Usando ThreadLocal igual que en Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q05',true)"><span class="quiz-letter">B</span> Usando el Context de Reactor para propagar la transacción entre operadores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q05',false)"><span class="quiz-letter">C</span> Solo funciona con un thread dedicado por transacción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q05',false)"><span class="quiz-letter">D</span> Las transacciones no están soportadas en R2DBC</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q05-ok">Correcto — Spring WebFlux usa Reactor Context (no ThreadLocal) para propagar la transacción a través del pipeline reactivo.</div>
+      <div class="quiz-feedback fail" id="wf4q05-fail">Incorrecto — Spring usa Context de Reactor para propagar transacciones, no ThreadLocal que es incompatible con el modelo reactivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q06">
+      <div class="quiz-label">wf4q06</div>
+      <div class="quiz-q">¿Cuál es el driver Redis reactivo por defecto en Spring Data Redis con WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q06',false)"><span class="quiz-letter">A</span> Jedis</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q06',true)"><span class="quiz-letter">B</span> Lettuce</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q06',false)"><span class="quiz-letter">C</span> Redisson</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q06',false)"><span class="quiz-letter">D</span> RedisReactor</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q06-ok">Correcto — Lettuce es el driver reactivo de Redis en Spring. Jedis es bloqueante y no es compatible con el modelo reactivo.</div>
+      <div class="quiz-feedback fail" id="wf4q06-fail">Incorrecto — Lettuce es el driver reactivo por defecto. Jedis es bloqueante y no soporta operaciones reactivas.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q07">
+      <div class="quiz-label">wf4q07</div>
+      <div class="quiz-q">¿Qué patrón implementa <code>ops.get(key).switchIfEmpty(db.find()...)</code> con Redis?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q07',false)"><span class="quiz-letter">A</span> Write-through</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q07',true)"><span class="quiz-letter">B</span> Cache-aside (lazy loading)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q07',false)"><span class="quiz-letter">C</span> Write-behind</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q07',false)"><span class="quiz-letter">D</span> Read-through (automático)</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q07-ok">Correcto — cache-aside: primero busca en Redis; si no existe, va a la BD y lo guarda en Redis para la próxima vez.</div>
+      <div class="quiz-feedback fail" id="wf4q07-fail">Incorrecto — este patrón es cache-aside: busca en caché, si está vacío va a la fuente y guarda en caché.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q08">
+      <div class="quiz-label">wf4q08</div>
+      <div class="quiz-q">¿Qué hace <code>TransactionalOperator.transactional(flux)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q08',true)"><span class="quiz-letter">A</span> Wrappea el flux en una transacción programática reactiva</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q08',false)"><span class="quiz-letter">B</span> Convierte un Flux bloqueante en reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q08',false)"><span class="quiz-letter">C</span> Sincroniza múltiples transacciones paralelas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q08',false)"><span class="quiz-letter">D</span> Guarda los cambios automáticamente sin commit explícito</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q08-ok">Correcto — TransactionalOperator permite gestión programática de transacciones reactivas, útil cuando @Transactional no es suficiente.</div>
+      <div class="quiz-feedback fail" id="wf4q08-fail">Incorrecto — transactional() wrappea el flux en una transacción reactiva: commit al completar, rollback al fallar.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q09">
+      <div class="quiz-label">wf4q09</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>R2dbcEntityTemplate</code> y repositorios derivados?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q09',true)"><span class="quiz-letter">A</span> Template permite queries dinámicas con Criteria API; repositorios son para queries fijas derivadas del nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q09',false)"><span class="quiz-letter">B</span> Template solo funciona con PostgreSQL; repositorios con todos los drivers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q09',false)"><span class="quiz-letter">C</span> Son intercambiables con mejor rendimiento del template</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q09',false)"><span class="quiz-letter">D</span> Template usa JPQL; repositorios usan SQL nativo</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q09-ok">Correcto — R2dbcEntityTemplate + Criteria API para queries dinámicas en runtime; repositorios derivados para queries conocidas en compilación.</div>
+      <div class="quiz-feedback fail" id="wf4q09-fail">Incorrecto — Template es para queries dinámicas con Criteria; repositorios derivados son para queries estáticas basadas en nombre de método.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q10">
+      <div class="quiz-label">wf4q10</div>
+      <div class="quiz-q">¿Cuándo hace rollback @Transactional en contexto reactivo?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q10',false)"><span class="quiz-letter">A</span> Solo cuando se llama manualmente transactionManager.rollback()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q10',true)"><span class="quiz-letter">B</span> Cuando el Mono/Flux retornado termina con señal onError</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q10',false)"><span class="quiz-letter">C</span> Cuando el Flux está vacío</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q10',false)"><span class="quiz-letter">D</span> Después de un timeout configurable</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q10-ok">Correcto — el rollback se desencadena cuando el publisher retornado señaliza onError. El error debe propagarse en el stream, no ser silenciado.</div>
+      <div class="quiz-feedback fail" id="wf4q10-fail">Incorrecto — @Transactional hace rollback cuando el Mono/Flux retornado emite onError. Si manejas el error sin propagarlo, no habrá rollback.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q11">
+      <div class="quiz-label">wf4q11</div>
+      <div class="quiz-q">¿Qué ocurre si se llama a JDBC desde dentro de un pipeline Reactor en el thread parallel()?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q11',false)"><span class="quiz-letter">A</span> JDBC retorna automáticamente un Mono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q11',true)"><span class="quiz-letter">B</span> El thread del pool se bloquea, degradando la concurrencia reactiva</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q11',false)"><span class="quiz-letter">C</span> Spring intercepta la llamada y la hace reactiva</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q11',false)"><span class="quiz-letter">D</span> R2DBC reemplaza automáticamente la llamada JDBC</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q11-ok">Correcto — JDBC bloquea el thread de parallel(), reduciendo la capacidad reactiva. Si debes usar JDBC, usa subscribeOn(boundedElastic()).</div>
+      <div class="quiz-feedback fail" id="wf4q11-fail">Incorrecto — JDBC bloquea el thread. Si debes usar JDBC en un contexto reactivo, wrappéalo con Mono.fromCallable() + subscribeOn(boundedElastic()).</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q12">
+      <div class="quiz-label">wf4q12</div>
+      <div class="quiz-q">¿Cuál es la principal limitación de Spring Data R2DBC respecto a JPA?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q12',true)"><span class="quiz-letter">A</span> No tiene lazy loading, cascades, ni first-level cache (session cache)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q12',false)"><span class="quiz-letter">B</span> Solo funciona con PostgreSQL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q12',false)"><span class="quiz-letter">C</span> No tiene soporte para queries derivadas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q12',false)"><span class="quiz-letter">D</span> No soporta transacciones</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q12-ok">Correcto — Spring Data R2DBC es más simple que JPA: sin lazy loading, sin cascade, sin second-level cache. Las relaciones se gestionan manualmente.</div>
+      <div class="quiz-feedback fail" id="wf4q12-fail">Incorrecto — la mayor limitación es la ausencia de características JPA: sin lazy loading, cascades, ni caché de sesión.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q13">
+      <div class="quiz-label">wf4q13</div>
+      <div class="quiz-q">¿Qué hace <code>ReactiveRedisMessageListenerContainer</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q13',true)"><span class="quiz-letter">A</span> Permite suscribirse a canales Redis Pub/Sub como Flux reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q13',false)"><span class="quiz-letter">B</span> Gestiona la cola de mensajes entrantes a la aplicación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q13',false)"><span class="quiz-letter">C</span> Envía mensajes a Redis de forma reactiva</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q13',false)"><span class="quiz-letter">D</span> Es un contenedor de conexiones reactivas a Redis</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q13-ok">Correcto — ReactiveRedisMessageListenerContainer permite recibir mensajes Redis Pub/Sub como un stream Flux reactivo.</div>
+      <div class="quiz-feedback fail" id="wf4q13-fail">Incorrecto — este contenedor expone mensajes Redis Pub/Sub como Flux, integrando Redis messaging en el modelo reactivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q14">
+      <div class="quiz-label">wf4q14</div>
+      <div class="quiz-q">¿Por qué el pool de R2DBC es típicamente más pequeño que el de JDBC?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q14',true)"><span class="quiz-letter">A</span> Con R2DBC, una conexión puede manejar múltiples operaciones concurrentes sin bloquear</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q14',false)"><span class="quiz-letter">B</span> R2DBC tiene más overhead por conexión</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q14',false)"><span class="quiz-letter">C</span> Por limitaciones del protocolo R2DBC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q14',false)"><span class="quiz-letter">D</span> El pool de R2DBC crece automáticamente sin límite</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q14-ok">Correcto — con R2DBC, una conexión puede procesar múltiples queries de forma multiplexada, sin bloquear. Con JDBC, una query = un thread bloqueado = necesitas más conexiones.</div>
+      <div class="quiz-feedback fail" id="wf4q14-fail">Incorrecto — R2DBC multiplexea operaciones por conexión, por lo que se necesitan menos conexiones para el mismo throughput que JDBC.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q15">
+      <div class="quiz-label">wf4q15</div>
+      <div class="quiz-q">¿Qué tipo retorna <code>ReactiveCrudRepository.findById(id)</code> cuando no existe el registro?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q15',false)"><span class="quiz-letter">A</span> Mono con null</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q15',false)"><span class="quiz-letter">B</span> Mono con Optional.empty()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q15',true)"><span class="quiz-letter">C</span> Mono vacío (Mono.empty())</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q15',false)"><span class="quiz-letter">D</span> Mono con error NoSuchElementException</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q15-ok">Correcto — findById retorna Mono.empty() cuando no existe el registro. Usa defaultIfEmpty() o switchIfEmpty() para manejar el caso vacío.</div>
+      <div class="quiz-feedback fail" id="wf4q15-fail">Incorrecto — findById retorna Mono.empty() cuando no se encuentra. Úsalo con defaultIfEmpty() para retornar un 404.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q16">
+      <div class="quiz-label">wf4q16</div>
+      <div class="quiz-q">¿Cuál es el formato correcto de URL para R2DBC con PostgreSQL?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q16',false)"><span class="quiz-letter">A</span> jdbc:postgresql://host:5432/db</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q16',true)"><span class="quiz-letter">B</span> r2dbc:postgresql://host:5432/db</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q16',false)"><span class="quiz-letter">C</span> reactive:postgresql://host:5432/db</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q16',false)"><span class="quiz-letter">D</span> r2dbc:postgres://host:5432/db</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q16-ok">Correcto — el scheme R2DBC usa "r2dbc:" en lugar de "jdbc:". La propiedad es spring.r2dbc.url.</div>
+      <div class="quiz-feedback fail" id="wf4q16-fail">Incorrecto — el formato R2DBC para PostgreSQL es r2dbc:postgresql://host:port/database.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q17">
+      <div class="quiz-label">wf4q17</div>
+      <div class="quiz-q">¿Qué ocurre con la transacción si el error es manejado con <code>onErrorReturn()</code> dentro del método @Transactional?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q17',false)"><span class="quiz-letter">A</span> La transacción hace rollback aunque el error sea manejado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q17',true)"><span class="quiz-letter">B</span> No habrá rollback — el error fue absorbido y el stream termina con éxito</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q17',false)"><span class="quiz-letter">C</span> Spring detecta el manejo de error y hace rollback parcial</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q17',false)"><span class="quiz-letter">D</span> onErrorReturn no está permitido dentro de métodos @Transactional</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q17-ok">Correcto — si el error es capturado con onErrorReturn, el stream completa normalmente y Spring hace COMMIT. Para rollback, el error debe propagarse.</div>
+      <div class="quiz-feedback fail" id="wf4q17-fail">Incorrecto — si el error es manejado con onErrorReturn, el stream termina con éxito → Spring hace commit. El error debe propagarse para rollback.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q18">
+      <div class="quiz-label">wf4q18</div>
+      <div class="quiz-q">¿Cómo se añade TTL al guardar en Redis con ReactiveValueOperations?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q18',false)"><span class="quiz-letter">A</span> <code>ops.set(key, value).expire(Duration)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q18',true)"><span class="quiz-letter">B</span> <code>ops.set(key, value, Duration.ofMinutes(10))</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q18',false)"><span class="quiz-letter">C</span> <code>ops.setExpire(key, value, 10, TimeUnit.MINUTES)</code></div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q18',false)"><span class="quiz-letter">D</span> <code>@RedisExpire(minutes=10) sobre el método</code></div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q18-ok">Correcto — set() acepta un tercer parámetro Duration para el TTL directamente en la operación SET con EXPIRE.</div>
+      <div class="quiz-feedback fail" id="wf4q18-fail">Incorrecto — el TTL se pasa como tercer parámetro: ops.set(key, value, Duration.ofMinutes(10)).</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q19">
+      <div class="quiz-label">wf4q19</div>
+      <div class="quiz-q">¿Qué clase ofrece queries dinámicas con Criteria API en Spring Data R2DBC?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q19',false)"><span class="quiz-letter">A</span> ReactiveJpaTemplate</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q19',true)"><span class="quiz-letter">B</span> R2dbcEntityTemplate</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q19',false)"><span class="quiz-letter">C</span> R2dbcQueryBuilder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q19',false)"><span class="quiz-letter">D</span> ReactiveDatabaseTemplate</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q19-ok">Correcto — R2dbcEntityTemplate + Query.query(Criteria...) permite construir queries dinámicas programáticamente.</div>
+      <div class="quiz-feedback fail" id="wf4q19-fail">Incorrecto — R2dbcEntityTemplate es el componente para queries dinámicas con Criteria API en Spring Data R2DBC.</div>
+    </div>
+
+    <div class="quiz-box" id="wf4q20">
+      <div class="quiz-label">wf4q20</div>
+      <div class="quiz-q">¿Qué tipo de lenguaje usa R2DBC para las @Query?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q20',false)"><span class="quiz-letter">A</span> JPQL (Java Persistence Query Language)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q20',false)"><span class="quiz-letter">B</span> HQL (Hibernate Query Language)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf4q20',true)"><span class="quiz-letter">C</span> SQL nativo específico de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf4q20',false)"><span class="quiz-letter">D</span> Criteria API obligatoria</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf4q20-ok">Correcto — R2DBC usa SQL nativo, no JPQL. El SQL puede variar entre bases de datos. No hay abstracción a nivel de lenguaje como en JPA.</div>
+      <div class="quiz-feedback fail" id="wf4q20-fail">Incorrecto — R2DBC usa SQL nativo, no JPQL. A diferencia de JPA, las queries son específicas de cada base de datos.</div>
+    </div>
+
+  </div>
+
+</ng-container>

@@ -1,0 +1,525 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===30">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">31</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Distributed Tracing con OpenTelemetry</h2>
+      <p class="lesson-sub">El Distributed Tracing permite seguir una petición a través de múltiples microservicios. Un Trace es el viaje completo; un Span es la unidad de trabajo en cada servicio. OpenTelemetry es el estándar unificado que reemplaza a Zipkin y Jaeger específicos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">Trace & Span</div>
+        <div class="tc-body">Trace: el viaje completo de una petición (e.g., checkout). Span: una operación individual (e.g., "llamada al servicio de inventario"). Cada span tiene traceId (global) y spanId (local).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></div>
+        <div class="tc-title">Context Propagation</div>
+        <div class="tc-body">El traceId se propaga en headers HTTP: <code>traceparent: 00-{{ '{' }}traceId{{ '}' }}-{{ '{' }}spanId{{ '}' }}-01</code>. Cuando el servicio B recibe la petición, continúa el trace existente como hijo del span del servicio A.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">OpenTelemetry</div>
+        <div class="tc-body">Vendor-neutral. Las trazas se envían al OTEL Collector que las exporta a Jaeger, Zipkin, Tempo o cualquier backend. Cambiar el backend = cambiar la configuración del collector.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Auto-instrumentation</div>
+        <div class="tc-body">El agente OTEL para JVM instrumenta automáticamente Spring, JDBC, RestTemplate, WebClient sin cambiar el código. Solo configurar el javaagent y el endpoint del collector.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml — Micrometer Tracing + OTEL</span></div>
+      <div class="anatomy-line">management.tracing:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;sampling.probability: 1.0</div>
+      <div class="anatomy-line">management.otlp.tracing:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;endpoint: http://otel-collector:4318/v1/traces</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Span personalizado</span></div>
+      <div class="anatomy-line">@Autowired <span class="a-type">Tracer</span> tracer;</div>
+      <div class="anatomy-line"><span class="a-type">Span</span> span = tracer.nextSpan().name(<span class="a-str">"process-payment"</span>).start();</div>
+      <div class="anatomy-line">span.tag(<span class="a-str">"payment.amount"</span>, amount.toString());</div>
+      <div class="anatomy-line">span.end();</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===31">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">32</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Logging Centralizado con ELK Stack</h2>
+      <p class="lesson-sub">Con decenas de microservicios, los logs deben centralizarse para poder correlacionarlos y buscar por traceId. ELK (Elasticsearch + Logstash + Kibana) o la alternativa moderna Grafana Loki son las soluciones estándar.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Elasticsearch</div>
+        <div class="tc-body">Motor de búsqueda y almacenamiento de logs. Indexa los logs en tiempo real. Permite búsqueda full-text y consultas complejas por cualquier campo del log estructurado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Logstash / Filebeat</div>
+        <div class="tc-body">Logstash: procesamiento de logs (parsing, enrichment, filtrado). Filebeat: colector ligero que lee logs de archivos y los envía a Elasticsearch directamente o vía Logstash.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Kibana</div>
+        <div class="tc-body">Visualización y búsqueda de logs. Dashboards de error rate por servicio, búsqueda por traceId para ver todos los logs de una petición, alertas cuando error rate supera umbral.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">Structured Logging (JSON)</div>
+        <div class="tc-body">Los logs deben ser JSON estructurado: nivel, mensaje, traceId, spanId, servicio, timestamp. El traceId permite correlacionar logs de múltiples servicios de la misma petición.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Logback con Logstash encoder (JSON)</span></div>
+      <div class="anatomy-line">&lt;appender name=<span class="a-str">"STDOUT"</span> class=<span class="a-str">"ch.qos.logback.core.ConsoleAppender"</span>&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&lt;encoder class=<span class="a-str">"net.logstash.logback.encoder.LogstashEncoder"</span>/&gt;</div>
+      <div class="anatomy-line">&lt;/appender&gt;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Log con traceId automático via MDC (Micrometer Tracing)</span></div>
+      <div class="anatomy-line">log.info(<span class="a-str">"Order created: {{ '{' }}{{ '}' }}"</span>, orderId);</div>
+      <div class="anatomy-line"><span class="a-cm">// Output JSON: {{ '{' }}"level":"INFO","traceId":"abc123","message":"Order created: 456"{{ '}' }}</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===32">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">33</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Métricas con Prometheus & Grafana</h2>
+      <p class="lesson-sub">Prometheus hace scraping de métricas de cada servicio (/actuator/prometheus). Grafana las visualiza y permite crear alertas. Spring Boot Actuator + Micrometer exponen métricas JVM, HTTP y de negocio con cero configuración.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ruler" aria-hidden="true"></i></div>
+        <div class="tc-title">Golden Signals</div>
+        <div class="tc-body">Latency (p50, p95, p99), Traffic (req/s), Errors (error rate %), Saturation (CPU, memory, threads). Estos 4 señales son suficientes para detectar cualquier problema.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bell" aria-hidden="true"></i></div>
+        <div class="tc-title">Alertmanager</div>
+        <div class="tc-body">Prometheus Alertmanager envía alertas a Slack, PagerDuty o email cuando las métricas superan umbrales: error rate > 1%, latencia p99 > 500ms, CPU > 80%.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Grafana Dashboards</div>
+        <div class="tc-body">Dashboards preconstruidos para Spring Boot (JVM dashboard, HTTP metrics). Dashboards de negocio personalizados: órdenes por minuto, tasa de conversión, revenue por hora.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ruler" aria-hidden="true"></i></div>
+        <div class="tc-title">Métricas personalizadas</div>
+        <div class="tc-body">Micrometer permite crear métricas de negocio: Counter (órdenes creadas), Gauge (pedidos en cola), Timer (duración de proceso de pago), DistributionSummary (tamaño de paquetes).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Métricas de negocio con Micrometer</span></div>
+      <div class="anatomy-line">@Autowired <span class="a-type">MeterRegistry</span> registry;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-type">Counter</span>.builder(<span class="a-str">"orders.created"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.tag(<span class="a-str">"status"</span>, <span class="a-str">"success"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.register(registry).increment();</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-type">Timer</span>.builder(<span class="a-str">"payment.processing.duration"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.register(registry)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.record(() -&gt; paymentService.process(payment));</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===33">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">34</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Health Checks, Liveness & Readiness</h2>
+      <p class="lesson-sub">Kubernetes usa los health probes para gestionar el ciclo de vida de los pods. Liveness: ¿está vivo el proceso? Readiness: ¿puede recibir tráfico? Spring Boot Actuator expone /actuator/health/liveness y /actuator/health/readiness.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-heart" aria-hidden="true"></i> Liveness Probe</div>
+        <ul>
+          <li>¿Está el proceso funcionando?</li>
+          <li>Si falla → Kubernetes reinicia el pod</li>
+          <li>Para deadlocks, OOM, estados corruptos</li>
+          <li>No incluir dependencias externas</li>
+          <li>Solo el estado interno del proceso</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="compare-title"><i class="ico ico-check" aria-hidden="true"></i> Readiness Probe</div>
+        <ul>
+          <li>¿Puede recibir tráfico?</li>
+          <li>Si falla → K8s quita del load balancer</li>
+          <li>Para inicialización, dependencias, warm-up</li>
+          <li>Puede incluir DB, cache, etc.</li>
+          <li>Pod sigue vivo pero sin tráfico</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Kubernetes probe configuration</span></div>
+      <div class="anatomy-line">livenessProbe:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;httpGet: {{ '{' }} path: /actuator/health/liveness, port: 8080 {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;initialDelaySeconds: 30</div>
+      <div class="anatomy-line">&nbsp;&nbsp;periodSeconds: 10</div>
+      <div class="anatomy-line">readinessProbe:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;httpGet: {{ '{' }} path: /actuator/health/readiness, port: 8080 {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;initialDelaySeconds: 10</div>
+      <div class="anatomy-line">&nbsp;&nbsp;periodSeconds: 5</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===34">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">35</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Docker Compose para Microservicios</h2>
+      <p class="lesson-sub">Docker Compose orquesta múltiples contenedores para desarrollo local. Define todos los servicios, redes y volúmenes en un solo archivo. Permite reproducir el entorno completo con un solo comando.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">Redes de Docker</div>
+        <div class="tc-body">Cada servicio en Compose puede comunicarse con otros por nombre de servicio: <code>http://order-service:8080</code>. La red interna resuelve el DNS automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Profiles</div>
+        <div class="tc-body">Los profiles de Compose permiten iniciar solo un subconjunto de servicios: <code>docker compose --profile dev up</code>. Útil para separar la infra (DB, Kafka) de los microservicios.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hourglass" aria-hidden="true"></i></div>
+        <div class="tc-title">depends_on & healthcheck</div>
+        <div class="tc-body">depends_on con condition: service_healthy garantiza que el servicio espera a que la DB esté lista. Sin healthcheck, depends_on solo espera que el contenedor inicie, no que esté listo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Override files</div>
+        <div class="tc-body">docker-compose.yml (base) + docker-compose.override.yml (dev) + docker-compose.prod.yml (prod). Cada archivo override puede añadir/modificar configuración para el entorno.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># docker-compose.yml — microservicios básico</span></div>
+      <div class="anatomy-line">services:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;order-service:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;image: myapp/order-service:latest</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;ports: [<span class="a-str">"8081:8080"</span>]</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;environment:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orders</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;depends_on:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;postgres: {{ '{' }} condition: service_healthy {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;postgres:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;image: postgres:16</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;healthcheck:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test: [<span class="a-str">"CMD"</span>, <span class="a-str">"pg_isready"</span>]</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;interval: 5s</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;retries: 5</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===35">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">36</span><span class="lesson-mod">M6 · Observabilidad y Despliegue</span></div>
+      <h2 class="lesson-title">Kubernetes para Microservicios</h2>
+      <p class="lesson-sub">Kubernetes es el estándar para orquestar microservicios en producción. Proporciona self-healing, escalado automático, rolling deployments y service discovery. Los recursos clave son: Deployment, Service, ConfigMap, HPA e Ingress.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></div>
+        <div class="tc-title">Deployment & ReplicaSet</div>
+        <div class="tc-body">El Deployment define el estado deseado (imagen, réplicas, resources). Kubernetes garantiza que siempre haya N réplicas corriendo. Rolling update: actualiza pods gradualmente sin downtime.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">Service & ClusterIP</div>
+        <div class="tc-body">Un Service provee un IP estable y DNS para acceder a los pods. ClusterIP: interno al cluster. NodePort: expone en cada nodo. LoadBalancer: provisiona un LB externo (cloud).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-trend" aria-hidden="true"></i></div>
+        <div class="tc-title">HPA (Horizontal Pod Autoscaler)</div>
+        <div class="tc-body">Escala automáticamente el número de pods según métricas: CPU, memory o métricas custom (req/s desde Prometheus). Reacciona a picos de tráfico sin intervención manual.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">ConfigMap & Secrets</div>
+        <div class="tc-body">ConfigMap: configuración no sensitiva. Secrets: credenciales cifradas (base64, integrar con Vault). Inyectados como variables de entorno o volúmenes en los pods.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># HPA — Horizontal Pod Autoscaler</span></div>
+      <div class="anatomy-line">apiVersion: autoscaling/v2</div>
+      <div class="anatomy-line">kind: HorizontalPodAutoscaler</div>
+      <div class="anatomy-line">spec:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;scaleTargetRef:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;name: order-service</div>
+      <div class="anatomy-line">&nbsp;&nbsp;minReplicas: 2</div>
+      <div class="anatomy-line">&nbsp;&nbsp;maxReplicas: 10</div>
+      <div class="anatomy-line">&nbsp;&nbsp;metrics:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;- type: Resource</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;resource:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: cpu</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target: {{ '{' }} type: Utilization, averageUtilization: 70 {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m6" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 6 — Observabilidad y Despliegue</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Qué es un "Trace" y un "Span" en el contexto de Distributed Tracing?</div>
+      <div class="quiz-options" id="msm6q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q01',false)"><div class="quiz-letter">A</div> Trace es un log de error; Span es la duración de un request HTTP</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q01',true)"><div class="quiz-letter">B</div> Trace es el recorrido completo de una petición por múltiples servicios identificado por un traceId. Span es la unidad de trabajo individual en cada servicio, con su propio spanId</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q01',false)"><div class="quiz-letter">C</div> Trace es el log de auditoría; Span es un intervalo de tiempo del servidor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q01',false)"><div class="quiz-letter">D</div> Trace es un error crítico; Span es una advertencia en los logs</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q01-ok">✓ Trace: checkout → order-service → inventory-service → payment-service. Todo con el mismo traceId. Span: "llamada a inventory" con spanId propio, timestamps de inicio/fin, tags y parent spanId.</div>
+      <div class="quiz-feedback fail" id="msm6q01-fail">✗ Trace = viaje completo (traceId único). Span = operación individual (spanId, parentSpanId, nombre, duración, tags). Los spans forman un árbol dentro del trace, mostrando la cadena de llamadas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Cómo se propaga el contexto de tracing entre microservicios en OpenTelemetry?</div>
+      <div class="quiz-options" id="msm6q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q02',false)"><div class="quiz-letter">A</div> El traceId se guarda en la base de datos y cada servicio lo consulta</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q02',true)"><div class="quiz-letter">B</div> A través del header HTTP <code>traceparent</code> (W3C standard): 00-{{ '{' }}traceId{{ '}' }}-{{ '{' }}spanId{{ '}' }}-{{ '{' }}flags{{ '}' }}. El servicio receptor lo lee y crea un child span del span padre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q02',false)"><div class="quiz-letter">C</div> A través de variables de entorno del sistema operativo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q02',false)"><div class="quiz-letter">D</div> El OTEL Collector coordina el traceId entre todos los servicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q02-ok">✓ traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01. El servicio B lee este header y crea un span hijo. La auto-instrumentación de Spring hace esto automáticamente.</div>
+      <div class="quiz-feedback fail" id="msm6q02-fail">✗ W3C traceparent header: versión-traceId-spanId-traceFlags. Propagado en cada HTTP call, Kafka message header, gRPC metadata. Auto-instrumentación OTEL inyecta y lee este header sin código.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Por qué los logs deben ser JSON estructurado en un sistema de microservicios?</div>
+      <div class="quiz-options" id="msm6q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q03',false)"><div class="quiz-letter">A</div> Porque JSON ocupa menos espacio que el texto plano</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q03',true)"><div class="quiz-letter">B</div> Para permitir búsqueda y filtrado por campos específicos (traceId, servicio, userId), correlacionar logs entre servicios y parsear sin regex frágiles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q03',false)"><div class="quiz-letter">C</div> Porque Elasticsearch solo acepta JSON como formato de entrada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q03',false)"><div class="quiz-letter">D</div> Para cifrar automáticamente los datos sensibles en los logs</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q03-ok">✓ JSON estructurado: buscar todos los logs de traceId X en Kibana en segundos. Texto plano requiere regex para extraer campos, falla si el formato cambia. JSON = campos indexados, búsquedas precisas.</div>
+      <div class="quiz-feedback fail" id="msm6q03-fail">✗ JSON estructurado permite: filtrar por traceId='abc' para ver toda la petición, buscar por userId='123' todos sus errores, agregar error counts por servicio. Texto plano = parseo frágil con regex.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Cuáles son los "Golden Signals" de Google SRE para monitorizar servicios?</div>
+      <div class="quiz-options" id="msm6q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q04',false)"><div class="quiz-letter">A</div> CPU, Memoria, Disco, Red</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q04',true)"><div class="quiz-letter">B</div> Latency (tiempo de respuesta), Traffic (req/s), Errors (tasa de error) y Saturation (utilización de recursos)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q04',false)"><div class="quiz-letter">C</div> Uptime, Availability, Response Time, Throughput</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q04',false)"><div class="quiz-letter">D</div> P50, P95, P99, P999 de latencia</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q04-ok">✓ Latency: p50/p95/p99. Traffic: req/s o mensajes/s. Errors: % de 5xx o excepciones. Saturation: CPU, memory, thread pool utilization. Estos 4 son suficientes para detectar cualquier degradación.</div>
+      <div class="quiz-feedback fail" id="msm6q04-fail">✗ Golden Signals (SRE Book): Latency (p99 of response time), Traffic (requests/sec), Errors (error rate %), Saturation (how "full" is your service: CPU, queue length). Monitorizarlos = detectar cualquier problema.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Liveness Probe y Readiness Probe en Kubernetes?</div>
+      <div class="quiz-options" id="msm6q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q05',false)"><div class="quiz-letter">A</div> Son idénticos; Kubernetes usa ambos para reiniciar el pod</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q05',true)"><div class="quiz-letter">B</div> Liveness: ¿el proceso está sano? Si falla → K8s reinicia el pod. Readiness: ¿puede recibir tráfico? Si falla → K8s lo retira del load balancer sin reiniciarlo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q05',false)"><div class="quiz-letter">C</div> Liveness es para bases de datos; Readiness es para servicios HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q05',false)"><div class="quiz-letter">D</div> Liveness solo verifica que el puerto esté abierto; Readiness ejecuta código de negocio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q05-ok">✓ Liveness falla → restart (para deadlocks, estados corruptos). Readiness falla → sin tráfico pero pod vivo (útil durante warm-up, cuando la DB está down temporalmente). Confundirlos → reiniciar pods innecesariamente.</div>
+      <div class="quiz-feedback fail" id="msm6q05-fail">✗ Liveness: ¿está el proceso vivo? Falla → reinicio del pod. Readiness: ¿está listo para tráfico? Falla → removido del Service endpoints. Pod can be not-ready but still alive.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Por qué NO deberías incluir dependencias externas (DB, Redis) en el Liveness Probe?</div>
+      <div class="quiz-options" id="msm6q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q06',false)"><div class="quiz-letter">A</div> Porque Kubernetes no puede conectarse a bases de datos externas</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q06',true)"><div class="quiz-letter">B</div> Si la DB tiene un fallo temporal, el liveness fallaría y Kubernetes reiniciaría todos los pods innecesariamente, agravando el problema (thundering herd al reconectar)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q06',false)"><div class="quiz-letter">C</div> Las dependencias externas son demasiado lentas para un health check</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q06',false)"><div class="quiz-letter">D</div> Los pods no tienen acceso de red a dependencias externas por defecto</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q06-ok">✓ DB falla 5 min → liveness falla → K8s reinicia todos los pods → nuevas conexiones a DB en recuperación → DB saturada → todos los pods en crashloop. La dependencia externa va en Readiness, no en Liveness.</div>
+      <div class="quiz-feedback fail" id="msm6q06-fail">✗ Liveness debe verificar solo el estado interno del proceso. Si DB falla → Readiness falla (sin tráfico) pero pods siguen vivos (sin reinicio). DB se recupera → Readiness vuelve a pasar → tráfico reanuda. Sin degradación en cascada.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué hace un HPA (Horizontal Pod Autoscaler) en Kubernetes?</div>
+      <div class="quiz-options" id="msm6q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q07',false)"><div class="quiz-letter">A</div> Aumenta la CPU y memoria de un pod existente automáticamente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q07',true)"><div class="quiz-letter">B</div> Ajusta automáticamente el número de réplicas de un Deployment según métricas (CPU, memoria, custom metrics), escalando hacia arriba o hacia abajo según la demanda</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q07',false)"><div class="quiz-letter">C</div> Distribuye pods entre nodos del cluster para balancear la carga</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q07',false)"><div class="quiz-letter">D</div> Reinicia pods cuando el uso de CPU supera el umbral</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q07-ok">✓ HPA observa métricas → si CPU > 70% → añade réplicas (hasta maxReplicas). Si CPU < 30% → reduce réplicas (hasta minReplicas). Reacciona a picos de tráfico sin intervención humana.</div>
+      <div class="quiz-feedback fail" id="msm6q07-fail">✗ HPA: scale out/in el número de pods. CPU media del deployment supera target → crear más pods. Carga baja → reducir pods. Vs VPA (Vertical): ajusta CPU/mem de pods existentes. HPA es lo más usado para microservicios.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre Docker Compose <code>depends_on</code> con y sin <code>condition: service_healthy</code>?</div>
+      <div class="quiz-options" id="msm6q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q08',false)"><div class="quiz-letter">A</div> Son equivalentes; ambos esperan que el contenedor esté completamente listo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q08',true)"><div class="quiz-letter">B</div> Sin condition: solo espera que el contenedor inicie (proceso lanzado). Con service_healthy: espera que el healthcheck del contenedor pase, garantizando que el servicio esté realmente listo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q08',false)"><div class="quiz-letter">C</div> service_healthy solo funciona con bases de datos SQL</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q08',false)"><div class="quiz-letter">D</div> depends_on sin condition es más rápido pero menos confiable en producción</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q08-ok">✓ depends_on simple: postgres container started → app starts immediately → app crashes because postgres isn't ready yet. depends_on + service_healthy: espera a que pg_isready devuelva OK. Sin race condition.</div>
+      <div class="quiz-feedback fail" id="msm6q08-fail">✗ depends_on: el contenedor postgres INICIA pero postgres puede tardar 2-10s en aceptar conexiones. service_healthy con healthcheck: espera que postgres realmente acepte conexiones. Evita "connection refused" al arranque.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Cuál es el propósito del OTEL Collector en una arquitectura de observabilidad?</div>
+      <div class="quiz-options" id="msm6q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q09',false)"><div class="quiz-letter">A</div> Almacena las trazas y métricas de forma permanente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q09',true)"><div class="quiz-letter">B</div> Recibe telemetría de los servicios, la procesa (sampling, enriquecimiento) y la exporta a uno o múltiples backends (Jaeger, Prometheus, Tempo) sin cambiar el código de los servicios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q09',false)"><div class="quiz-letter">C</div> Genera automáticamente dashboards en Grafana</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q09',false)"><div class="quiz-letter">D</div> Reemplaza a Prometheus como sistema de métricas</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q09-ok">✓ OTEL Collector: receive (OTLP, Jaeger, Zipkin protocols) → process (batch, sampling, attribute transformation) → export (Jaeger, Prometheus, Datadog, Tempo). Desacopla servicios del backend de observabilidad.</div>
+      <div class="quiz-feedback fail" id="msm6q09-fail">✗ OTEL Collector = pipeline de telemetría. Servicios envían al Collector (un solo endpoint). El Collector rutea a Jaeger (trazas) + Prometheus (métricas) + Loki (logs). Cambiar backend = cambiar config del Collector, no del servicio.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué es un ConfigMap en Kubernetes y cómo se diferencia de un Secret?</div>
+      <div class="quiz-options" id="msm6q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q10',false)"><div class="quiz-letter">A</div> ConfigMap y Secret son idénticos; uno es para valores cortos y otro para archivos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q10',true)"><div class="quiz-letter">B</div> ConfigMap almacena configuración no sensitiva en texto plano. Secret almacena datos sensibles (passwords, tokens) con base64 encoding y restricciones de acceso adicionales via RBAC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q10',false)"><div class="quiz-letter">C</div> ConfigMap es para contenedores; Secret es para pods completos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q10',false)"><div class="quiz-letter">D</div> ConfigMap se crea en runtime; Secret se define solo en el Dockerfile</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q10-ok">✓ ConfigMap: spring.profiles.active, feature flags, URLs de servicios. Secret: DB password, JWT secret key, API tokens. Base64 ≠ cifrado. Para prod, usar Vault o sealed-secrets para cifrado real.</div>
+      <div class="quiz-feedback fail" id="msm6q10-fail">✗ ConfigMap: texto plano, visible en etcd. Secret: base64 (no cifrado por default). Ambos se inyectan como env vars o volúmenes. Para cifrado real: encrypt etcd + Vault/External Secrets Operator.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un Service tipo ClusterIP, NodePort y LoadBalancer en Kubernetes?</div>
+      <div class="quiz-options" id="msm6q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q11',false)"><div class="quiz-letter">A</div> Son variantes del mismo tipo según el número de pods destino</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q11',true)"><div class="quiz-letter">B</div> ClusterIP: solo accesible dentro del cluster. NodePort: accesible en cada nodo en un puerto específico. LoadBalancer: provisiona un LB externo en cloud (AWS ELB, GCP LB)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q11',false)"><div class="quiz-letter">C</div> Solo se puede usar uno por namespace; los otros tipos son deprecados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q11',false)"><div class="quiz-letter">D</div> ClusterIP es más rápido; NodePort y LoadBalancer son solo para debugging</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q11-ok">✓ ClusterIP: comunicación interna, microservicio A → B. NodePort: exponer en puerto alto (30000-32767) en todos los nodos, para dev/testing. LoadBalancer: exponer al internet con IP/DNS externo, para APIs públicas.</div>
+      <div class="quiz-feedback fail" id="msm6q11-fail">✗ ClusterIP: 10.96.x.x (internal). NodePort: NodeIP:3xxxx (external, dev). LoadBalancer: cloud-assigned-IP:443 (public). En prod: ClusterIP entre servicios + Ingress Controller para exponer APIs al exterior.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Cuál es el rol de Grafana Alertmanager en una estrategia de observabilidad?</div>
+      <div class="quiz-options" id="msm6q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q12',false)"><div class="quiz-letter">A</div> Gestiona los permisos de acceso a los dashboards de Grafana</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q12',true)"><div class="quiz-letter">B</div> Envía alertas cuando las métricas superan umbrales definidos: error rate > 1%, latencia p99 > 500ms. Integra con Slack, PagerDuty, email y gestiona silenciamiento y agrupación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q12',false)"><div class="quiz-letter">C</div> Reinicia automáticamente los servicios cuando hay un error</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q12',false)"><div class="quiz-letter">D</div> Almacena los logs de auditoría de quién modificó los dashboards</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q12-ok">✓ Alertmanager: recibe alerts de Prometheus → agrupa (para no enviar 100 alerts del mismo problema) → silencia (durante mantenimiento) → enruta (critical→PagerDuty, warning→Slack).</div>
+      <div class="quiz-feedback fail" id="msm6q12-fail">✗ Alert pipeline: Prometheus evalúa PromQL rules → si condición true por X tiempo → fire alert to Alertmanager → Alertmanager route/group/silence → notify Slack/PagerDuty/email. Sin Alertmanager: alert storm.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué es el "sampling" en Distributed Tracing y cuándo usar head-based vs tail-based sampling?</div>
+      <div class="quiz-options" id="msm6q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q13',false)"><div class="quiz-letter">A</div> El número de spans que puede tener un trace</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q13',true)"><div class="quiz-letter">B</div> Decidir qué porcentaje de traces guardar. Head-based: decisión al inicio (rápido, sin ver el resultado). Tail-based: decisión al final cuando se sabe si hubo error (conserva casos interesantes)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q13',false)"><div class="quiz-letter">C</div> La compresión de datos de tracing para ahorrar almacenamiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q13',false)"><div class="quiz-letter">D</div> El proceso de validar que los spans de un trace son consistentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q13-ok">✓ Head-based 10%: descarta 90% desde el inicio, eficiente pero puede perder el 10% que tenía errores. Tail-based: guarda todos temporalmente, al final guarda el trace si tuvo error o latencia alta. Más inteligente, más costoso.</div>
+      <div class="quiz-feedback fail" id="msm6q13-fail">✗ Sampling: 1000 req/s con tracing completo = gigabytes. Head-based 1%: 10 req/s instrumentadas (aleatorio). Tail-based: retiene temporalmente todos, decide al final según outcome (errores, SLO violations). OTEL Collector soporta tail sampling.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Qué ventaja tiene Grafana Loki sobre ELK Stack para logging?</div>
+      <div class="quiz-options" id="msm6q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q14',false)"><div class="quiz-letter">A</div> Loki soporta más formatos de log que Elasticsearch</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q14',true)"><div class="quiz-letter">B</div> Loki solo indexa los labels (metadata), no el contenido del log. Es mucho más económico en almacenamiento y recursos pero requiere conocer los labels de antemano para filtrar eficientemente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q14',false)"><div class="quiz-letter">C</div> Loki incluye Grafana integrado; ELK necesita Kibana por separado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q14',false)"><div class="quiz-letter">D</div> Loki tiene soporte nativo para machine learning en logs</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q14-ok">✓ Elasticsearch indexa todo el contenido → caro en memoria/disco pero búsqueda full-text potente. Loki indexa solo labels (app, namespace, pod) → más barato, búsqueda en texto = filtrar chunks comprimidos.</div>
+      <div class="quiz-feedback fail" id="msm6q14-fail">✗ Loki: index labels only, compress log content. Bajo costo, ideal si conoces tus labels de búsqueda. ELK: indexa todo el texto, full-text search potente pero caro. Loki + Grafana = observability stack simplificado (Grafana stack: Loki+Tempo+Prometheus).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Qué es el rolling update en Kubernetes y cómo garantiza zero downtime?</div>
+      <div class="quiz-options" id="msm6q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q15',false)"><div class="quiz-letter">A</div> Actualiza todos los pods simultáneamente para reducir el tiempo total</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q15',true)"><div class="quiz-letter">B</div> Actualiza los pods gradualmente: crea nuevos pods con la nueva versión y termina los viejos progresivamente, manteniendo siempre un número mínimo de pods disponibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q15',false)"><div class="quiz-letter">C</div> Actualiza pods durante las noches para no afectar el tráfico</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q15',false)"><div class="quiz-letter">D</div> Reinicia los pods en orden alphabético por nombre</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q15-ok">✓ maxUnavailable=1: nunca más de 1 pod fuera de servicio. maxSurge=1: puede haber 1 pod extra durante el update. K8s espera que el nuevo pod pase readiness antes de terminar el viejo. Zero downtime.</div>
+      <div class="quiz-feedback fail" id="msm6q15-fail">✗ Rolling update: crear 1 pod nueva versión → esperar readiness → terminar 1 pod versión antigua → repetir. maxUnavailable y maxSurge controlan la velocidad y disponibilidad durante el proceso.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Cómo crea Micrometer métricas de negocio custom en Spring Boot?</div>
+      <div class="quiz-options" id="msm6q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q16',false)"><div class="quiz-letter">A</div> Mediante configuración en application.yml sin código Java adicional</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q16',true)"><div class="quiz-letter">B</div> Inyectando MeterRegistry y usando Counter.builder(), Gauge.builder(), Timer.builder() para crear métricas con nombre, tags y descripción que se exponen en /actuator/prometheus</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q16',false)"><div class="quiz-letter">C</div> Añadiendo @Metric a los métodos de los controllers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q16',false)"><div class="quiz-letter">D</div> Mediante la clase MetricsConfig que se auto-configura con Spring Boot</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q16-ok">✓ Counter: valores que solo incrementan (órdenes creadas). Gauge: valores que sube/baja (items en cola). Timer: duración de operaciones con percentiles. DistributionSummary: distribución de tamaños. Todos con tags para dimensionar.</div>
+      <div class="quiz-feedback fail" id="msm6q16-fail">✗ MeterRegistry.counter("orders.created").tag("status","success").increment(). Timer.record(() → operation). Las métricas aparecen en /actuator/prometheus y Prometheus las scrapea. Tags = dimensiones para filtrar en Grafana.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué es el initialDelaySeconds en las probes de Kubernetes y por qué es importante?</div>
+      <div class="quiz-options" id="msm6q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q17',false)"><div class="quiz-letter">A</div> El tiempo máximo que puede tardar el pod en responder a la probe</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q17',true)"><div class="quiz-letter">B</div> El tiempo que Kubernetes espera antes de empezar a hacer health checks. Necesario para que la aplicación tenga tiempo de inicializarse antes de ser considerada "failed"</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q17',false)"><div class="quiz-letter">C</div> El intervalo entre checks de salud periódicos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q17',false)"><div class="quiz-letter">D</div> El número de fallos consecutivos antes de considerar el pod como no saludable</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q17-ok">✓ Spring Boot puede tardar 30-60s en iniciar (conectar DB, cargar contexto). Sin initialDelaySeconds suficiente, Kubernetes verá que el endpoint no responde y reiniciará el pod antes de que pueda arrancar.</div>
+      <div class="quiz-feedback fail" id="msm6q01-fail">✗ initialDelaySeconds: wait before first probe. Sin esto: K8s hace probe al segundo 1, la app tarda 30s en arrancar → probe falla → pod reiniciado → crashloop. Mejor alternativa: Startup Probe (K8s 1.18+) para bootstrapping largo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué problema resuelve la Startup Probe en Kubernetes comparada con initialDelaySeconds?</div>
+      <div class="quiz-options" id="msm6q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q18',false)"><div class="quiz-letter">A</div> La Startup Probe reemplaza a la Liveness Probe una vez que la app arranca</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q18',true)"><div class="quiz-letter">B</div> Permite un tiempo de arranque largo sin afectar la sensibilidad de la Liveness Probe una vez iniciada. Evita el tradeoff entre "tiempo de arranque" y "tiempo de detección de deadlock"</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q18',false)"><div class="quiz-letter">C</div> Es más eficiente porque solo hace una check en total</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q18',false)"><div class="quiz-letter">D</div> Solo funciona para aplicaciones que usan JVM</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q18-ok">✓ Sin Startup Probe: initialDelaySeconds=60 (boot largo) → si la app entra en deadlock a los 65s, Kubernetes tarda otros 60s en detectarlo. Startup Probe: large timeout solo durante boot → Liveness con timeout normal una vez listo.</div>
+      <div class="quiz-feedback fail" id="msm6q18-fail">✗ initialDelaySeconds=120 (para app lenta): Liveness no detecta deadlocks durante 120s. Startup Probe: failureThreshold*periodSeconds=120s de gracia. Una vez pasa → Liveness arranca con threshold de 10s. Mejor de ambos mundos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Prometheus scraping y push-based metrics collection?</div>
+      <div class="quiz-options" id="msm6q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q19',false)"><div class="quiz-letter">A</div> Prometheus solo puede scrapear servicios en el mismo cluster</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q19',true)"><div class="quiz-letter">B</div> Pull (scraping): Prometheus llama a /actuator/prometheus de cada servicio. Push: los servicios envían métricas activamente a un agregador (Graphite, InfluxDB, StatsD)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q19',false)"><div class="quiz-letter">C</div> Push es más preciso; Prometheus scraping introduce lag de 15 segundos mínimo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q19',false)"><div class="quiz-letter">D</div> Prometheus no puede hacer scraping de aplicaciones Spring Boot</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q19-ok">✓ Pull: Prometheus controla el ritmo, autodescubrimiento de servicios, el servicio no necesita saber dónde está Prometheus. Push: servicio decide cuándo enviar, útil para short-lived jobs (PushGateway). Pull es más simple en microservicios.</div>
+      <div class="quiz-feedback fail" id="msm6q19-fail">✗ Pull: Prometheus descubre targets (via Kubernetes SD) y los scrapea cada 15s. Ventaja: Prometheus controla, servicios no necesitan configuración de destino. Push: servicio envía → útil para batch jobs o lambdas. Prometheus PushGateway como puente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Cuáles son las tres señales que forman el "Observability Pillars" y cómo se complementan?</div>
+      <div class="quiz-options" id="msm6q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q20',false)"><div class="quiz-letter">A</div> CPU, Memoria y Red — métricas de infraestructura para todo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm6q20',true)"><div class="quiz-letter">B</div> Metrics (¿qué está fallando?), Traces (¿dónde está fallando en el flujo distribuido?) y Logs (¿por qué está fallando con contexto detallado?)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q20',false)"><div class="quiz-letter">C</div> Uptime, Error Rate y Deployment Frequency</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm6q20',false)"><div class="quiz-letter">D</div> Alertas, Dashboards y Runbooks</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm6q20-ok">✓ Metrics: "el error rate del checkout subió al 5%". Traces: "el error está en el paso payment-service → bank-api". Logs: "bank-api retorna 'Card declined: insufficient funds' para userId=123". Los tres juntos = RCA completo.</div>
+      <div class="quiz-feedback fail" id="msm6q20-fail">✗ Metrics alertan sobre el problema (síntoma). Traces localizan dónde en el sistema distribuido (diagnóstico). Logs explican el detalle del error (causa). OpenTelemetry + Grafana Stack: Prometheus + Tempo + Loki = tres pilares integrados.</div>
+    </div>
+  </div>
+
+</ng-container>

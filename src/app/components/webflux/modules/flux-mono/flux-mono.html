@@ -1,0 +1,560 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===7">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">08</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">Creación de Mono</h2>
+      <p class="lesson-sub">Todas las formas de instanciar un Mono, desde valores estáticos hasta fuentes asíncronas y lazy.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Mono.just / empty / error</div>
+        <div class="tc-body"><code>just(T)</code> — eager, evalúa inmediatamente. <code>empty()</code> — completa sin emitir. <code>error(Throwable)</code> — señal onError inmediata.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Mono.fromCallable</div>
+        <div class="tc-body">Wrappea una llamada bloqueante. Se evalúa en la suscripción. Úsalo con <code>subscribeOn(Schedulers.boundedElastic())</code> para no bloquear el event loop.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hourglass" aria-hidden="true"></i></div>
+        <div class="tc-title">Mono.fromFuture</div>
+        <div class="tc-body">Convierte un <code>CompletableFuture</code> en Mono reactivo. El Future ya debe estar en ejecución. Soporta cancelación mediante la propagación de cancel().</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hourglass" aria-hidden="true"></i></div>
+        <div class="tc-title">Mono.defer</div>
+        <div class="tc-body">Lazy — el supplier se ejecuta en cada suscripción. Captura el estado actual del entorno (timestamp, variables locales). Imprescindible para retry correcto.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-type">Mono</span>.just(<span class="a-str">"eager"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// valor capturado YA</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.fromCallable(() -&gt; db.findById(<span class="a-num">1</span>))&nbsp;<span class="a-cm">// lazy, blocking OK</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.fromSupplier(this::calcular)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// lazy, no checked ex</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.fromFuture(asyncService.call())&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// CompletableFuture</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.defer(() -&gt; <span class="a-type">Mono</span>.just(ahora()))&nbsp;&nbsp;&nbsp;<span class="a-cm">// tiempo capturado tarde</span></div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// subscribe con consumer / error / complete</span></div>
+      <div class="anatomy-line">mono.subscribe(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;val -&gt; process(val),</div>
+      <div class="anatomy-line">&nbsp;&nbsp;err -&gt; handle(err),</div>
+      <div class="anatomy-line">&nbsp;&nbsp;() -&gt; complete()</div>
+      <div class="anatomy-line">);</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===8">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">09</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">Creación de Flux</h2>
+      <p class="lesson-sub">Fábricas estáticas y fuentes programáticas para crear streams de múltiples elementos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">Flux estáticos</div>
+        <div class="tc-body"><code>just(a,b,c)</code>, <code>range(1,10)</code>, <code>fromIterable(list)</code>, <code>fromArray(arr)</code>, <code>fromStream(stream)</code>. Todos cold, evalúan en suscripción.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">Flux.interval</div>
+        <div class="tc-body">Emite Long crecientes a intervalos fijos. Hot, emite en <code>Schedulers.parallel()</code>. Requiere backpressure — el consumer debe ser tan rápido como el interval.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">Flux.generate</div>
+        <div class="tc-body">Programático síncrono. El BiFunction recibe estado + SynchronousSink. Solo se puede llamar <code>next()</code> UNA VEZ por iteración. Ideal para generadores con estado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Flux.create</div>
+        <div class="tc-body">Programático asíncrono. Recibe FluxSink que puede llamarse desde múltiples threads. Permite bridge desde APIs callback/event-listener. Especifica estrategia overflow.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// generate: estado incrementa</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.generate(() -&gt; <span class="a-num">0</span>, (estado, sink) -&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;sink.next(estado);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">if</span> (estado &gt;= <span class="a-num">9</span>) sink.complete();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> estado + <span class="a-num">1</span>;</div>
+      <div class="anatomy-line">{{ '}' }})</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// create: bridge con listener</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.create(sink -&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;eventBus.on(<span class="a-str">"data"</span>, evt -&gt; sink.next(evt));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;eventBus.on(<span class="a-str">"done"</span>, () -&gt; sink.complete());</div>
+      <div class="anatomy-line">{{ '}' }}, <span class="a-type">OverflowStrategy</span>.BUFFER)</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===9">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">10</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">map, flatMap, concatMap, switchMap</h2>
+      <p class="lesson-sub">Los operadores de transformación más importantes — cada uno con diferente semántica de concurrencia y orden.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">map</div>
+        <div class="tc-body">Transformación síncrona 1:1. Cada elemento entra, un elemento sale. No puede retornar un Publisher. Siempre preserva el orden.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-leaf" aria-hidden="true"></i></div>
+        <div class="tc-title">flatMap</div>
+        <div class="tc-body">Async, concurrente. Cada elemento → Publisher interno. Suscribe a todos concurrentemente. Los resultados se intercalan según lleguen (sin orden garantizado).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">concatMap</div>
+        <div class="tc-body">Async, secuencial. Suscribe al siguiente inner publisher SOLO cuando el anterior completa. Orden garantizado. Menor throughput que flatMap pero predecible.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">flatMapSequential</div>
+        <div class="tc-body">Como flatMap (concurrente) pero los resultados se emiten en el orden original. Internamente usa un buffer. Combina el throughput de flatMap con el orden de concatMap.</div>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label">flatMap (sin orden)</div>
+        <div class="compare-code">Entrada: [1, 2, 3]
+Llama API concurrente
+Salida posible: [2, 1, 3]
+Máximo throughput</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">concatMap (con orden)</div>
+        <div class="compare-code">Entrada: [1, 2, 3]
+Llama API secuencial
+Salida garantizada: [1, 2, 3]
+Menor throughput</div>
+      </div>
+    </div>
+    <div class="info-box">Regla práctica: usa <code>flatMap</code> cuando el orden no importa (más rápido); usa <code>concatMap</code> cuando necesitas preservar el orden de la fuente.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===10">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">11</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">filter, take &amp; skip</h2>
+      <p class="lesson-sub">Operadores de filtrado y selección para controlar qué elementos pasan por el pipeline.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">filter / distinct</div>
+        <div class="tc-body"><code>filter(pred)</code> — pasa elementos que cumplen predicado. <code>distinct()</code> — elimina duplicados (usa hashCode/equals). <code>distinctUntilChanged()</code> — elimina repetidos consecutivos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-scissors" aria-hidden="true"></i></div>
+        <div class="tc-title">take</div>
+        <div class="tc-body"><code>take(n)</code> — primeros N elementos luego cancela upstream. <code>takeLast(n)</code> — últimos N (requiere buffer). <code>takeUntil(pred)</code> — hasta que se cumple el predicado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-play" aria-hidden="true"></i></div>
+        <div class="tc-title">skip</div>
+        <div class="tc-body"><code>skip(n)</code> — omite los primeros N. <code>skipLast(n)</code> — omite los últimos N. <code>skipUntil(pred)</code> — omite hasta que el predicado es true.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">elementAt / first / last</div>
+        <div class="tc-body"><code>elementAt(i)</code> — Mono con el elemento en la posición i. <code>next()</code> — primer elemento como Mono. <code>last()</code> — último elemento como Mono.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-type">Flux</span>.range(<span class="a-num">1</span>, <span class="a-num">20</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.filter(n -&gt; n % <span class="a-num">2</span> == <span class="a-num">0</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// solo pares: 2,4,6...</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.skip(<span class="a-num">2</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// omite 2,4 → 6,8...</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.take(<span class="a-num">3</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// toma solo 6,8,10</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subscribe(System.out::println);</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===11">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">12</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">zip, merge &amp; concat</h2>
+      <p class="lesson-sub">Combinación de múltiples publishers para orquestar operaciones paralelas o secuenciales.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">zip</div>
+        <div class="tc-body">Combina pares de elementos sincronizados. Espera un elemento de CADA fuente, los empaqueta en Tuple. Se detiene cuando la fuente más corta completa.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">merge</div>
+        <div class="tc-body">Suscribe a todos los publishers concurrentemente. Los elementos se intercalan según llegan. El stream completa cuando todos completan. Usa mergeWith() para 2.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-book" aria-hidden="true"></i></div>
+        <div class="tc-title">concat</div>
+        <div class="tc-body">Secuencial — suscribe al segundo solo cuando el primero completa. Orden garantizado. Usa concatWith() para 2 publishers. Similar a flatMap con concurrency=1.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">combineLatest</div>
+        <div class="tc-body">Emite cada vez que cualquier fuente emite, combinando con el último valor de las demás. Requiere que todas hayan emitido al menos una vez. Útil para formularios reactivos.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// zip: peticiones paralelas combinadas</span></div>
+      <div class="anatomy-line"><span class="a-type">Mono</span>.zip(userService.find(id), orderService.find(id))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.map(t -&gt; <span class="a-kw">new</span> <span class="a-type">UserOrderDTO</span>(t.getT1(), t.getT2()))</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// merge: varios streams en uno</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.merge(emailFlux, pushFlux, smsFlux)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subscribe(notif -&gt; send(notif));</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// concat: página 1, luego página 2</span></div>
+      <div class="anatomy-line"><span class="a-type">Flux</span>.concat(getPage(<span class="a-num">1</span>), getPage(<span class="a-num">2</span>), getPage(<span class="a-num">3</span>))</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===12">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">13</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">Manejo de Errores</h2>
+      <p class="lesson-sub">Estrategias para capturar, transformar y recuperarse de errores en pipelines reactivos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">onErrorReturn</div>
+        <div class="tc-body">Fallback a un valor estático cuando ocurre error. El stream completa normalmente con ese valor. No re-suscribe a la fuente. Simple pero limitado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shuffle" aria-hidden="true"></i></div>
+        <div class="tc-title">onErrorResume</div>
+        <div class="tc-body">Fallback a otro Publisher. Permite lógica compleja de recuperación (llamar API alternativa, retornar caché). El tipo de retorno debe ser compatible.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">retry / retryWhen</div>
+        <div class="tc-body"><code>retry(n)</code> — re-suscribe N veces. <code>retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))</code> — retry con exponential backoff. Esencial para llamadas a servicios externos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">timeout</div>
+        <div class="tc-body">Emite TimeoutException si no hay elementos en la duración especificada. Combina con onErrorResume para fallback en caso de timeout.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line">callExternalApi(id)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.timeout(<span class="a-type">Duration</span>.ofSeconds(<span class="a-num">3</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.retryWhen(<span class="a-type">Retry</span>.backoff(<span class="a-num">3</span>, <span class="a-type">Duration</span>.ofMillis(<span class="a-num">500</span>)))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.onErrorResume(<span class="a-type">TimeoutException</span>.class,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;ex -&gt; getCachedFallback(id))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.onErrorMap(<span class="a-type">WebClientException</span>.class,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;ex -&gt; <span class="a-kw">new</span> <span class="a-type">ServiceUnavailableException</span>(ex))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.doOnError(e -&gt; metrics.increment(<span class="a-str">"errors"</span>));</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===13">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">14</span><span class="lesson-mod">Módulo 2 · Flux &amp; Mono</span></div>
+      <h2 class="lesson-title">Testing con StepVerifier</h2>
+      <p class="lesson-sub">La herramienta estándar de Reactor para probar pipelines reactivos de forma síncrona y determinista.</p>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Verificar secuencia normal</span></div>
+      <div class="anatomy-line"><span class="a-type">StepVerifier</span>.create(<span class="a-type">Flux</span>.range(<span class="a-num">1</span>,<span class="a-num">3</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expectNext(<span class="a-num">1</span>, <span class="a-num">2</span>, <span class="a-num">3</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.verifyComplete();</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Verificar error</span></div>
+      <div class="anatomy-line"><span class="a-type">StepVerifier</span>.create(<span class="a-type">Mono</span>.error(<span class="a-kw">new</span> <span class="a-type">RuntimeException</span>()))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expectErrorMatches(e -&gt; e <span class="a-kw">instanceof</span> <span class="a-type">RuntimeException</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.verify();</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// withVirtualTime: simular tiempo</span></div>
+      <div class="anatomy-line"><span class="a-type">StepVerifier</span>.withVirtualTime(() -&gt; <span class="a-type">Flux</span>.interval(<span class="a-type">Duration</span>.ofHours(<span class="a-num">1</span>)).take(<span class="a-num">3</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.thenAwait(<span class="a-type">Duration</span>.ofHours(<span class="a-num">3</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expectNextCount(<span class="a-num">3</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.verifyComplete();</div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Métodos de expectativa</div>
+        <div class="tc-body"><code>expectNext(T...)</code>, <code>expectNextMatches(pred)</code>, <code>expectNextCount(n)</code>, <code>expectError(Class)</code>, <code>expectErrorMessage(msg)</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">withVirtualTime</div>
+        <div class="tc-body">Simula tiempo sin esperar. El supplier debe crear el Publisher DENTRO de withVirtualTime. Luego usa thenAwait() para avanzar el reloj virtual.</div>
+      </div>
+    </div>
+    <div class="warn-box">Importante: siempre termina con <code>verifyComplete()</code>, <code>verify()</code>, o <code>verifyError()</code> — sin esta llamada, las expectativas no se verifican.</div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 2</div>
+
+    <div class="quiz-box" id="wf2q01">
+      <div class="quiz-label">wf2q01</div>
+      <div class="quiz-q">¿En qué thread emite por defecto <code>Flux.interval(Duration.ofSeconds(1))</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q01',false)"><span class="quiz-letter">A</span> Schedulers.single()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q01',true)"><span class="quiz-letter">B</span> Schedulers.parallel()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q01',false)"><span class="quiz-letter">C</span> Schedulers.boundedElastic()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q01',false)"><span class="quiz-letter">D</span> El thread del caller</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q01-ok">Correcto — Flux.interval usa Schedulers.parallel() por defecto para las emisiones.</div>
+      <div class="quiz-feedback fail" id="wf2q01-fail">Incorrecto — Flux.interval emite en Schedulers.parallel() por defecto.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q02">
+      <div class="quiz-label">wf2q02</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>Mono.fromCallable()</code> y <code>Mono.just()</code> en términos de evaluación?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q02',true)"><span class="quiz-letter">A</span> just() evalúa el valor inmediatamente; fromCallable() evalúa lazy en cada suscripción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q02',false)"><span class="quiz-letter">B</span> Son equivalentes con diferente nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q02',false)"><span class="quiz-letter">C</span> fromCallable() evalúa en background; just() en el thread actual</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q02',false)"><span class="quiz-letter">D</span> just() acepta null; fromCallable() lanza NPE</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q02-ok">Correcto — just() es eager (captura el valor al crear el Mono); fromCallable() es lazy (ejecuta el Callable al suscribir).</div>
+      <div class="quiz-feedback fail" id="wf2q02-fail">Incorrecto — just() es eager (evalúa ahora); fromCallable() es lazy (evalúa al suscribir).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q03">
+      <div class="quiz-label">wf2q03</div>
+      <div class="quiz-q">¿Qué ocurre si uno de los publishers en <code>Flux.zip()</code> es más corto que los demás?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q03',true)"><span class="quiz-letter">A</span> El zip completa cuando el publisher más corto completa</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q03',false)"><span class="quiz-letter">B</span> Los elementos sobrantes del publisher más largo se emiten solos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q03',false)"><span class="quiz-letter">C</span> Espera indefinidamente a que el publisher corto emita más</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q03',false)"><span class="quiz-letter">D</span> Lanza una excepción IndexOutOfBoundsException</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q03-ok">Correcto — zip se detiene con el publisher más corto. Usa zipDelayError o combineLatest si necesitas otro comportamiento.</div>
+      <div class="quiz-feedback fail" id="wf2q03-fail">Incorrecto — zip completa cuando el publisher más corto completa, descartando el resto.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q04">
+      <div class="quiz-label">wf2q04</div>
+      <div class="quiz-q">¿Cuál es la restricción de <code>Flux.generate()</code> con SynchronousSink?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q04',true)"><span class="quiz-letter">A</span> Solo se puede llamar next() UNA vez por invocación del BiFunction</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q04',false)"><span class="quiz-letter">B</span> No puede tener estado entre invocaciones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q04',false)"><span class="quiz-letter">C</span> Solo acepta tipos Integer o String</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q04',false)"><span class="quiz-letter">D</span> No puede llamar complete() desde el BiFunction</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q04-ok">Correcto — SynchronousSink solo permite un next() por ciclo. Para múltiples elementos por ciclo usa Flux.create() con FluxSink.</div>
+      <div class="quiz-feedback fail" id="wf2q04-fail">Incorrecto — la restricción de generate es que SynchronousSink solo puede llamarse next() una vez por invocación.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q05">
+      <div class="quiz-label">wf2q05</div>
+      <div class="quiz-q">¿Qué hace <code>retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q05',false)"><span class="quiz-letter">A</span> Reintenta exactamente 3 veces sin espera</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q05',true)"><span class="quiz-letter">B</span> Reintenta hasta 3 veces con espera exponencial empezando en 1 segundo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q05',false)"><span class="quiz-letter">C</span> Reintenta cada segundo durante 3 segundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q05',false)"><span class="quiz-letter">D</span> Espera 3 segundos antes del primer reintento</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q05-ok">Correcto — backoff(3, 1s) reintenta máximo 3 veces con backoff exponencial: 1s, 2s, 4s (aprox), con jitter.</div>
+      <div class="quiz-feedback fail" id="wf2q05-fail">Incorrecto — Retry.backoff hace hasta N reintentos con delay exponencial, no lineal.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q06">
+      <div class="quiz-label">wf2q06</div>
+      <div class="quiz-q">¿Cuándo usar <code>StepVerifier.withVirtualTime()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q06',false)"><span class="quiz-letter">A</span> Para tests que deben ejecutarse en múltiples threads</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q06',true)"><span class="quiz-letter">B</span> Para testear publishers con delays o intervalos sin esperar el tiempo real</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q06',false)"><span class="quiz-letter">C</span> Para verificar que el publisher emite en menos de N milisegundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q06',false)"><span class="quiz-letter">D</span> Cuando el Publisher puede emitir elementos null</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q06-ok">Correcto — withVirtualTime avanza el reloj virtual con thenAwait(), evitando esperar tiempo real en tests.</div>
+      <div class="quiz-feedback fail" id="wf2q06-fail">Incorrecto — withVirtualTime permite simular el paso del tiempo en tests sin esperar el tiempo real.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q07">
+      <div class="quiz-label">wf2q07</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>doOnError</code> y <code>onErrorResume</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q07',true)"><span class="quiz-letter">A</span> doOnError es un side-effect (el error sigue propagándose); onErrorResume recupera con un fallback Publisher</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q07',false)"><span class="quiz-letter">B</span> Son equivalentes pero doOnError acepta lambdas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q07',false)"><span class="quiz-letter">C</span> onErrorResume solo funciona con checked exceptions</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q07',false)"><span class="quiz-letter">D</span> doOnError cancela la suscripción; onErrorResume la mantiene</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q07-ok">Correcto — doOnError ejecuta un side-effect (log, métricas) pero el error continúa propagándose. onErrorResume termina el error y provee un publisher alternativo.</div>
+      <div class="quiz-feedback fail" id="wf2q07-fail">Incorrecto — doOnError es solo side-effect (el error continúa); onErrorResume intercepta y provee alternativa.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q08">
+      <div class="quiz-label">wf2q08</div>
+      <div class="quiz-q">¿Qué hace <code>Flux.defer()</code> respecto a la evaluación?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q08',false)"><span class="quiz-letter">A</span> Retrasa la primera emisión N milisegundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q08',true)"><span class="quiz-letter">B</span> El supplier se ejecuta en cada suscripción, creando un nuevo Flux lazy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q08',false)"><span class="quiz-letter">C</span> Comparte un Flux entre múltiples suscriptores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q08',false)"><span class="quiz-letter">D</span> Cachea el primer valor para suscriptores posteriores</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q08-ok">Correcto — defer() crea el Flux lazy: el supplier se llama en cada subscribe(), capturando el estado actual del entorno.</div>
+      <div class="quiz-feedback fail" id="wf2q08-fail">Incorrecto — defer() crea el publisher lazy ejecutando el supplier en cada suscripción.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q09">
+      <div class="quiz-label">wf2q09</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>reduce</code> y <code>scan</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q09',true)"><span class="quiz-letter">A</span> reduce emite un Mono con el resultado final; scan emite cada resultado intermedio como Flux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q09',false)"><span class="quiz-letter">B</span> Son equivalentes; scan tiene mejor rendimiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q09',false)"><span class="quiz-letter">C</span> scan solo funciona con tipos numéricos; reduce con cualquier tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q09',false)"><span class="quiz-letter">D</span> reduce usa BiFunction; scan usa Function</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q09-ok">Correcto — reduce espera a la compleción y emite el acumulado final; scan emite el acumulado después de cada elemento.</div>
+      <div class="quiz-feedback fail" id="wf2q09-fail">Incorrecto — reduce → Mono (resultado final); scan → Flux (cada resultado parcial).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q10">
+      <div class="quiz-label">wf2q10</div>
+      <div class="quiz-q">¿Cuántas veces se llama <code>next()</code> como mínimo en <code>StepVerifier</code> sin una declaración de expectativa?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q10',false)"><span class="quiz-letter">A</span> 0 — las expectativas son opcionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q10',false)"><span class="quiz-letter">B</span> Una vez — para iniciar la verificación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q10',false)"><span class="quiz-letter">C</span> Igual al número de elementos emitidos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q10',true)"><span class="quiz-letter">D</span> Sin verify() final, ninguna expectativa se verifica — el test pasaría aunque el Publisher falle</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q10-ok">Correcto — sin la llamada terminal (verifyComplete/verifyError/verify), el StepVerifier NO ejecuta nada. Es el error más común.</div>
+      <div class="quiz-feedback fail" id="wf2q10-fail">Incorrecto — sin verify() al final, el StepVerifier no ejecuta la verificación y el test pasa sin comprobar nada.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q11">
+      <div class="quiz-label">wf2q11</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>buffer(n)</code> y <code>window(n)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q11',true)"><span class="quiz-letter">A</span> buffer emite List&lt;T&gt;; window emite Flux&lt;T&gt; (publisher anidado)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q11',false)"><span class="quiz-letter">B</span> Son sinónimos con diferente nombre de método</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q11',false)"><span class="quiz-letter">C</span> window aplica backpressure; buffer no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q11',false)"><span class="quiz-letter">D</span> buffer agrupa por tiempo; window por número de elementos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q11-ok">Correcto — buffer acumula elementos en una lista; window crea sub-Flux para cada ventana. window permite procesar elementos a medida que llegan.</div>
+      <div class="quiz-feedback fail" id="wf2q11-fail">Incorrecto — buffer() → Flux&lt;List&lt;T&gt;&gt;; window() → Flux&lt;Flux&lt;T&gt;&gt; (puede procesar mientras se llena).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q12">
+      <div class="quiz-label">wf2q12</div>
+      <div class="quiz-q">¿Qué contrato debe cumplir el tipo T para que <code>distinct()</code> funcione correctamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q12',false)"><span class="quiz-letter">A</span> Debe implementar Comparable&lt;T&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q12',true)"><span class="quiz-letter">B</span> Debe implementar correctamente equals() y hashCode()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q12',false)"><span class="quiz-letter">C</span> Debe ser Serializable</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q12',false)"><span class="quiz-letter">D</span> Debe ser un tipo primitivo o String</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q12-ok">Correcto — distinct() usa un HashSet internamente, por lo que T debe tener hashCode/equals correctos para funcionar bien.</div>
+      <div class="quiz-feedback fail" id="wf2q12-fail">Incorrecto — distinct() requiere equals() y hashCode() correctamente implementados.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q13">
+      <div class="quiz-label">wf2q13</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>takeUntil(pred)</code> y <code>takeWhile(pred)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q13',true)"><span class="quiz-letter">A</span> takeUntil incluye el elemento que satisface el predicado; takeWhile lo excluye</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q13',false)"><span class="quiz-letter">B</span> Son equivalentes con condición invertida</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q13',false)"><span class="quiz-letter">C</span> takeWhile incluye el elemento que falla el predicado; takeUntil lo excluye</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q13',false)"><span class="quiz-letter">D</span> takeUntil espera N segundos; takeWhile espera N elementos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q13-ok">Correcto — takeUntil toma hasta que el predicado es true (incluyendo ese elemento); takeWhile toma mientras el predicado es true (excluyendo el primero que falla).</div>
+      <div class="quiz-feedback fail" id="wf2q13-fail">Incorrecto — takeUntil para después del elemento que cumple el predicado (lo incluye); takeWhile para antes (lo excluye).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q14">
+      <div class="quiz-label">wf2q14</div>
+      <div class="quiz-q">¿Puede <code>Flux.create()</code> ser llamado desde múltiples threads simultáneamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q14',true)"><span class="quiz-letter">A</span> Sí — FluxSink es thread-safe por diseño</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q14',false)"><span class="quiz-letter">B</span> No — lanzaría ConcurrentModificationException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q14',false)"><span class="quiz-letter">C</span> Solo si se usa OverflowStrategy.ERROR</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q14',false)"><span class="quiz-letter">D</span> No — generate() es el apropiado para múltiples threads</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q14-ok">Correcto — FluxSink (create) es thread-safe. SynchronousSink (generate) NO lo es. Por eso create es mejor para bridge con APIs multi-thread.</div>
+      <div class="quiz-feedback fail" id="wf2q14-fail">Incorrecto — FluxSink es thread-safe por diseño, lo que permite llamar next() desde múltiples threads.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q15">
+      <div class="quiz-label">wf2q15</div>
+      <div class="quiz-q">¿Qué hace <code>doFinally(signal -&gt; cleanup())</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q15',false)"><span class="quiz-letter">A</span> Solo se ejecuta si el stream completa normalmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q15',true)"><span class="quiz-letter">B</span> Se ejecuta siempre al terminar: por compleción, error o cancelación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q15',false)"><span class="quiz-letter">C</span> Solo se ejecuta si hay error o cancelación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q15',false)"><span class="quiz-letter">D</span> Es equivalente a doOnComplete() + doOnError()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q15-ok">Correcto — doFinally cubre todos los casos de terminación (complete, error, cancel). Ideal para liberar recursos.</div>
+      <div class="quiz-feedback fail" id="wf2q15-fail">Incorrecto — doFinally se ejecuta en cualquier terminación: complete, error o cancel. Recibe el SignalType como parámetro.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q16">
+      <div class="quiz-label">wf2q16</div>
+      <div class="quiz-q">¿Qué ocurre con <code>flatMap</code> cuando un inner publisher emite un error?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q16',true)"><span class="quiz-letter">A</span> El error se propaga inmediatamente al Flux principal, cancelando otros inner publishers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q16',false)"><span class="quiz-letter">B</span> El inner publisher se reintenta automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q16',false)"><span class="quiz-letter">C</span> El error se ignora y continúa con los demás</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q16',false)"><span class="quiz-letter">D</span> Todos los inner publishers deben completar antes de propagar el error</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q16-ok">Correcto — el primer error en un inner publisher cancela todo el flatMap. Usa flatMapDelayError() si quieres recopilar todos los errores.</div>
+      <div class="quiz-feedback fail" id="wf2q16-fail">Incorrecto — el error de un inner publisher se propaga inmediatamente. Usa flatMapDelayError() para recopilar todos los errores.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q17">
+      <div class="quiz-label">wf2q17</div>
+      <div class="quiz-q">¿Qué hace <code>switchIfEmpty(Mono.just("default"))</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q17',false)"><span class="quiz-letter">A</span> Cambia el tipo del Publisher si está vacío</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q17',true)"><span class="quiz-letter">B</span> Si el Mono/Flux origen es vacío, usa el publisher alternativo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q17',false)"><span class="quiz-letter">C</span> Emite "default" si ocurre un error</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q17',false)"><span class="quiz-letter">D</span> Cancela el publisher si emite más de un elemento</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q17-ok">Correcto — switchIfEmpty provee un publisher alternativo cuando la fuente completa sin emitir elementos (empty).</div>
+      <div class="quiz-feedback fail" id="wf2q17-fail">Incorrecto — switchIfEmpty se activa cuando el publisher fuente completa vacío (sin elementos, no error).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q18">
+      <div class="quiz-label">wf2q18</div>
+      <div class="quiz-q">¿Para qué sirve <code>Flux.create()</code> vs <code>Flux.generate()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q18',true)"><span class="quiz-letter">A</span> create: bridge async multi-thread con FluxSink thread-safe; generate: generación síncrona con estado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q18',false)"><span class="quiz-letter">B</span> Son equivalentes, create tiene mejor rendimiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q18',false)"><span class="quiz-letter">C</span> generate es para async; create es para sync</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q18',false)"><span class="quiz-letter">D</span> create requiere backpressure manual; generate no</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q18-ok">Correcto — create es ideal para bridgear APIs callback/eventos (multi-thread); generate es para generación secuencial con estado.</div>
+      <div class="quiz-feedback fail" id="wf2q18-fail">Incorrecto — create para bridge async/multi-thread; generate para generación síncrona con estado entre iteraciones.</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q19">
+      <div class="quiz-label">wf2q19</div>
+      <div class="quiz-q">¿Cuándo se suscribe el StepVerifier al Publisher en <code>StepVerifier.create(flux)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q19',false)"><span class="quiz-letter">A</span> Inmediatamente al llamar create()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q19',true)"><span class="quiz-letter">B</span> Al llamar el método terminal (verify, verifyComplete, verifyError)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q19',false)"><span class="quiz-letter">C</span> Al llamar el primer expectNext()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q19',false)"><span class="quiz-letter">D</span> En el siguiente ciclo del event loop</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q19-ok">Correcto — StepVerifier es lazy: acumula expectativas y las verifica solo al llamar verify() o variantes.</div>
+      <div class="quiz-feedback fail" id="wf2q19-fail">Incorrecto — StepVerifier se suscribe al publisher solo cuando se llama el método terminal (verify, verifyComplete, etc.).</div>
+    </div>
+
+    <div class="quiz-box" id="wf2q20">
+      <div class="quiz-label">wf2q20</div>
+      <div class="quiz-q">¿Qué hace <code>flatMapSequential</code> a diferencia de <code>flatMap</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q20',false)"><span class="quiz-letter">A</span> Procesa los inner publishers secuencialmente, uno a la vez</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf2q20',true)"><span class="quiz-letter">B</span> Suscribe concurrentemente a todos los inner publishers pero emite los resultados en el orden original</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q20',false)"><span class="quiz-letter">C</span> Limita la concurrencia a un máximo de 2 inner publishers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf2q20',false)"><span class="quiz-letter">D</span> Es un alias de concatMap</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf2q20-ok">Correcto — flatMapSequential tiene la concurrencia de flatMap pero garantiza el orden de emisión del original.</div>
+      <div class="quiz-feedback fail" id="wf2q20-fail">Incorrecto — flatMapSequential es concurrente como flatMap pero emite en orden. Es el punto medio entre flatMap (sin orden) y concatMap (secuencial).</div>
+    </div>
+
+  </div>
+
+</ng-container>

@@ -1,0 +1,290 @@
+<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===40">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">41</span><span class="lesson-mod">Concurrencia</span></div>
+        <h2 class="lesson-title">Threads &amp; Runnable</h2>
+        <p class="lesson-sub">Un <code>Thread</code> es una unidad de ejecución. Para crear uno: extiende <code>Thread</code> o implementa <code>Runnable</code> (preferido). <code>start()</code> lanza el hilo; <code>run()</code> solo ejecuta en el hilo actual.</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Desde Java 8 puedes usar lambdas: <code>new Thread(() -&gt; System.out.println("Hilo")).start();</code></div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:40, file:'ThreadsDemo.java', hint:'Observa el orden de ejecución (no determinista)'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===41">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">42</span><span class="lesson-mod">Concurrencia</span></div>
+        <h2 class="lesson-title">Sincronización</h2>
+        <p class="lesson-sub"><code>synchronized</code> garantiza que solo un hilo accede al bloque a la vez. Evita condiciones de carrera (<em>race conditions</em>). Alternativas modernas: <code>ReentrantLock</code>, <code>AtomicInteger</code>.</p>
+      </div>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> La sincronización excesiva causa <em>deadlock</em>. Prefiere <code>java.util.concurrent.atomic</code> para contadores simples.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:41, file:'SincronizacionDemo.java', hint:'Quita synchronized y compara'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===42">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">43</span><span class="lesson-mod">Concurrencia</span></div>
+        <h2 class="lesson-title">ExecutorService &amp; Thread Pools</h2>
+        <p class="lesson-sub"><code>ExecutorService</code> gestiona un pool de hilos reutilizables. Evita crear/destruir hilos manualmente. <code>submit()</code> retorna un <code>Future</code> con el resultado.</p>
+      </div>
+      <table class="ref-table">
+        <tr><th>Factory</th><th>Descripción</th></tr>
+        <tr><td><code>newFixedThreadPool(n)</code></td><td>Pool de n hilos fijos</td></tr>
+        <tr><td><code>newCachedThreadPool()</code></td><td>Pool dinámico, reutiliza ociosos</td></tr>
+        <tr><td><code>newSingleThreadExecutor()</code></td><td>Un solo hilo secuencial</td></tr>
+        <tr><td><code>newScheduledThreadPool(n)</code></td><td>Tareas programadas / periódicas</td></tr>
+      </table>
+      <ng-container *ngTemplateOutlet="playground; context:{id:42, file:'ExecutorDemo.java', hint:'Añade más tareas al pool'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===43">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">44</span><span class="lesson-mod">Concurrencia</span></div>
+        <h2 class="lesson-title">CompletableFuture (Java 8+)</h2>
+        <p class="lesson-sub">Permite programación asíncrona y no bloqueante con encadenamiento funcional. <code>thenApply</code>, <code>thenCombine</code>, <code>thenCompose</code>, <code>exceptionally</code>.</p>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:43, file:'CompletableDemo.java', hint:'Añade un exceptionally al final'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m8" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 8 — Concurrencia</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 20</div>
+          <div class="quiz-q">¿Cuál es la diferencia entre <code>thread.run()</code> y <code>thread.start()</code>?</div>
+          <div class="quiz-options" id="em8q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><div class="quiz-letter">A</div> No hay diferencia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q01',true)"><div class="quiz-letter">B</div> <code>run()</code> ejecuta en el hilo actual; <code>start()</code> crea un nuevo hilo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><div class="quiz-letter">C</div> <code>start()</code> es solo un alias de <code>run()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q01',false)"><div class="quiz-letter">D</div> <code>run()</code> crea un nuevo hilo del sistema operativo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q01-ok">✓ <code>start()</code> solicita al scheduler que cree un nuevo hilo y llame a <code>run()</code>. Llamar <code>run()</code> directamente es solo una invocación de método normal.</div>
+          <div class="quiz-feedback fail" id="em8q01-fail">✗ Solo <code>start()</code> crea un nuevo hilo. Llamar <code>run()</code> directamente ejecuta el código en el hilo actual sin concurrencia.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 20</div>
+          <div class="quiz-q">¿Qué es una condición de carrera (race condition)?</div>
+          <div class="quiz-options" id="em8q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><div class="quiz-letter">A</div> Un bucle infinito causado por threading</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q02',true)"><div class="quiz-letter">B</div> Múltiples hilos acceden y modifican datos compartidos sin sincronización</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><div class="quiz-letter">C</div> Un hilo que termina antes de lo esperado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q02',false)"><div class="quiz-letter">D</div> Un error de compilación en código concurrente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q02-ok">✓ Race condition ocurre cuando el resultado depende del orden de ejecución de los hilos, provocando comportamiento impredecible.</div>
+          <div class="quiz-feedback fail" id="em8q02-fail">✗ Una condición de carrera surge cuando hilos concurrentes acceden a datos compartidos sin la debida sincronización.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 20</div>
+          <div class="quiz-q">¿Qué garantiza <code>synchronized</code> en un método de instancia?</div>
+          <div class="quiz-options" id="em8q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><div class="quiz-letter">A</div> Que el método se llama de forma asíncrona</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><div class="quiz-letter">B</div> Que el método se ejecuta en un hilo virtual</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q03',true)"><div class="quiz-letter">C</div> Que solo un hilo puede ejecutar el método a la vez por instancia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q03',false)"><div class="quiz-letter">D</div> Que el método es más rápido gracias al JIT</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q03-ok">✓ <code>synchronized</code> adquiere el monitor (lock) del objeto. Otros hilos que intenten entrar esperarán hasta que sea liberado.</div>
+          <div class="quiz-feedback fail" id="em8q03-fail">✗ <code>synchronized</code> garantiza exclusión mutua: solo un hilo ejecuta el bloque o método a la vez sobre la misma instancia.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 20</div>
+          <div class="quiz-q">¿Qué es un deadlock?</div>
+          <div class="quiz-options" id="em8q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><div class="quiz-letter">A</div> Un hilo que nunca libera la CPU</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><div class="quiz-letter">B</div> Un pool de hilos que se agota</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q04',true)"><div class="quiz-letter">C</div> Dos o más hilos bloqueados esperándose mutuamente sin poder avanzar</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q04',false)"><div class="quiz-letter">D</div> Una excepción lanzada desde un hilo secundario</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q04-ok">✓ Deadlock: A espera a B, B espera a A. Nadie avanza. Se previene con orden consistente de adquisición de locks.</div>
+          <div class="quiz-feedback fail" id="em8q04-fail">✗ Un deadlock ocurre cuando hilos se bloquean mutuamente por esperar recursos que el otro sostiene.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 20</div>
+          <div class="quiz-q">¿Qué ventaja tienen las clases <code>Atomic*</code> (como <code>AtomicInteger</code>) sobre <code>synchronized</code> para contadores simples?</div>
+          <div class="quiz-options" id="em8q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><div class="quiz-letter">A</div> Son más legibles en el código</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><div class="quiz-letter">B</div> Soportan tipos <code>float</code> y <code>double</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q05',true)"><div class="quiz-letter">C</div> Son lock-free (operaciones CAS), más eficientes para operaciones simples</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q05',false)"><div class="quiz-letter">D</div> Permiten múltiples hilos en la misma operación simultáneamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q05-ok">✓ Las clases atómicas usan instrucciones CAS (Compare-And-Swap) del hardware, evitando bloqueos. Perfectas para contadores e índices.</div>
+          <div class="quiz-feedback fail" id="em8q05-fail">✗ <code>Atomic*</code> usa operaciones CAS sin bloqueos, lo que reduce la contención y mejora el rendimiento para operaciones simples.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 20</div>
+          <div class="quiz-q">¿Qué retorna <code>ExecutorService.submit(Callable&lt;T&gt;)</code>?</div>
+          <div class="quiz-options" id="em8q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><div class="quiz-letter">A</div> <code>void</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><div class="quiz-letter">B</div> <code>Thread</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q06',true)"><div class="quiz-letter">C</div> <code>Future&lt;T&gt;</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q06',false)"><div class="quiz-letter">D</div> <code>Runnable</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q06-ok">✓ <code>submit(Callable)</code> retorna <code>Future&lt;T&gt;</code> que permite obtener el resultado, cancelar la tarea o detectar excepciones.</div>
+          <div class="quiz-feedback fail" id="em8q06-fail">✗ <code>submit(Callable)</code> devuelve <code>Future&lt;T&gt;</code>. <code>submit(Runnable)</code> devuelve <code>Future&lt;?&gt;</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>Future.get()</code>?</div>
+          <div class="quiz-options" id="em8q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><div class="quiz-letter">A</div> Cancela la tarea asociada</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q07',true)"><div class="quiz-letter">B</div> Bloquea el hilo actual hasta que la tarea complete y retorna el resultado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><div class="quiz-letter">C</div> Retorna <code>null</code> si la tarea no ha terminado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q07',false)"><div class="quiz-letter">D</div> Siempre lanza una excepción</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q07-ok">✓ <code>get()</code> es una operación bloqueante. Para no-bloqueante usa <code>isDone()</code> o <code>get(timeout, unit)</code>.</div>
+          <div class="quiz-feedback fail" id="em8q07-fail">✗ <code>Future.get()</code> bloquea hasta que la tarea completa. Puede relanzar excepciones de la tarea como <code>ExecutionException</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>pool.shutdown()</code>?</div>
+          <div class="quiz-options" id="em8q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><div class="quiz-letter">A</div> Cancela todas las tareas pendientes y en ejecución de inmediato</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><div class="quiz-letter">B</div> Destruye el pool sin esperar</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q08',true)"><div class="quiz-letter">C</div> Rechaza nuevas tareas y espera a que las ya enviadas terminen</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q08',false)"><div class="quiz-letter">D</div> Pausa el pool temporalmente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q08-ok">✓ <code>shutdown()</code> = parada ordenada. Para canclar todo inmediatamente, usa <code>shutdownNow()</code>.</div>
+          <div class="quiz-feedback fail" id="em8q08-fail">✗ <code>shutdown()</code> es un cierre ordenado: no acepta nuevas tareas pero finaliza las pendientes. <code>shutdownNow()</code> es agresivo.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>thread.join()</code>?</div>
+          <div class="quiz-options" id="em8q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><div class="quiz-letter">A</div> Añade el hilo a un pool existente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><div class="quiz-letter">B</div> Detiene permanentemente el hilo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q09',true)"><div class="quiz-letter">C</div> El hilo que llama espera a que <code>thread</code> termine su ejecución</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q09',false)"><div class="quiz-letter">D</div> Reinicia el hilo desde el principio</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q09-ok">✓ <code>join()</code> bloquea el hilo llamante hasta que el hilo objetivo muere. Útil para sincronizar finalización.</div>
+          <div class="quiz-feedback fail" id="em8q09-fail">✗ <code>join()</code> hace que el hilo actual espere la finalización del hilo referenciado.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 20</div>
+          <div class="quiz-q">¿Para qué sirve <code>volatile</code> en una variable compartida entre hilos?</div>
+          <div class="quiz-options" id="em8q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><div class="quiz-letter">A</div> Hace la variable inmutable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><div class="quiz-letter">B</div> La convierte en atómica para operaciones compuestas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q10',true)"><div class="quiz-letter">C</div> Garantiza que todos los hilos leen el valor más reciente desde memoria principal</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q10',false)"><div class="quiz-letter">D</div> Optimiza la lectura con caché de CPU</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q10-ok">✓ <code>volatile</code> impide que la JVM guarde el valor en caché de CPU. Garantiza visibilidad, pero no atomicidad para operaciones como <code>++</code>.</div>
+          <div class="quiz-feedback fail" id="em8q10-fail">✗ <code>volatile</code> garantiza visibilidad entre hilos (no atomicidad). Para operaciones atómicas usa <code>AtomicInteger</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 20</div>
+          <div class="quiz-q">¿Con qué versión de Java se introdujeron los Virtual Threads de forma estable (GA)?</div>
+          <div class="quiz-options" id="em8q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><div class="quiz-letter">A</div> Java 19</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><div class="quiz-letter">B</div> Java 20</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q11',true)"><div class="quiz-letter">C</div> Java 21</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q11',false)"><div class="quiz-letter">D</div> Java 17</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q11-ok">✓ Virtual Threads became GA en Java 21 (JEP 444). Fueron preview en Java 19 y 20.</div>
+          <div class="quiz-feedback fail" id="em8q11-fail">✗ Virtual Threads (JEP 444) se estabilizaron en Java 21. Usa <code>Thread.ofVirtual().start(Runnable)</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>CompletableFuture.thenApply(fn)</code>?</div>
+          <div class="quiz-options" id="em8q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><div class="quiz-letter">A</div> Lanza una excepción de forma manejada</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><div class="quiz-letter">B</div> Combina dos futuros en uno</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q12',true)"><div class="quiz-letter">C</div> Transforma el resultado aplicando <code>fn</code> cuando el futuro completa</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q12',false)"><div class="quiz-letter">D</div> Bloquea el hilo actual hasta completar</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q12-ok">✓ <code>thenApply</code> es como <code>map</code> en Stream: transforma el resultado. Retorna un nuevo <code>CompletableFuture</code>.</div>
+          <div class="quiz-feedback fail" id="em8q12-fail">✗ <code>thenApply(fn)</code> aplica una función al resultado cuando el futuro completa, retornando un nuevo <code>CompletableFuture</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 20</div>
+          <div class="quiz-q">¿Qué fábrica crea un pool de tamaño fijo de hilos de plataforma?</div>
+          <div class="quiz-options" id="em8q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><div class="quiz-letter">A</div> Executors.newCachedThreadPool()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q13',true)"><div class="quiz-letter">B</div> Executors.newFixedThreadPool(n)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><div class="quiz-letter">C</div> Executors.newVirtualThreadPerTaskExecutor()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q13',false)"><div class="quiz-letter">D</div> Executors.newSingleRunPool()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q13-ok">✓ <code>newFixedThreadPool(n)</code> crea exactamente <code>n</code> hilos. Las tareas extra esperan en la cola.</div>
+          <div class="quiz-feedback fail" id="em8q13-fail">✗ <code>newFixedThreadPool(n)</code> = n hilos fijos. <code>newCachedThreadPool</code> = crece y decrece. <code>newVirtualThreadPerTaskExecutor</code> = un virtual thread por tarea.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 20</div>
+          <div class="quiz-q">¿Qué excepciones puede lanzar <code>Future.get()</code>?</div>
+          <div class="quiz-options" id="em8q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><div class="quiz-letter">A</div> RuntimeException únicamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><div class="quiz-letter">B</div> ThreadException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q14',true)"><div class="quiz-letter">C</div> ExecutionException e InterruptedException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q14',false)"><div class="quiz-letter">D</div> FutureException</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q14-ok">✓ <code>ExecutionException</code> envuelve excepciones de la tarea; <code>InterruptedException</code> si el hilo esperador es interrumpido.</div>
+          <div class="quiz-feedback fail" id="em8q14-fail">✗ <code>Future.get()</code> lanza <code>ExecutionException</code> (excepción de la tarea) y <code>InterruptedException</code> (hilo interrumpido).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>CompletableFuture.thenCombine(other, fn)</code>?</div>
+          <div class="quiz-options" id="em8q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><div class="quiz-letter">A</div> Ejecuta el futuro dos veces de forma paralela</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><div class="quiz-letter">B</div> Devuelve el resultado del futuro más rápido</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q15',true)"><div class="quiz-letter">C</div> Espera a que ambos futuros completen y combina sus resultados con <code>fn</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q15',false)"><div class="quiz-letter">D</div> Cancela el primer futuro y retorna el segundo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q15-ok">✓ <code>thenCombine</code> espera a los dos futuros y aplica la función combinadora <code>BiFunction&lt;T,U,R&gt;</code>.</div>
+          <div class="quiz-feedback fail" id="em8q15-fail">✗ <code>thenCombine</code> combina resultados de dos <code>CompletableFuture</code> independientes cuando ambos terminan.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 20</div>
+          <div class="quiz-q">¿Qué garantiza la palabra clave <code>volatile</code> en Java?</div>
+          <div class="quiz-options" id="em8q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><div class="quiz-letter">A</div> Atomicidad de operaciones compuestas como <code>i++</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q16',true)"><div class="quiz-letter">B</div> Visibilidad: todos los hilos ven el valor más reciente; NO garantiza atomicidad</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><div class="quiz-letter">C</div> Exclusión mutua equivalente a <code>synchronized</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q16',false)"><div class="quiz-letter">D</div> Que el campo no puede ser modificado después de inicializado</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q16-ok">✓ <code>volatile</code> garantiza <strong>visibilidad</strong>: cuando un hilo escribe una variable <code>volatile</code>, el valor se escribe inmediatamente en main memory (no solo en caché del core). Otros hilos siempre leen de main memory. Pero <code>volatile</code> NO hace <code>i++</code> atómico (sigue siendo read-modify-write). Usa <code>AtomicInteger</code> para eso.</div>
+          <div class="quiz-feedback fail" id="em8q16-fail">✗ <code>volatile</code> = visibilidad garantizada entre hilos. No da atomicidad: <code>count++</code> sigue siendo no-atómico incluso con <code>volatile</code>. Para atomicidad usa <code>AtomicInteger</code>, <code>AtomicLong</code>, etc.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 20</div>
+          <div class="quiz-q">¿Cuáles son las 4 condiciones necesarias para que ocurra un <em>deadlock</em>?</div>
+          <div class="quiz-options" id="em8q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><div class="quiz-letter">A</div> Starvation, liveness, fairness, priority inversion</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q17',true)"><div class="quiz-letter">B</div> Exclusión mutua, retención y espera, sin preferencia, espera circular</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><div class="quiz-letter">C</div> Concurrencia, sincronización, memoria compartida, bloqueo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q17',false)"><div class="quiz-letter">D</div> Race condition, livelock, starvation, priority inversion</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q17-ok">✓ Condiciones de Coffman para deadlock: 1) <strong>Exclusión mutua</strong> (recurso no compartible), 2) <strong>Hold &amp; Wait</strong> (hilo retiene y espera más), 3) <strong>No preferencia</strong> (no se puede forzar liberación), 4) <strong>Espera circular</strong> (ciclo de dependencias). Eliminar cualquiera previene deadlock.</div>
+          <div class="quiz-feedback fail" id="em8q17-fail">✗ Las 4 condiciones de Coffman: mutual exclusion + hold-and-wait + no preemption + circular wait. Si se elimina cualquiera, el deadlock no puede ocurrir. La más fácil de romper suele ser el orden consistente de adquisición de locks.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 20</div>
+          <div class="quiz-q">¿Qué diferencia hay entre <code>Thread.sleep()</code> y <code>Object.wait()</code> respecto a los locks?</div>
+          <div class="quiz-options" id="em8q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><div class="quiz-letter">A</div> Ambos liberan el lock del monitor durante la pausa</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><div class="quiz-letter">B</div> Ninguno libera el lock</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q18',true)"><div class="quiz-letter">C</div> <code>sleep()</code> mantiene el lock; <code>wait()</code> libera el lock del monitor hasta ser notificado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q18',false)"><div class="quiz-letter">D</div> <code>sleep()</code> libera el lock; <code>wait()</code> lo mantiene</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q18-ok">✓ <code>Thread.sleep(n)</code>: pausa el hilo N milisegundos <strong>sin</strong> liberar ningún lock. Otros hilos no pueden entrar al <code>synchronized</code> block. <code>Object.wait()</code>: <strong>libera</strong> el monitor y espera hasta que otro hilo llame <code>notify()/notifyAll()</code>. Por eso <code>wait()</code> debe llamarse dentro de <code>synchronized</code>.</div>
+          <div class="quiz-feedback fail" id="em8q18-fail">✗ <code>sleep()</code> duerme pero retiene el lock (bloquea a otros). <code>wait()</code> libera el monitor temporalmente, permitiendo que otros hilos entren. <code>wait()</code> requiere estar dentro de un bloque <code>synchronized</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 20</div>
+          <div class="quiz-q">¿Qué hace <code>AtomicInteger.compareAndSet(expected, update)</code>?</div>
+          <div class="quiz-options" id="em8q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><div class="quiz-letter">A</div> Compara dos enteros pasados e imprime el resultado</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><div class="quiz-letter">B</div> Usa <code>synchronized</code> internamente para comparar y actualizar</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q19',true)"><div class="quiz-letter">C</div> Operación CAS (Compare-And-Swap) atómica a nivel hardware: si el valor actual == expected, lo reemplaza por update; retorna <code>true</code> si hubo cambio</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q19',false)"><div class="quiz-letter">D</div> Bloquea el AtomicInteger hasta que otro hilo lo desbloquee</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q19-ok">✓ CAS (Compare-And-Swap) es una instrucción atómica de la CPU. Si el valor actual == <code>expected</code>, lo cambia a <code>update</code> y retorna <code>true</code>. Si otro hilo modificó el valor antes, retorna <code>false</code> sin cambiar nada. Base de algoritmos lock-free. Más eficiente que <code>synchronized</code> en contención baja.</div>
+          <div class="quiz-feedback fail" id="em8q19-fail">✗ CAS es atómica a nivel de CPU (instrucción <code>CMPXCHG</code>). Compara valor actual con esperado: si coincide, actualiza y retorna <code>true</code>; si no, retorna <code>false</code>. Sin locks → algoritmos lock-free/wait-free.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 20</div>
+          <div class="quiz-q">¿Cuál es el pool compartido que usan los streams paralelos (<code>parallelStream()</code>) por defecto?</div>
+          <div class="quiz-options" id="em8q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><div class="quiz-letter">A</div> Un pool dedicado creado por cada stream paralelo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><div class="quiz-letter">B</div> <code>Executors.newCachedThreadPool()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em8q20',true)"><div class="quiz-letter">C</div> <code>ForkJoinPool.commonPool()</code> — compartido por toda la JVM</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em8q20',false)"><div class="quiz-letter">D</div> El thread principal (main thread) realiza todo el trabajo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em8q20-ok">✓ <code>parallelStream()</code> usa el <code>ForkJoinPool.commonPool()</code> — un pool compartido por toda la JVM con <code>Runtime.getRuntime().availableProcessors()-1</code> hilos por defecto. Cuidado: si bloqueas hilos en el common pool (I/O, <code>sleep()</code>), afectas a TODA la aplicación. Para aislamiento, usa un <code>ForkJoinPool</code> dedicado.</div>
+          <div class="quiz-feedback fail" id="em8q20-fail">✗ <code>parallelStream()</code> usa <code>ForkJoinPool.commonPool()</code>, compartido por la JVM. Sus hilos = núcleos - 1. Esto puede ser problemático si múltiples componentes usan streams paralelos con I/O bloqueante simultáneamente.</div>
+        </div>
+      </div>
+
+</ng-container>

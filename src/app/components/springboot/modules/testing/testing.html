@@ -1,0 +1,669 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===32">
+    <div class="lesson-header">
+      <span class="lesson-num">32</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">JUnit 5 con Spring</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">@Test · @BeforeEach/@AfterEach · @BeforeAll/@AfterAll · assertThrows · @ParameterizedTest · @ExtendWith</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-flask" aria-hidden="true"></i></span>
+        <div class="tc-title">@Test</div>
+        <div class="tc-body">Anotación principal de JUnit 5 (Jupiter). Marca un método como caso de prueba. No requiere modificadores de acceso específicos. Puede ser void o retornar cualquier tipo que JUnit ignore.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></span>
+        <div class="tc-title">@BeforeEach / @AfterEach</div>
+        <div class="tc-body"><strong>@BeforeEach</strong> se ejecuta antes de cada método @Test. Ideal para inicializar objetos. <strong>@AfterEach</strong> se ejecuta después de cada test para limpiar recursos. Ambos se llaman por cada instancia de la clase de test.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></span>
+        <div class="tc-title">@BeforeAll / @AfterAll</div>
+        <div class="tc-body"><strong>@BeforeAll</strong> se ejecuta una sola vez antes de todos los tests de la clase. Debe ser <strong>static</strong> (salvo con @TestInstance(Lifecycle.PER_CLASS)). Útil para configuración costosa como levantar servidores o conexiones.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></span>
+        <div class="tc-title">assertThrows</div>
+        <div class="tc-body"><code>assertThrows(ExceptionClass.class, () -&gt; codigo())</code> verifica que el bloque lanza la excepción esperada. Retorna la instancia de la excepción para hacer asserts adicionales sobre su mensaje o causa.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></span>
+        <div class="tc-title">@ParameterizedTest</div>
+        <div class="tc-body">Ejecuta el mismo test con múltiples valores. Con <strong>@ValueSource</strong> se proveen valores literales (ints, strings, etc.). Con <strong>@MethodSource</strong> se referencia un método estático que devuelve un Stream de argumentos.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></span>
+        <div class="tc-title">@ExtendWith(SpringExtension.class)</div>
+        <div class="tc-body">Integra JUnit 5 con el ApplicationContext de Spring. Carga el contexto y permite inyección de dependencias en las clases de test. Es equivalente a @RunWith(SpringRunner.class) de JUnit 4. Incluido implícitamente en @SpringBootTest.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@ExtendWith</span>(<span class="a-type">SpringExtension</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ProductServiceTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@BeforeAll</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">static void</span> <span class="a-type">initAll</span>() {{ '{' }} <span class="a-cm">/* una vez */</span> {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@BeforeEach</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">init</span>() {{ '{' }} <span class="a-cm">/* antes de cada @Test */</span> {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">shouldThrowWhenNotFound</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">RuntimeException</span> ex = assertThrows(<span class="a-type">RuntimeException</span>.class,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;() -&gt; service.findById(<span class="a-num">-1L</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertEquals(<span class="a-str">"Not found"</span>, ex.getMessage());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ParameterizedTest</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@ValueSource</span>(ints = {{ '{' }}<span class="a-num">1</span>, <span class="a-num">2</span>, <span class="a-num">3</span>{{ '}' }})</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">shouldFindById</span>(<span class="a-type">int</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertNotNull(service.findById((<span class="a-type">long</span>) id));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="info-box">
+      @MethodSource admite métodos en la misma clase (sin nombre completo) o en clases externas usando el formato "com.pkg.Clase#metodo". El método debe ser static y devolver Stream, Iterable, Iterator o array.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===33">
+    <div class="lesson-header">
+      <span class="lesson-num">33</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">Mockito</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">@Mock vs @MockBean · @InjectMocks · when/thenReturn · verify · ArgumentCaptor · @Spy vs @SpyBean · doThrow</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></span>
+        <div class="tc-title">@Mock vs @MockBean</div>
+        <div class="tc-body"><strong>@Mock</strong> (Mockito puro) crea un mock sin Spring Context. Vive solo en la prueba unitaria. <strong>@MockBean</strong> (Spring Boot Test) crea un mock y lo registra como bean en el ApplicationContext de Spring, reemplazando el bean real. Úsalo cuando necesites el contexto de Spring.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-plug" aria-hidden="true"></i></span>
+        <div class="tc-title">@InjectMocks</div>
+        <div class="tc-body">Le dice a Mockito que cree una instancia de la clase bajo prueba e inyecte en ella los mocks y spies declarados con @Mock / @Spy. Requiere <code>MockitoAnnotations.openMocks(this)</code> o la extensión <strong>@ExtendWith(MockitoExtension.class)</strong>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-undo" aria-hidden="true"></i></span>
+        <div class="tc-title">when().thenReturn()</div>
+        <div class="tc-body">Define el comportamiento de un mock: <code>when(repo.findById(1L)).thenReturn(Optional.of(producto))</code>. Variantes: <strong>thenThrow()</strong> lanza excepción, <strong>thenAnswer()</strong> ejecuta lógica dinámica, <strong>thenCallRealMethod()</strong> llama al método real.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></span>
+        <div class="tc-title">verify()</div>
+        <div class="tc-body">Comprueba que un método fue invocado. <code>verify(repo).save(any())</code> falla si el método no fue llamado. Con <strong>times(n)</strong>, <strong>never()</strong>, <strong>atLeastOnce()</strong> se controla el número de invocaciones. <strong>verifyNoMoreInteractions()</strong> asegura que no haya otras llamadas.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></span>
+        <div class="tc-title">ArgumentCaptor</div>
+        <div class="tc-body">Captura los argumentos pasados a un mock para inspeccionarlos. <code>ArgumentCaptor&lt;Product&gt; captor = ArgumentCaptor.forClass(Product.class)</code>. Después de <code>verify(repo).save(captor.capture())</code>, se accede al valor con <code>captor.getValue()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></span>
+        <div class="tc-title">@Spy vs @SpyBean</div>
+        <div class="tc-body"><strong>@Spy</strong> (Mockito) envuelve un objeto real y solo intercepta los métodos que se configuran explícitamente; el resto llaman al código real. <strong>@SpyBean</strong> (Spring Boot Test) hace lo mismo pero con un bean del ApplicationContext, combinando comportamiento real con stubbing selectivo.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@ExtendWith</span>(<span class="a-type">MockitoExtension</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">OrderServiceTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Mock</span> <span class="a-type">OrderRepository</span> repo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@InjectMocks</span> <span class="a-type">OrderService</span> service;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">captureArgument</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ArgumentCaptor</span>&lt;<span class="a-type">Order</span>&gt; captor = <span class="a-type">ArgumentCaptor</span>.forClass(<span class="a-type">Order</span>.class);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;service.create(<span class="a-kw">new</span> <span class="a-type">OrderDto</span>(<span class="a-str">"item"</span>, <span class="a-num">5</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;verify(repo).save(captor.capture());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertEquals(<span class="a-num">5</span>, captor.getValue().getQuantity());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">shouldPropagateException</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;doThrow(<span class="a-kw">new</span> <span class="a-type">RuntimeException</span>(<span class="a-str">"DB down"</span>)).when(repo).save(any());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertThrows(<span class="a-type">RuntimeException</span>.class, () -&gt; service.create(<span class="a-kw">new</span> <span class="a-type">OrderDto</span>()));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">@Mock — sin contexto Spring</div>
+        <div class="compare-code">@ExtendWith(MockitoExtension.class)
+@Mock UserRepository repo;
+// Mock vive solo en esta clase</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">@MockBean — reemplaza bean Spring</div>
+        <div class="compare-code">@SpringBootTest
+@MockBean UserRepository repo;
+// Bean del contexto reemplazado</div>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      doThrow() es necesario en lugar de when().thenThrow() cuando el método que lanza la excepción es void. Para métodos con retorno, ambas formas funcionan.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===34">
+    <div class="lesson-header">
+      <span class="lesson-num">34</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">MockMvc</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">MockMvc setup · perform · andExpect · status · jsonPath · contentType · @AutoConfigureMockMvc · MockMvcRequestBuilders</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></span>
+        <div class="tc-title">¿Qué es MockMvc?</div>
+        <div class="tc-body">MockMvc permite probar controladores Spring MVC sin levantar un servidor HTTP real. Simula el ciclo completo request/response a nivel de DispatcherServlet: filtros, interceptores, validación, serialización JSON y manejo de excepciones.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></span>
+        <div class="tc-title">Setup</div>
+        <div class="tc-body">Se instancia con <strong>MockMvcBuilders.standaloneSetup(controller)</strong> (sin contexto) o vía <strong>@AutoConfigureMockMvc</strong> + @SpringBootTest (contexto completo). Con @WebMvcTest se carga solo la capa web sin persistencia.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-play" aria-hidden="true"></i></span>
+        <div class="tc-title">perform()</div>
+        <div class="tc-body">Ejecuta una request simulada. Recibe un <strong>MockHttpServletRequestBuilder</strong> construido con <code>MockMvcRequestBuilders.get("/ruta")</code>, <code>.post()</code>, <code>.put()</code>, <code>.delete()</code>, etc. Admite headers, params, content y contentType.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></span>
+        <div class="tc-title">andExpect()</div>
+        <div class="tc-body">Encadena assertions sobre la respuesta. <strong>status().isOk()</strong> verifica HTTP 200, <strong>status().isNotFound()</strong> verifica 404. <strong>jsonPath("$.name")</strong> navega el JSON de respuesta con expresiones JSONPath. <strong>content().contentType()</strong> verifica el Content-Type.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-map" aria-hidden="true"></i></span>
+        <div class="tc-title">jsonPath()</div>
+        <div class="tc-body">Utiliza la librería JsonPath para navegar el cuerpo JSON. <code>.value("Alice")</code> comprueba igualdad, <code>.exists()</code> comprueba presencia, <code>.isArray()</code> valida el tipo, <code>.hasJsonPathValue("$.items[0].id")</code> para rutas anidadas.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></span>
+        <div class="tc-title">@AutoConfigureMockMvc</div>
+        <div class="tc-body">Combinado con @SpringBootTest, crea y configura automáticamente un MockMvc con toda la cadena de filtros y seguridad del contexto. Admite <code>addFilters = false</code> para desactivar filtros. Permite inyectar MockMvc con @Autowired.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@SpringBootTest</span></div>
+      <div class="anatomy-line"><span class="a-kw">@AutoConfigureMockMvc</span></div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ProductControllerTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Autowired</span> <span class="a-type">MockMvc</span> mockMvc;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@MockBean</span> <span class="a-type">ProductService</span> service;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">getProductReturns200</span>() <span class="a-kw">throws</span> <span class="a-type">Exception</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;when(service.findById(<span class="a-num">1L</span>)).thenReturn(<span class="a-kw">new</span> <span class="a-type">Product</span>(<span class="a-num">1L</span>, <span class="a-str">"Laptop"</span>));</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;mockMvc.perform(<span class="a-type">MockMvcRequestBuilders</span>.get(<span class="a-str">"/api/products/1"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.accept(<span class="a-type">MediaType</span>.APPLICATION_JSON))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.andExpect(status().isOk())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.andExpect(content().contentType(<span class="a-type">MediaType</span>.APPLICATION_JSON))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.andExpect(jsonPath(<span class="a-str">"$.name"</span>).value(<span class="a-str">"Laptop"</span>))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.andExpect(jsonPath(<span class="a-str">"$.id"</span>).value(<span class="a-num">1</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="info-box">
+      Para tests más rápidos usa @WebMvcTest(ProductController.class): carga solo la capa web (controladores, filtros, convertidores) sin JPA ni servicios completos. Los beans de servicio deben mockearse con @MockBean.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===35">
+    <div class="lesson-header">
+      <span class="lesson-num">35</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">@SpringBootTest</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">webEnvironment · TestRestTemplate · @MockBean en contexto · @TestConfiguration · Slices</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></span>
+        <div class="tc-title">@SpringBootTest</div>
+        <div class="tc-body">Carga el <strong>ApplicationContext completo</strong> de Spring Boot para pruebas de integración. Escanea desde la clase anotada con @SpringBootApplication y levanta todos los beans, configuraciones y autoconfigurations.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></span>
+        <div class="tc-title">webEnvironment</div>
+        <div class="tc-body"><strong>MOCK</strong> (default): contexto web simulado, sin servidor real. <strong>RANDOM_PORT</strong>: levanta servidor en puerto aleatorio (evita conflictos). <strong>DEFINED_PORT</strong>: usa el puerto configurado (server.port). <strong>NONE</strong>: sin capa web.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></span>
+        <div class="tc-title">TestRestTemplate</div>
+        <div class="tc-body">Cliente HTTP simplificado para tests de integración con servidor real (RANDOM_PORT/DEFINED_PORT). No lanza excepciones en errores HTTP (retorna ResponseEntity). Se inyecta con @Autowired cuando el servidor está activo. Maneja cookies y redirects automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></span>
+        <div class="tc-title">@MockBean en contexto</div>
+        <div class="tc-body">Con @SpringBootTest, @MockBean reemplaza el bean real en el ApplicationContext por un mock de Mockito. Esto <strong>invalida el caché del contexto</strong>, forzando la recarga del contexto en los tests que lo usan. Úsalo con moderación para preservar el rendimiento.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></span>
+        <div class="tc-title">@TestConfiguration</div>
+        <div class="tc-body">Define beans adicionales o de reemplazo exclusivamente para tests. A diferencia de @Configuration normal, no es detectada por el escaneo de componentes principal. Se puede anidar dentro de la clase de test o importar con @Import. Ideal para configurar datasources en memoria, mocks específicos o beans de test.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></span>
+        <div class="tc-title">Test Slices</div>
+        <div class="tc-body">Spring Boot ofrece slices especializados que cargan solo parte del contexto: <strong>@WebMvcTest</strong> (capa web), <strong>@DataJpaTest</strong> (JPA), <strong>@JsonTest</strong> (serialización), <strong>@WebFluxTest</strong> (Reactive), <strong>@RestClientTest</strong> (clientes REST). Son más rápidos que @SpringBootTest completo.</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">RANDOM_PORT</div>
+        <div class="compare-code">@SpringBootTest(webEnvironment =
+  WebEnvironment.RANDOM_PORT)
+// Puerto aleatorio → sin conflictos
+@LocalServerPort int port;</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">DEFINED_PORT</div>
+        <div class="compare-code">@SpringBootTest(webEnvironment =
+  WebEnvironment.DEFINED_PORT)
+// Usa server.port (default 8080)
+// Puede fallar si el puerto está ocupado</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@SpringBootTest</span>(webEnvironment = <span class="a-type">SpringBootTest</span>.WebEnvironment.RANDOM_PORT)</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">OrderIntegrationTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Autowired</span> <span class="a-type">TestRestTemplate</span> restTemplate;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@MockBean</span> <span class="a-type">EmailService</span> emailService; <span class="a-cm">// reemplaza bean real</span></div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@TestConfiguration</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">static class</span> <span class="a-type">TestConfig</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Clock</span> fixedClock() {{ '{' }} <span class="a-kw">return</span> <span class="a-type">Clock</span>.fixed(<span class="a-type">Instant</span>.EPOCH, <span class="a-type">ZoneOffset</span>.UTC); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">createOrderReturns201</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ResponseEntity</span>&lt;<span class="a-type">Order</span>&gt; resp = restTemplate.postForEntity(<span class="a-str">"/api/orders"</span>, dto, <span class="a-type">Order</span>.class);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertEquals(<span class="a-type">HttpStatus</span>.CREATED, resp.getStatusCode());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="warn-box">
+      Cada combinación única de configuración del contexto (diferente @MockBean, @TestPropertySource, etc.) genera un nuevo ApplicationContext. Minimiza variaciones para aprovechar el caché de contexto y acelerar la suite de tests.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===36">
+    <div class="lesson-header">
+      <span class="lesson-num">36</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">@DataJpaTest</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">H2 auto-configured · TestEntityManager · @Sql · @Rollback · Test isolation · @AutoConfigureTestDatabase</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></span>
+        <div class="tc-title">@DataJpaTest</div>
+        <div class="tc-body">Slice de test que carga únicamente la capa JPA: entidades, repositorios, Hibernate y la base de datos. Excluye controladores, servicios y otras configuraciones. Configura automáticamente una <strong>base de datos en memoria H2</strong> y gestiona transacciones por test.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></span>
+        <div class="tc-title">H2 Auto-configurado</div>
+        <div class="tc-body">Spring Boot sustituye la datasource real por H2 en memoria cuando se usa @DataJpaTest (comportamiento de <strong>@AutoConfigureTestDatabase</strong> con Replace.ANY por defecto). El esquema se genera desde las entidades JPA con ddl-auto=create-drop.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></span>
+        <div class="tc-title">TestEntityManager</div>
+        <div class="tc-body">Wrapper de EntityManager diseñado para tests. Ofrece métodos simplificados: <strong>persist(entity)</strong>, <strong>find(Class, id)</strong>, <strong>flush()</strong>, <strong>persistAndFlush(entity)</strong>. Permite controlar el estado del contexto de persistencia explícitamente durante los tests.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-file" aria-hidden="true"></i></span>
+        <div class="tc-title">@Sql</div>
+        <div class="tc-body">Ejecuta scripts SQL antes o después de un test. Puede anotarse en la clase o en métodos específicos. <code>@Sql("/data.sql")</code> carga datos de prueba. <code>@Sql(scripts = "/cleanup.sql", executionPhase = AFTER_TEST_METHOD)</code> limpia después del test.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></span>
+        <div class="tc-title">@Rollback</div>
+        <div class="tc-body">Por defecto, @DataJpaTest envuelve cada test en una transacción que hace <strong>rollback automático</strong> al finalizar, garantizando aislamiento. Con <code>@Rollback(false)</code> o <code>@Commit</code> se persisten los cambios. Útil para depurar el estado real de la BD.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></span>
+        <div class="tc-title">@AutoConfigureTestDatabase</div>
+        <div class="tc-body">Personaliza la sustitución de datasource. <code>replace = Replace.NONE</code> usa la datasource de producción (útil con Testcontainers). <code>replace = Replace.AUTO_CONFIGURED</code> solo reemplaza datasources auto-configuradas. Permite combinar @DataJpaTest con bases de datos reales en CI.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@DataJpaTest</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Sql</span>(<span class="a-str">"/test-data/products.sql"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ProductRepositoryTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Autowired</span> <span class="a-type">TestEntityManager</span> em;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Autowired</span> <span class="a-type">ProductRepository</span> repo;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">findByCategory</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Product</span> p = em.persistAndFlush(<span class="a-kw">new</span> <span class="a-type">Product</span>(<span class="a-str">"Teclado"</span>, <span class="a-str">"TECH"</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">List</span>&lt;<span class="a-type">Product</span>&gt; results = repo.findByCategory(<span class="a-str">"TECH"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertThat(results).contains(p);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Rollback</span>(<span class="a-kw">false</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-type">persistsForDebug</span>() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;repo.save(<span class="a-kw">new</span> <span class="a-type">Product</span>(<span class="a-str">"Monitor"</span>, <span class="a-str">"TECH"</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// datos visibles en BD para inspección</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span>Añade la dependencia H2 en scope test en pom.xml / build.gradle</div>
+      <div class="step"><span class="step-n">2</span>Usa @DataJpaTest para cargar solo la capa JPA y reducir tiempo de arranque</div>
+      <div class="step"><span class="step-n">3</span>Usa TestEntityManager.persistAndFlush() para insertar datos y forzar el flush al contexto de persistencia antes de llamar al repositorio</div>
+      <div class="step"><span class="step-n">4</span>Para tests contra BD real usa @AutoConfigureTestDatabase(replace = Replace.NONE) + Testcontainers</div>
+    </div>
+
+    <div class="info-box">
+      @DataJpaTest no carga @Service ni @Controller. Si tu repositorio tiene dependencias en otros beans, inyéctalos manualmente con @Import o usa @SpringBootTest con el slice adecuado.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="isEval">
+    <div class="lesson-header">
+      <span class="lesson-num">M6</span>
+      <span class="lesson-mod">Módulo 6 · Testing</span>
+      <span class="lesson-title">Evaluación — 20 preguntas avanzadas</span>
+    </div>
+
+    <div class="quiz-section">
+
+      <div class="quiz-box" id="em6q01">
+        <div class="quiz-label">Pregunta 1 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia de ciclo de vida entre @Mock y @MockBean?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><span class="quiz-letter">A</span>@Mock usa reflexión; @MockBean usa proxies JDK</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q01',true)"><span class="quiz-letter">B</span>@Mock existe solo en el test sin Spring; @MockBean reemplaza un bean en el ApplicationContext y lo destruye al cerrar el contexto</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><span class="quiz-letter">C</span>@MockBean es más rápido porque no carga Spring</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q01',false)"><span class="quiz-letter">D</span>Ambos son equivalentes; la diferencia es solo de anotación</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q01-ok">Correcto. @Mock es un mock puro de Mockito sin contexto Spring. @MockBean registra el mock en el ApplicationContext como bean, reemplazando el bean real, y su ciclo de vida está ligado al contexto.</div>
+        <div class="quiz-feedback fail" id="em6q01-fail">Incorrecto. @Mock vive solo en la clase de test (sin Spring). @MockBean integra el mock en el ApplicationContext de Spring Boot, reemplazando el bean real para toda la prueba de integración.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q02">
+        <div class="quiz-label">Pregunta 2 / 20</div>
+        <div class="quiz-q">¿Cómo funciona el caché del contexto de Spring en pruebas y qué lo invalida?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><span class="quiz-letter">A</span>El contexto se recrea para cada clase de test siempre</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q02',true)"><span class="quiz-letter">B</span>Spring reutiliza el mismo contexto entre tests con la misma configuración; @MockBean, @DirtiesContext o @TestPropertySource diferente invalidan el caché</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><span class="quiz-letter">C</span>El contexto solo se cachea cuando se usa @SpringBootTest(webEnvironment=NONE)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q02',false)"><span class="quiz-letter">D</span>El caché expira después de 5 minutos automáticamente</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q02-ok">Correcto. Spring TestContext Framework cachea los ApplicationContexts por su configuración (clases, propiedades, etc.). Cualquier diferencia en la configuración —incluyendo @MockBean— fuerza la creación de un contexto nuevo.</div>
+        <div class="quiz-feedback fail" id="em6q02-fail">Incorrecto. Spring reutiliza el ApplicationContext entre tests con idéntica configuración. @MockBean, @DirtiesContext y cambios en propiedades de test invalidan ese caché y fuerzan la recarga del contexto.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q03">
+        <div class="quiz-label">Pregunta 3 / 20</div>
+        <div class="quiz-q">¿Para qué sirve @DirtiesContext y cuándo deberías usarlo?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><span class="quiz-letter">A</span>Para limpiar la base de datos H2 entre tests</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><span class="quiz-letter">B</span>Para resetear los mocks de Mockito después de cada test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q03',true)"><span class="quiz-letter">C</span>Indica que el test modifica el ApplicationContext y que debe descartarse tras el test, forzando la creación de un contexto nuevo para los tests siguientes</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q03',false)"><span class="quiz-letter">D</span>Limpia todos los beans @Singleton convirtiéndolos en @Prototype</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q03-ok">Correcto. @DirtiesContext descarta el ApplicationContext cacheado después del test (o clase), forzando su recarga. Úsalo cuando el test modifica el estado compartido del contexto, como cambiar properties en tiempo de ejecución.</div>
+        <div class="quiz-feedback fail" id="em6q03-fail">Incorrecto. @DirtiesContext marca el contexto como "sucio" y hace que Spring lo descarte y recargue para los tests siguientes. Se usa cuando un test altera el estado del ApplicationContext de forma que afectaría otros tests.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q04">
+        <div class="quiz-label">Pregunta 4 / 20</div>
+        <div class="quiz-q">¿Cuál es la principal diferencia entre MockMvc y RestAssured para tests de controladores?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q04',true)"><span class="quiz-letter">A</span>MockMvc prueba la capa web sin levantar servidor HTTP real; RestAssured hace peticiones HTTP reales contra un servidor levantado</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><span class="quiz-letter">B</span>MockMvc es para APIs REST; RestAssured solo soporta SOAP</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><span class="quiz-letter">C</span>RestAssured requiere JUnit 5; MockMvc solo funciona con JUnit 4</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q04',false)"><span class="quiz-letter">D</span>MockMvc no soporta JSON; RestAssured sí</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q04-ok">Correcto. MockMvc simula el ciclo request/response a nivel de DispatcherServlet sin un puerto TCP. RestAssured lanza peticiones HTTP reales, por lo que necesita un servidor arrancado (RANDOM_PORT o DEFINED_PORT).</div>
+        <div class="quiz-feedback fail" id="em6q04-fail">Incorrecto. La clave es que MockMvc opera a nivel de DispatcherServlet (sin servidor TCP), mientras que RestAssured realiza peticiones HTTP reales contra un servidor en ejecución.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q05">
+        <div class="quiz-label">Pregunta 5 / 20</div>
+        <div class="quiz-q">¿Qué hace la anotación @Captor de Mockito?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><span class="quiz-letter">A</span>Captura excepciones lanzadas por mocks</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q05',true)"><span class="quiz-letter">B</span>Es azúcar sintáctico para declarar un ArgumentCaptor como campo, equivalente a ArgumentCaptor.forClass()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><span class="quiz-letter">C</span>Registra todas las invocaciones de un método para reproducirlas</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q05',false)"><span class="quiz-letter">D</span>Intercepta el valor de retorno de un método real antes de retornarlo</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q05-ok">Correcto. @Captor es equivalente a declarar el campo como ArgumentCaptor.forClass(Tipo.class), pero infiere el tipo genérico automáticamente y requiere inicialización con MockitoAnnotations.openMocks(this) o @ExtendWith(MockitoExtension.class).</div>
+        <div class="quiz-feedback fail" id="em6q05-fail">Incorrecto. @Captor es una anotación de Mockito que inicializa automáticamente un campo de tipo ArgumentCaptor, evitando tener que llamar a ArgumentCaptor.forClass() explícitamente.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q06">
+        <div class="quiz-label">Pregunta 6 / 20</div>
+        <div class="quiz-q">¿Qué permite verificar InOrder en Mockito?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q06',true)"><span class="quiz-letter">A</span>Que los métodos de uno o varios mocks fueron invocados en un orden específico</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><span class="quiz-letter">B</span>Que los argumentos pasados a un mock están ordenados alfabéticamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><span class="quiz-letter">C</span>Que los tests se ejecutan en el orden declarado en la clase</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q06',false)"><span class="quiz-letter">D</span>Que los beans de Spring se inicializan antes que los mocks</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q06-ok">Correcto. InOrder inOrder = inOrder(mockA, mockB) crea un verificador que comprueba el orden relativo de invocaciones. inOrder.verify(mockA).metodo() seguido de inOrder.verify(mockB).otro() falla si el orden fue distinto.</div>
+        <div class="quiz-feedback fail" id="em6q06-fail">Incorrecto. InOrder de Mockito permite verificar que los métodos de mocks fueron llamados en un orden determinado. Se crea con inOrder(mock1, mock2) y luego se usa inOrder.verify() en lugar de Mockito.verify().</div>
+      </div>
+
+      <div class="quiz-box" id="em6q07">
+        <div class="quiz-label">Pregunta 7 / 20</div>
+        <div class="quiz-q">¿Cuándo es útil usar thenAnswer() en lugar de thenReturn() en Mockito?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><span class="quiz-letter">A</span>Cuando el mock debe retornar null</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><span class="quiz-letter">B</span>Cuando el método tiene más de dos parámetros</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q07',true)"><span class="quiz-letter">C</span>Cuando el valor de retorno depende de los argumentos recibidos o se necesita lógica dinámica en el callback</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q07',false)"><span class="quiz-letter">D</span>Solo cuando el método retorna un tipo primitivo</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q07-ok">Correcto. thenAnswer(invocation -&gt; ...) recibe un objeto InvocationOnMock que da acceso a los argumentos, el mock y el método. Permite retornar valores calculados dinámicamente, modificar argumentos o simular comportamientos complejos.</div>
+        <div class="quiz-feedback fail" id="em6q07-fail">Incorrecto. thenAnswer() es útil cuando el valor de retorno debe calcularse en función de los argumentos o requiere lógica dinámica. Recibe un lambda con InvocationOnMock que expone los argumentos de la llamada.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q08">
+        <div class="quiz-label">Pregunta 8 / 20</div>
+        <div class="quiz-q">¿Qué hace @TestPropertySource en una clase de test de Spring?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q08',true)"><span class="quiz-letter">A</span>Permite sobreescribir propiedades del application.properties para ese test específico, cargando un archivo .properties o definiendo valores inline</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><span class="quiz-letter">B</span>Carga propiedades desde un servidor de configuración remoto</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><span class="quiz-letter">C</span>Inyecta propiedades como parámetros en los métodos @Test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q08',false)"><span class="quiz-letter">D</span>Convierte todas las propiedades en @Value de solo lectura</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q08-ok">Correcto. @TestPropertySource(locations = "classpath:test.properties") o @TestPropertySource(properties = "key=value") sobreescribe propiedades del entorno para el test. Útil para cambiar URLs, puertos o flags de feature sin modificar el archivo principal.</div>
+        <div class="quiz-feedback fail" id="em6q08-fail">Incorrecto. @TestPropertySource permite sobreescribir o añadir propiedades para una clase de test concreta, ya sea cargando un archivo properties o definiendo pares key=value directamente en la anotación.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q09">
+        <div class="quiz-label">Pregunta 9 / 20</div>
+        <div class="quiz-q">¿Cuál es el efecto de usar @ActiveProfiles("test") en una clase de test?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><span class="quiz-letter">A</span>Activa el modo debug de JUnit para ese test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q09',true)"><span class="quiz-letter">B</span>Activa el perfil "test" de Spring, cargando application-test.properties y beans condicionados con @Profile("test")</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><span class="quiz-letter">C</span>Reemplaza automáticamente todos los beans por mocks</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q09',false)"><span class="quiz-letter">D</span>Solo carga beans marcados con @Primary</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q09-ok">Correcto. @ActiveProfiles activa los perfiles indicados para el ApplicationContext del test. Spring cargará application-test.yml/properties y registrará beans condicionados con @Profile("test") o @ConditionalOnProfile.</div>
+        <div class="quiz-feedback fail" id="em6q09-fail">Incorrecto. @ActiveProfiles("test") activa el perfil Spring "test" para el contexto del test, lo que hace que se carguen configuraciones específicas de ese perfil (application-test.properties y beans @Profile("test")).</div>
+      </div>
+
+      <div class="quiz-box" id="em6q10">
+        <div class="quiz-label">Pregunta 10 / 20</div>
+        <div class="quiz-q">¿Cuándo deberías preferir RANDOM_PORT sobre DEFINED_PORT en @SpringBootTest?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q10',true)"><span class="quiz-letter">A</span>Cuando ejecutas tests en paralelo o en CI donde el puerto podría estar ocupado, para evitar conflictos de puertos</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><span class="quiz-letter">B</span>Cuando el test necesita conocer el puerto exacto de antemano</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><span class="quiz-letter">C</span>Cuando la aplicación usa WebSockets</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q10',false)"><span class="quiz-letter">D</span>Solo con TestRestTemplate; no funciona con WebTestClient</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q10-ok">Correcto. RANDOM_PORT asigna un puerto libre aleatoriamente en cada ejecución, eliminando conflictos cuando múltiples tests o procesos CI usan el mismo servidor. El puerto se obtiene con @LocalServerPort o inyectando el valor en TestRestTemplate.</div>
+        <div class="quiz-feedback fail" id="em6q10-fail">Incorrecto. RANDOM_PORT es preferible para entornos paralelos y CI porque evita conflictos si el puerto fijo ya está ocupado. El puerto asignado se puede inyectar con @LocalServerPort.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q11">
+        <div class="quiz-label">Pregunta 11 / 20</div>
+        <div class="quiz-q">¿Para qué se usa WireMock en tests de Spring Boot?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><span class="quiz-letter">A</span>Para mockear beans de Spring sin Mockito</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q11',true)"><span class="quiz-letter">B</span>Para simular servidores HTTP externos, permitiendo probar código que consume APIs de terceros sin acceso real a la red</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><span class="quiz-letter">C</span>Para interceptar llamadas JDBC y verificar las queries SQL generadas</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q11',false)"><span class="quiz-letter">D</span>Para reemplazar Hibernate por un ORM más ligero en tests</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q11-ok">Correcto. WireMock levanta un servidor HTTP stub que responde según reglas configuradas. Ideal para probar RestTemplate/WebClient/FeignClient que consumen APIs externas sin hacer llamadas reales a la red, garantizando tests deterministas y rápidos.</div>
+        <div class="quiz-feedback fail" id="em6q11-fail">Incorrecto. WireMock es un servidor HTTP stub para simular APIs externas. Permite configurar respuestas esperadas para determinadas requests HTTP, haciendo que los tests de código cliente sean herméticos y predecibles.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q12">
+        <div class="quiz-label">Pregunta 12 / 20</div>
+        <div class="quiz-q">¿Cuál es el comportamiento de @Transactional en un método de test de @DataJpaTest?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><span class="quiz-letter">A</span>Hace commit automáticamente al finalizar el test para que los datos persistan</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q12',true)"><span class="quiz-letter">B</span>La transacción hace rollback automático al finalizar el test, deshaciendo todos los cambios y aislando los tests entre sí</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><span class="quiz-letter">C</span>@Transactional en tests es ignorado; solo tiene efecto en código de producción</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q12',false)"><span class="quiz-letter">D</span>Crea una transacción separada por cada assert del test</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q12-ok">Correcto. Por defecto, @DataJpaTest envuelve cada test en una transacción con rollback automático (comportamiento de @Transactional en tests de Spring). Esto garantiza que cada test empiece con un estado limpio de la BD.</div>
+        <div class="quiz-feedback fail" id="em6q12-fail">Incorrecto. En tests de Spring, @Transactional hace rollback por defecto al finalizar el método de test, deshaciendo cualquier insert/update/delete. Para forzar commit usa @Commit o @Rollback(false).</div>
+      </div>
+
+      <div class="quiz-box" id="em6q13">
+        <div class="quiz-label">Pregunta 13 / 20</div>
+        <div class="quiz-q">¿En qué fase se ejecuta por defecto un script declarado con @Sql?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q13',true)"><span class="quiz-letter">A</span>BEFORE_TEST_METHOD: antes de que se ejecute el método de test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><span class="quiz-letter">B</span>AFTER_TEST_CLASS: una vez finalizada toda la clase de test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><span class="quiz-letter">C</span>BEFORE_TEST_CLASS: antes del primer test de la clase</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q13',false)"><span class="quiz-letter">D</span>AFTER_TEST_METHOD: siempre después del test</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q13-ok">Correcto. La fase por defecto de @Sql es ExecutionPhase.BEFORE_TEST_METHOD. Se puede cambiar a AFTER_TEST_METHOD con executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD para scripts de limpieza.</div>
+        <div class="quiz-feedback fail" id="em6q13-fail">Incorrecto. @Sql se ejecuta por defecto en la fase BEFORE_TEST_METHOD, antes de que se ejecute el método de test. Para ejecutar scripts después usa executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q14">
+        <div class="quiz-label">Pregunta 14 / 20</div>
+        <div class="quiz-q">¿Cuál es el problema de usar ArgumentMatchers.any() con tipos genéricos como List&lt;String&gt;?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><span class="quiz-letter">A</span>any() no funciona con colecciones, solo con tipos primitivos</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q14',true)"><span class="quiz-letter">B</span>Por type erasure, any(List.class) no distingue List&lt;String&gt; de List&lt;Integer&gt; en tiempo de ejecución; se debe usar any() sin clase o anyList()</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><span class="quiz-letter">C</span>any() lanza ClassCastException con genéricos en Java 17+</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q14',false)"><span class="quiz-letter">D</span>any() con genéricos requiere importar ArgumentMatchers de forma estática obligatoriamente</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q14-ok">Correcto. El type erasure de Java elimina la información genérica en runtime. any(List.class) matchea cualquier List independientemente de su tipo genérico. Para mayor expresividad usa anyList(), anyMap(), anySet() o any() sin argumento.</div>
+        <div class="quiz-feedback fail" id="em6q14-fail">Incorrecto. Debido al type erasure de Java, los genéricos no existen en runtime. any(List.class) no puede distinguir entre List&lt;String&gt; y List&lt;Integer&gt;. Usa anyList() o any() sin argumento para evitar confusión.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q15">
+        <div class="quiz-label">Pregunta 15 / 20</div>
+        <div class="quiz-q">¿Cómo se realiza un test de subida de archivos (multipart) con MockMvc?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q15',true)"><span class="quiz-letter">A</span>Con MockMvcRequestBuilders.multipart("/url").file(mockMultipartFile), construyendo un MockMultipartFile con nombre, tipo y contenido en bytes</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><span class="quiz-letter">B</span>MockMvc no soporta multipart; se debe usar RestAssured para esto</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><span class="quiz-letter">C</span>Con perform(post("/url").param("file", base64EncodedContent))</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q15',false)"><span class="quiz-letter">D</span>Con @MockBean de MultipartResolver y stubbing manual del stream</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q15-ok">Correcto. MockMvcRequestBuilders.multipart("/upload").file(new MockMultipartFile("file", "test.txt", "text/plain", "contenido".getBytes())) construye la request multipart sin necesitar un servidor real.</div>
+        <div class="quiz-feedback fail" id="em6q15-fail">Incorrecto. MockMvc sí soporta multipart. Se usa MockMvcRequestBuilders.multipart("/url").file(new MockMultipartFile(...)) para construir requests de subida de archivos sin servidor.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q16">
+        <div class="quiz-label">Pregunta 16 / 20</div>
+        <div class="quiz-q">¿Qué carga @WebFluxTest y para qué tipo de tests es adecuado?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><span class="quiz-letter">A</span>Carga el contexto completo incluyendo Reactor Netty y todos los beans</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q16',true)"><span class="quiz-letter">B</span>Carga solo la capa web reactiva (controladores @RestController con Flux/Mono) y configura WebTestClient; excluye servicios y repositorios</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><span class="quiz-letter">C</span>Es un alias de @SpringBootTest para proyectos WebFlux</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q16',false)"><span class="quiz-letter">D</span>Solo funciona con R2DBC; no es compatible con controladores estándar</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q16-ok">Correcto. @WebFluxTest es el slice para la capa reactiva. Carga RouterFunctions, @RestController, WebFilter y configura automáticamente un WebTestClient. Los servicios deben mockearse con @MockBean.</div>
+        <div class="quiz-feedback fail" id="em6q16-fail">Incorrecto. @WebFluxTest es un slice que carga únicamente la capa web reactiva (controladores, filtros web) y auto-configura WebTestClient para testing. Los servicios y repositorios deben sustituirse con @MockBean.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q17">
+        <div class="quiz-label">Pregunta 17 / 20</div>
+        <div class="quiz-q">¿Qué prueba @JsonTest y qué herramientas configura?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q17',true)"><span class="quiz-letter">A</span>Prueba la serialización/deserialización JSON configurando JacksonTester, GsonTester o JsonbTester según la librería disponible, sin cargar el contexto completo</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><span class="quiz-letter">B</span>Valida que los endpoints REST devuelven JSON bien formado haciendo peticiones HTTP reales</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><span class="quiz-letter">C</span>Compara dos respuestas JSON byte a byte para detectar diferencias</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q17',false)"><span class="quiz-letter">D</span>Genera automáticamente casos de test para todos los @JsonProperty de las entidades</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q17-ok">Correcto. @JsonTest es un slice que configura únicamente el subsistema de serialización JSON. Inyecta JacksonTester (o GsonTester/JsonbTester) con ObjectMapper correctamente configurado para probar serialize/deserialize de DTOs/entidades.</div>
+        <div class="quiz-feedback fail" id="em6q17-fail">Incorrecto. @JsonTest carga solo la infraestructura de serialización JSON y configura helpers como JacksonTester. Permite probar serialización y deserialización de objetos sin arrancar el contexto completo de Spring.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q18">
+        <div class="quiz-label">Pregunta 18 / 20</div>
+        <div class="quiz-q">¿Qué ventaja ofrece assertAll() de JUnit 5 frente a assertions individuales?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><span class="quiz-letter">A</span>Es más rápido que assertEquals porque no usa reflexión</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q18',true)"><span class="quiz-letter">B</span>Ejecuta todas las assertions agrupadas aunque algunas fallen, reportando todos los fallos a la vez en lugar de detenerse en el primero</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><span class="quiz-letter">C</span>Permite reutilizar los mismos assertions en múltiples tests automáticamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q18',false)"><span class="quiz-letter">D</span>Agrupa los tests en suites y ejecuta cada assertion en un thread separado</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q18-ok">Correcto. assertAll() garantiza que todas las assertions del grupo se evalúan siempre, reportando todos los fallos en un solo informe. Con assertions individuales, el test se detiene en la primera que falla, ocultando el resto de problemas.</div>
+        <div class="quiz-feedback fail" id="em6q18-fail">Incorrecto. assertAll() evalúa todas las assertions del grupo aunque algunas fallen, lo que permite ver de una sola ejecución todos los problemas en lugar de tener que corregirlos uno a uno ejecutando el test repetidamente.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q19">
+        <div class="quiz-label">Pregunta 19 / 20</div>
+        <div class="quiz-q">¿Cuándo deberías usar TestEntityManager en lugar de JpaRepository en un test @DataJpaTest?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q19',true)"><span class="quiz-letter">A</span>Para preparar el estado inicial de la BD (arrange) sin pasar por la lógica del repositorio bajo prueba, garantizando que el setup no está contaminado por el código que se quiere testear</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><span class="quiz-letter">B</span>TestEntityManager siempre debe usarse; JpaRepository no está disponible en @DataJpaTest</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><span class="quiz-letter">C</span>Solo se usa TestEntityManager cuando la entidad no tiene un repositorio definido</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q19',false)"><span class="quiz-letter">D</span>TestEntityManager es más rápido porque evita la capa de abstracción de Spring Data</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q19-ok">Correcto. El patrón recomendado es usar TestEntityManager para el arrange (insertar datos de prueba) y JpaRepository para el act/assert (ejecutar y verificar la query bajo prueba). Así el setup no depende del código que se está probando.</div>
+        <div class="quiz-feedback fail" id="em6q19-fail">Incorrecto. La práctica recomendada es usar TestEntityManager para insertar datos de prueba (arrange) y el JpaRepository bajo prueba para el act/assert. Esto evita que el código de setup y el código bajo prueba sean el mismo, haciendo el test más fiable.</div>
+      </div>
+
+      <div class="quiz-box" id="em6q20">
+        <div class="quiz-label">Pregunta 20 / 20</div>
+        <div class="quiz-q">¿Qué problema puede ocurrir cuando múltiples clases de test usan @MockBean sobre el mismo bean?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><span class="quiz-letter">A</span>El bean mockeado lanza NullPointerException en el segundo test</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><span class="quiz-letter">B</span>@MockBean solo puede usarse una vez por proyecto; el segundo uso falla en compilación</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em6q20',true)"><span class="quiz-letter">C</span>Cada combinación diferente de @MockBean genera un contexto separado, aumentando el tiempo de ejecución; además, si un test deja el mock en estado inesperado y el contexto se reutiliza, puede contaminar otros tests</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em6q20',false)"><span class="quiz-letter">D</span>Solo puede haber un @MockBean por tipo en todo el contexto; el segundo sobrescribe silenciosamente al primero</div>
+        </div>
+        <div class="quiz-feedback ok" id="em6q20-ok">Correcto. Cada configuración única de @MockBean crea un nuevo ApplicationContext, lo que puede multiplicar el tiempo de arranque en suites grandes. Además, si el contexto se reutiliza entre tests y el mock no se reinicia (sin @ResetMocks), el estado puede contaminar otros tests.</div>
+        <div class="quiz-feedback fail" id="em6q20-fail">Incorrecto. El problema real de @MockBean en múltiples tests es doble: cada configuración diferente invalida el caché del contexto (más tiempo de arranque), y si el contexto se comparte sin resetear el mock, el estado de un test puede afectar a los siguientes.</div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-container>

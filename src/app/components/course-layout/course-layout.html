@@ -1,0 +1,125 @@
+@let course = c();
+@if (course.view === 'home') {
+  <div class="pf-container pf-page">
+    <div class="pf-split">
+      <aside class="pf-side" aria-label="Resumen del curso">
+        <a class="pf-back" routerLink="/java-backend"><app-icon name="arrow-left" /> Apuntes</a>
+        <h1 class="pf-side-title">{{ course.title }}</h1>
+        <dl class="pf-facts">
+          <div><dt>Módulos</dt><dd>{{ course.modules.length }}</dd></div>
+          <div><dt>Lecciones</dt><dd>{{ course.lessonCount }}</dd></div>
+          <div><dt>Evaluaciones</dt><dd>{{ course.evalCount }}, una por módulo</dd></div>
+          @if (course.visitedCount) {
+            <div><dt>Tu progreso</dt><dd>{{ course.visitedCount }} de {{ course.totalLessons }} vistas en este navegador</dd></div>
+          }
+        </dl>
+        <div class="cl-actions">
+          <button type="button" class="pf-btn pf-btn--solid" (click)="course.resume()">
+            {{ course.last ? 'Continuar donde lo dejé' : 'Empezar el curso' }}
+          </button>
+        </div>
+      </aside>
+
+      <div>
+        <p class="pf-statement">{{ course.intro }}</p>
+        <section class="pf-section" aria-labelledby="h-modulos">
+          <h2 id="h-modulos" class="pf-h">Módulos</h2>
+          <p class="pf-lead">En orden. Cada módulo termina con una evaluación.</p>
+          <app-flow [steps]="moduleSteps()" label="Módulos del curso, en orden" />
+        </section>
+      </div>
+    </div>
+  </div>
+} @else {
+  @let mod = course.modules[course.activeModule];
+  <div class="cl-lesson">
+    <aside class="cl-index" id="cl-index" [class.open]="course.menuOpen" aria-label="Lecciones del curso">
+      <div class="cl-index-head">
+        <button type="button" class="cl-home" (click)="course.goHome()"><app-icon name="arrow-left" /> {{ course.title }}</button>
+        <div class="cl-progress" role="progressbar" aria-label="Posición en el curso" aria-valuemin="1" [attr.aria-valuemax]="course.totalLessons" [attr.aria-valuenow]="course.position">
+          <span [style.width.%]="progressPct()"></span>
+        </div>
+        <p class="cl-progress-text">{{ course.position }} de {{ course.totalLessons }}</p>
+      </div>
+      <ol class="cl-mods">
+        @for (m of course.modules; track m.badge; let mi = $index) {
+          <li>
+            <button type="button" class="cl-mod" [class.active]="course.activeModule === mi" [attr.aria-expanded]="course.expandedModule === mi" (click)="course.toggleModule(mi)">
+              <span class="cl-dot" aria-hidden="true"></span>
+              <span class="cl-mod-title">{{ m.title }}</span>
+              <span class="cl-mod-count">{{ course.visitedIn(mi) }}/{{ m.lessons.length }}</span>
+            </button>
+            @if (course.expandedModule === mi) {
+              <ol class="cl-lessons">
+                @for (l of m.lessons; track $index; let li = $index) {
+                  @let current = mi === course.activeModule && li === course.activeLessonInModule;
+                  <li>
+                    <a
+                      class="cl-l"
+                      [routerLink]="course.route"
+                      [queryParams]="{ m: mi, l: li }"
+                      [class.current]="current"
+                      [class.done]="course.isDone(mi, li)"
+                      [class.eval]="course.isEvalTitle(l)"
+                      [attr.aria-current]="current ? 'page' : null"
+                    >
+                      <span class="cl-state" aria-hidden="true"></span>
+                      <span>{{ course.labelFor(mi, l) }}</span>
+                    </a>
+                  </li>
+                }
+              </ol>
+            }
+          </li>
+        }
+      </ol>
+    </aside>
+    @if (course.menuOpen) {
+      <button type="button" class="cl-backdrop" aria-label="Cerrar la lista de lecciones" (click)="course.toggleMenu()"></button>
+    }
+
+    <div class="cl-content">
+      <div class="cl-bar">
+        <div class="cl-bar-in">
+        <button type="button" class="cl-menu-btn" (click)="course.toggleMenu()" [attr.aria-expanded]="course.menuOpen" aria-controls="cl-index">
+          <app-icon name="menu" /> Lecciones
+        </button>
+        <p class="cl-where">
+          <span class="cl-dot current" aria-hidden="true"></span>
+          Módulo {{ course.activeModule + 1 }}: {{ mod.title }}
+        </p>
+        <p class="cl-count">{{ course.isCurrentEval ? 'Evaluación' : 'Lección ' + (course.activeLessonInModule + 1) + ' de ' + mod.lessons.length }}</p>
+        </div>
+      </div>
+
+      <div class="cl-body">
+        <ng-content />
+      </div>
+
+      @if (course.isLastLesson) {
+        <section class="cl-complete" aria-labelledby="h-fin">
+          <h2 id="h-fin">Llegaste al final del curso</h2>
+          <p>{{ course.completeText }}</p>
+          <a class="pf-btn pf-btn--solid" routerLink="/java-backend">Ver las otras rutas</a>
+        </section>
+      }
+
+      <nav class="cl-nav" aria-label="Lección anterior y siguiente">
+        @if (course.prevTarget; as t) {
+          <a class="cl-nav-btn" [routerLink]="course.route" [queryParams]="{ m: t.m, l: t.l }">
+            <small><app-icon name="arrow-left" /> Anterior</small>
+            <span>{{ course.titleAt(t) }}</span>
+          </a>
+        } @else {
+          <span></span>
+        }
+        @if (course.nextTarget; as t) {
+          <a class="cl-nav-btn next" [routerLink]="course.route" [queryParams]="{ m: t.m, l: t.l }">
+            <small>Siguiente <app-icon name="arrow-right" /></small>
+            <span>{{ course.titleAt(t) }}</span>
+          </a>
+        }
+      </nav>
+    </div>
+  </div>
+}

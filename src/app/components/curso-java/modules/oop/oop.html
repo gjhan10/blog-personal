@@ -1,0 +1,873 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===9">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">10</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Introducción a la POO</h2>
+        <p class="lesson-sub">La POO es un modelo de programación que organiza el código en <strong>clases</strong> y <strong>objetos</strong>, imitando cómo funciona el mundo real.</p>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">¿Qué es una Clase?</div> <br>
+          <div >&nbsp;&nbsp;Es el <strong>molde o plantilla</strong> que define cómo serán los objetos.</div>
+        </div>
+
+        <div class="compare-col">
+          <div class="compare-label good">Clase Auto → Objeto miAuto</div>
+          <div class="compare-code">
+            color = "rojo"&nbsp;&nbsp;&nbsp;&nbsp;// Atributo<br>
+            velocidad = 0&nbsp;&nbsp;&nbsp;&nbsp;// Atributo<br>
+            acelerar()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Método<br>
+            frenar()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Método
+          </div>
+        </div>
+        
+      </div>
+
+      <div class="compare-grid" style="margin-top:16px; align-items:center">
+        
+        <div class="compare-col">
+          <div class="compare-label good">¿Qué es un Objeto?</div>
+          <div > <br>
+            &nbsp;&nbsp;Un objeto es una <strong>instancia de una clase</strong>. Algo concreto creado a partir del <strong>  molde (la clase).</strong><br><br>
+            <strong>&nbsp;&nbsp;Un objeto tiene: </strong> <br><br>
+            <strong>&nbsp;&nbsp;Atributos</strong> → características o datos (variables).<br>
+            <strong>&nbsp;&nbsp;Métodos</strong> → acciones o comportamientos (funciones). <br><br>
+          </div>
+        </div>
+
+        <div style="text-align:center">
+          <img src="assets/svg/car-red.svg" alt="Auto rojo — ejemplo de objeto" style="max-width:280px; width:100%" />
+          <div style="font-size:0.75rem; color:#888; margin-top:4px">Objeto: <code>miAuto</code></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===10">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">11</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Clases &amp; Objetos</h2>
+        <p class="lesson-sub">Una <strong>clase</strong> es el plano (blueprint). Un <strong>objeto</strong> es una instancia concreta creada con <code>new</code>. Los objetos tienen <em>estado</em> (campos) y <em>comportamiento</em> (métodos).</p>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type"> NombreClase</span> <span class="a-br">{{ '{' }}</span></div>
+        <div class="anatomy-line pl"><span class="a-type">Tipo</span> <span class="a-body"> campo;</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">void</span> <span class="a-fn"> metodo</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }} ... {{ '}' }}</span></div>
+        <div class="anatomy-line"><span class="a-br">{{ '}' }}</span></div>
+        <div class="anatomy-line" style="margin-top:6px"><span class="a-type">NombreClase</span> <span class="a-body"> obj = </span><span class="a-kw">new </span> <span class="a-fn">NombreClase</span><span class="a-paren">()</span><span class="a-body">;</span></div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:10, file:'ClasesObjetos.java', hint:'Añade un tercer Coche'}"></ng-container>
+    </div>
+    <div class="lesson-card" *ngIf="globalLesson===11">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">12</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Creación de Métodos en Java</h2>
+        <p class="lesson-sub">Un <strong>método</strong> es un <strong>bloque de código que realiza una acción</strong>. Sirve para <strong>reutilizar código</strong> y <strong>organizar el programa</strong>.</p>
+      </div>
+      <div class="code-anatomy">
+        <div class="anatomy-line"><span class="a-body">modificador </span><span class="a-type">tipoDeRetorno </span> <span class="a-fn">nombreDelMetodo</span><span class="a-paren">(parámetros)</span> <span class="a-br">{{ '{' }}</span></div>
+        <div class="anatomy-line pl"><span class="a-comment">// cuerpo del método</span></div>
+        <div class="anatomy-line pl"><span class="a-kw">return</span><span class="a-body"> valor;</span> <span class="a-comment">// si tiene tipo de retorno</span></div>
+        <div class="anatomy-line"><span class="a-br">{{ '}' }}</span></div>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">void — sin retorno</div>
+          <div class="compare-code"><span class="a-kw">public void</span> saludar() {{ '{' }}<br>&nbsp;&nbsp;System.out.println("Hola!");<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">int — con retorno</div>
+          <div class="compare-code"><span class="a-kw">public int</span> sumar(<span class="a-type">int</span> a, <span class="a-type">int</span> b) {{ '{' }}<br>&nbsp;&nbsp;<span class="a-kw">return</span> a + b;<br>{{ '}' }}<br><br><span class="a-type">int</span> resultado = sumar(5, 3);<br>System.out.println(resultado); <span class="a-comment">// 8</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-card" *ngIf="globalLesson===12">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">13</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Constructores</h2>
+        <p class="lesson-sub">El constructor inicializa el objeto en el momento de su creación. Tiene el mismo nombre que la clase, sin tipo de retorno. Puede haber múltiples constructores (sobrecarga).</p>
+      </div>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Si no se define ningún constructor, Java proporciona uno por defecto sin parámetros. En cuanto defines uno con parámetros, el de defecto desaparece.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:12, file:'Persona.java', hint:'Crea más objetos Persona'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===13">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">14</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Miembros estáticos <code>(static)</code></h2>
+        <p class="lesson-sub">Un miembro <code>static</code> (atributo o método) pertenece a la <strong>clase</strong>, no a los objetos. Se carga en memoria una sola vez y se comparte entre todas las instancias. En otras palabras: los miembros estáticos son <strong>"de la clase"</strong>, no "del objeto".</p>
+      </div>
+
+      <h3 class="var-h3">Variables estáticas</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Se declaran con la palabra clave <code>static</code>.</li>
+        <li>Son <strong>compartidas por todos los objetos</strong> de la clase.</li>
+        <li>Útiles para <strong>contadores, configuraciones globales o constantes</strong>.</li>
+      </ul>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">Clase Persona</div>
+          <div class="compare-code"><span class="a-kw">class</span> Persona {{ '{' }}<br>&nbsp;&nbsp;<span class="a-kw">static int</span> contador = 0; <span class="a-comment">// compartida</span><br>&nbsp;&nbsp;<span class="a-type">String</span> nombre;<br>&nbsp;&nbsp;Persona(<span class="a-type">String</span> n) {{ '{' }}<br>&nbsp;&nbsp;&nbsp;&nbsp;nombre = n;<br>&nbsp;&nbsp;&nbsp;&nbsp;contador++; <span class="a-comment">// crece con cada objeto</span><br>&nbsp;&nbsp;{{ '}' }}<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Acceso en main</div>
+          <div class="compare-code"><span class="a-kw">new</span> Persona("Ana");<br><span class="a-kw">new</span> Persona("Luis");<br>System.out.println(Persona.contador); <span class="a-comment">// 2</span></div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Métodos estáticos</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Pertenecen a la clase, <strong>no necesitan crear un objeto</strong> para usarse.</li>
+        <li>Solo pueden acceder a <strong>otros miembros estáticos</strong> (no a variables de instancia).</li>
+      </ul>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">Clase Utilidades</div>
+          <div class="compare-code"><span class="a-kw">class</span> Utilidades {{ '{' }}<br>&nbsp;&nbsp;<span class="a-kw">static void</span> saludar(<span class="a-type">String</span> nombre) {{ '{' }}<br>&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Hola, " + nombre);<br>&nbsp;&nbsp;{{ '}' }}<br>{{ '}' }}</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Llamada sin objeto</div>
+          <div class="compare-code">Utilidades.saludar("Carlos"); <span class="a-comment">// sin new</span></div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Bloques estáticos</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Se ejecutan <strong>una sola vez</strong>, cuando la clase se carga en memoria.</li>
+        <li>Ideales para <strong>inicializar recursos</strong> o <strong>configuraciones estáticas</strong>.</li>
+      </ul>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label">Bloque estático</div>
+          <div class="compare-code"><span class="a-kw">class</span> Configuracion {{ '{' }}<br>&nbsp;&nbsp;<span class="a-kw">static</span> <span class="a-type">String</span> appName;<br>&nbsp;&nbsp;<span class="a-kw">static</span> {{ '{' }}<br>&nbsp;&nbsp;&nbsp;&nbsp;appName = "MiAplicacion";<br>&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Configuraci\u00f3n cargada");<br>&nbsp;&nbsp;{{ '}' }}<br>{{ '}' }}</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:13, file:'EstaticoDemo.java', hint:'Crea más objetos Persona y verifica el contador'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===14">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">15</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Abstracción</h2>
+        <p class="lesson-sub">Mecanismo que <strong>oculta los detalles</strong> de implementación y expone únicamente lo esencial. Se logra con <strong>clases abstractas</strong> e <strong>interfaces</strong>.</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+        <li>Oculta los detalles y muestra solo lo necesario.</li>
+        <li>Es el proceso de <strong>definir qué hace</strong> un objeto sin mostrar <strong>cómo lo hace</strong>.</li>
+        <li>Permite trabajar a un nivel conceptual, sin preocuparse por la implementación.</li>
+        <li>Se usa para simplificar sistemas complejos dividiéndolos en modelos más simples.</li>
+        <li>Se logra con <strong>clases abstractas</strong> o <strong>interfaces</strong>.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Ejemplo — abstract class Figura</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">abstract class</span> <span class="a-type"> Figura</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-kw">abstract double</span> <span class="a-fn"> area</span><span class="a-paren">()</span><span class="a-body">;</span> <span class="a-comment">// sin implementación</span><br>
+            <span class="a-br">{{ '}' }}</span><br>
+            <br>
+            <span class="a-kw">class</span> <span class="a-type"> Circulo</span> <span class="a-kw"> extends</span> <span class="a-type"> Figura</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-kw">double</span> radio<span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-fn">Circulo</span><span class="a-paren">(</span><span class="a-kw">double</span> r<span class="a-paren">)</span> <span class="a-br">{{ '{' }}</span> radio = r<span class="a-body">;</span> <span class="a-br">{{ '}' }}</span><br>
+            &nbsp;&nbsp;<span class="a-kw">double</span> <span class="a-fn"> area</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span> <span class="a-kw">return</span> Math.<span class="a-body">PI</span> * radio * radio<span class="a-body">;</span> <span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:14, file:'Main.java', hint:'Agrega método apagar()'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===15">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">16</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Encapsulamiento</h2>
+        <p class="lesson-sub">Oculta el estado interno (<code>private</code>) y expone solo lo necesario (<code>public</code>) mediante getters y setters. Protege la integridad de los datos.</p>
+      </div>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:14px">
+        <li>Protege los datos del objeto.</li>
+        <li>Se logra usando modificadores de acceso (<code>private</code>, <code>public</code>, <code>protected</code>, <em>default</em>).</li>
+        <li>Se accede a los datos mediante <strong>getters</strong> y <strong>setters</strong>.</li>
+      </ul>
+      <div class="compare-grid" style="grid-template-columns:1fr; margin-bottom:14px">
+        <div class="compare-col">
+          <div class="compare-label">Ejemplo — getter &amp; setter</div>
+          <div class="compare-code">
+            <span class="a-kw">class</span> <span class="a-type"> Persona</span> {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">private </span> <span class="a-type">String</span> nombre; <span class="a-comment">// protegido</span><br><br>
+            &nbsp;&nbsp;<span class="a-kw">public void  </span> <span class="a-fn">setNombre</span>(<span class="a-type">String</span> n) {{ '{' }} nombre = n; {{ '}' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">public </span> <span class="a-type">String</span> <span class="a-fn"> getNombre</span>() {{ '{' }} <span class="a-kw">return</span> nombre; {{ '}' }}<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+      <table class="ref-table">
+        <tr><th>Modificador</th><th>Clase</th><th>Paquete</th><th>Subclase</th><th>Mundial</th></tr>
+        <tr><td><code>private</code></td><td>✓</td><td>✗</td><td>✗</td><td>✗</td></tr>
+        <tr><td><em>(default)</em></td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+        <tr><td><code>protected</code></td><td>✓</td><td>✓</td><td>✓</td><td>✗</td></tr>
+        <tr><td><code>public</code></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+      </table>
+      <ng-container *ngTemplateOutlet="playground; context:{id:15, file:'CuentaBancaria.java', hint:'Intenta retirar más del saldo'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===16">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">17</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Herencia</h2>
+        <p class="lesson-sub"><code>extends</code> permite que una clase hija herede campos y métodos de la clase padre. Java solo soporta <strong>herencia simple</strong>. <code>super</code> accede al padre.</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+          <li>Una clase puede heredar atributos y métodos de otra.</li>
+          <li>Se usa la palabra clave <code>extends</code>.</li>
+          <li>A la clase "padre" se le conoce como <strong>superclase</strong>, mientras que la "hija" es la <strong>subclase</strong>.</li>
+        </ul>
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> El método sobreescrito debe tener <strong>exactamente la misma firma</strong>. Anota siempre <code>@Override</code> para que el compilador lo verifique.</div>
+
+      <div class="inh-layout">
+        <div class="inh-layout-left">
+          <h3 class="subsection-title">Consideraciones</h3>
+          <ul class="lesson-intro-list">
+            <li>Todas las clases heredan de <code>Object</code>.</li>
+            <li>Si una clase no hereda explícitamente de otra, implícitamente hereda de <code>Object</code>.</li>
+            <li>Una clase sólo puede heredar otra clase, aunque la superclase puede heredar a su vez a otra y así hasta n niveles.</li>
+            <li>Varias clases pueden heredar la misma clase.</li>
+            <li>Los miembros <code>private</code> de la superclase <strong>no son accesibles</strong> directamente desde la subclase.</li>
+            <li>Si queremos que una clase no se pueda heredar, la definiremos con <code>final</code>.</li>
+            <li>Entre la subclase y la superclase hay una relación de tipo <em>"Es un"</em>.</li>
+            <li>Un objeto de la subclase <em>"es un"</em> objeto del tipo de la superclase.</li>
+          </ul>
+        </div>
+
+        <div class="inheritance-diagram">
+          <div class="inh-node inh-root"><i class="ico ico-vehicle" aria-hidden="true"></i> Vehículo</div>
+          <div class="inh-lines">
+            <span class="inh-line"></span>
+            <span class="inh-line"></span>
+            <span class="inh-line"></span>
+          </div>
+          <div class="inh-children">
+            <div class="inh-node"><i class="ico ico-vehicle" aria-hidden="true"></i> Auto</div>
+            <div class="inh-node"><i class="ico ico-vehicle" aria-hidden="true"></i> Bicicleta</div>
+            <div class="inh-node"><i class="ico ico-vehicle" aria-hidden="true"></i> Bote</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">Constructores en herencia</h3>
+      <ul class="lesson-intro-list">
+        <li>Una subclase <strong>no hereda</strong> los constructores de la superclase.</li>
+        <li>La subclase SIEMPRE llama a un constructor de la superclase. Si no escribes nada, Java llama automáticamente a: <code>super();</code></li>
+        <li>Si el padre NO tiene constructor vacío, debes llamar a uno existente.</li>
+        <li>La llamada a <code>super(...)</code> debe ser la <strong>PRIMERA</strong> línea del constructor.</li>
+      </ul>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Padre sin constructor vacío → super() obligatorio</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">class</span> <span class="a-type"> A</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-fn">A</span><span class="a-paren">(int x)</span> <span class="a-br">{{ '{' }} {{ '}' }}</span> <span class="a-comment">// no hay constructor vacío</span><br>
+            <span class="a-br">{{ '}' }}</span><br><br>
+            <span class="a-kw">class</span> <span class="a-type"> B</span> <span class="a-kw"> extends </span><span class="a-type">A</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-fn">B</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">super</span><span class="a-paren">(10)</span><span class="a-body">;</span> <span class="a-comment">// obligatorio</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">super() llamado automáticamente — salida al crear Perro</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">class</span> <span class="a-type"> Animal</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-fn">Animal</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Animal creado"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span><br><br>
+            <span class="a-kw">class</span> <span class="a-type"> Perro</span> <span class="a-kw"> extends </span><span class="a-type">Animal</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-fn">Perro</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">super</span><span class="a-paren">()</span><span class="a-body">;</span> <span class="a-comment">// llamado automático</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Perro creado"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">Sobreescritura de métodos</h3>
+      <p class="lesson-sub" style="margin-bottom:14px">Es cuando una <strong>subclase</strong> define un método con el <strong>mismo nombre, mismos parámetros y mismo tipo de retorno</strong> que un método de la <strong>superclase</strong>, pero cambiando su comportamiento.</p>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Superclase — Animal</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">public class</span> <span class="a-type"> Animal</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-kw">public void</span> <span class="a-fn"> hacerSonido</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Sonido genérico"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Subclase — Perro con @Override</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">public class</span> <span class="a-type"> Perro</span> <span class="a-kw"> extends </span><span class="a-type">Animal</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-comment">@Override</span><br>
+            &nbsp;&nbsp;<span class="a-kw">public void</span> <span class="a-fn"> hacerSonido</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Guau guau"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:16, file:'HerenciaDemo.java', hint:'Añade class Ave extends Animal'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===18">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">19</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Polimorfismo</h2>
+        <p class="lesson-sub">Un objeto puede tomar muchas formas. Con polimorfismo de tiempo de ejecución (<em>dynamic dispatch</em>), un array de <code>Animal</code> puede contener objetos <code>Perro</code> y <code>Gato</code> y llamar al método correcto de cada uno.</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+        <li>Significa "muchas formas".</li>
+        <li>Capacidad de un objeto de tomar <strong>diferentes formas</strong> y permitir que un mismo método se comporte de <strong>distintas maneras</strong> según el tipo real del objeto que lo ejecute.</li>
+        <li>Funciona mediante <strong>herencia</strong> e <strong>interfaces</strong>.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label">Ejemplo — polimorfismo con herencia</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">class</span> <span class="a-type"> Animal</span> <span class="a-br">{{ '{' }}</span> <span class="a-kw">void</span> <span class="a-fn">sonido</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span> System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Sonido de animal"</span><span class="a-paren">)</span><span class="a-body">;</span> <span class="a-br">{{ '}' }} {{ '}' }}</span><br>
+            <span class="a-kw">class</span> <span class="a-type"> Perro</span> <span class="a-kw"> extends </span><span class="a-type">Animal</span> <span class="a-br">{{ '{' }}</span> <span class="a-kw">void </span> <span class="a-fn">sonido</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span> System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Guau!"</span><span class="a-paren">)</span><span class="a-body">;</span> <span class="a-br">{{ '}' }} {{ '}' }}</span><br>
+            <span class="a-kw">class</span> <span class="a-type"> Gato</span> <span class="a-kw"> extends </span><span class="a-type">Animal</span> <span class="a-br">{{ '{' }}</span> <span class="a-kw">void </span> <span class="a-fn">sonido</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span> System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"Miau!"</span><span class="a-paren">)</span><span class="a-body">;</span> <span class="a-br">{{ '}' }} {{ '}' }}</span><br>
+            <br>
+            <span class="a-type">Animal</span> a = <span class="a-kw">new</span> <span class="a-fn"> Perro</span><span class="a-paren">()</span><span class="a-body">;</span><br>
+            a.<span class="a-fn">sonido</span><span class="a-paren">()</span><span class="a-body">;</span> <span class="a-comment">// Guau!</span>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:18, file:'PolimorfismoDemo.java', hint:'Agrega más formas'}"></ng-container>
+      <div class="quiz-section">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Quiz OOP</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta única</div>
+          <div class="quiz-q">¿Cuál es la diferencia principal entre polimorfismo en tiempo de compilación y en tiempo de ejecución?</div>
+          <div class="quiz-options" id="qoop1">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'qoop1',false)"><div class="quiz-letter">A</div> No hay diferencia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'qoop1',true)"><div class="quiz-letter">B</div> El de compilación usa sobrecarga; el de ejecución usa sobreescritura</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'qoop1',false)"><div class="quiz-letter">C</div> El de ejecución es más lento siempre</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'qoop1',false)"><div class="quiz-letter">D</div> Solo existe el de ejecución en Java</div>
+          </div>
+          <div class="quiz-feedback ok" id="qoop1-ok">✓ Sobrecarga = compilación. Sobreescritura + herencia = ejecución (dynamic dispatch).</div>
+          <div class="quiz-feedback fail" id="qoop1-fail">✗ Sobrecarga lleva al polimorfismo de compilación; la sobreescritura al de ejecución.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===19">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">30</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Interfaces</h2>
+        <p class="lesson-sub">Una <strong>interfaz</strong> en Java es un tipo de referencia que define un <strong>conjunto de métodos abstractos (sin implementación)</strong> que una clase debe implementar.</p>
+      </div>
+
+      <p class="lesson-sub" style="margin-bottom:12px">También puede contener <strong>constantes</strong>, <strong>métodos por defecto (default)</strong> y <strong>métodos estáticos</strong>.</p>
+
+      <ul class="lesson-intro-list">
+        <li>Definir contratos que las clases deben cumplir</li>
+        <li>Aplicar <strong>polimorfismo</strong></li>
+        <li>Separar el "qué" del "cómo"</li>
+        <li>Simular <strong>herencia múltiple</strong></li>
+        <li>Crear código más flexible y mantenible</li>
+        <li>Usadas ampliamente en <strong>APIs</strong>, <strong>frameworks</strong>, <strong>eventos</strong>, <strong>inyección de dependencias</strong>, etc.</li>
+      </ul>
+
+      <h3 class="subsection-title">Interfaces Funcionales</h3>
+      <ul class="lesson-intro-list">
+        <li>Una <strong>interfaz funcional</strong> es una interfaz que tiene <strong>exactamente un solo método abstracto</strong>. Ese método define la "función" principal que la interfaz representa.</li>
+        <li>Estas interfaces se usan principalmente para trabajar con <strong>expresiones lambda</strong> y la <strong>programación funcional</strong> introducida en Java 8.</li>
+        <li>Tiene un solo método abstracto (obligatorio), este método define la operación principal.</li>
+        <li>Puede tener métodos <code>default</code> y <code>static</code>, no afectan la condición de que sea funcional.</li>
+        <li>Puede llevar la anotación <code>@FunctionalInterface</code>, esto <strong>no es obligatorio</strong>, pero:
+          <ul style="margin-top:6px; padding-left:1.2rem">
+            <li>Garantiza que la interfaz cumple la regla del método único.</li>
+            <li>Produce error de compilación si se agregan métodos extra.</li>
+          </ul>
+        </li>
+        <li>Es compatible automáticamente con expresiones lambda.</li>
+      </ul>
+
+      <p class="lesson-sub" style="margin:10px 0 6px"><strong>Ejemplo:</strong></p>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Interfaz funcional con lambda</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-type">Operacion</span> suma = <span class="a-paren">(a, b)</span> <span class="a-kw">-&gt;</span> a + b<span class="a-body">;</span>
+          </div>
+        </div>
+      </div>
+      <p class="lesson-sub" style="margin-top:10px">Permite implementar comportamientos de manera concisa, especialmente en streams, callbacks y programación reactiva.</p>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Clase abstracta</div>
+          <div class="compare-code compare-code--light">- Puede tener estado<br>- Herencia simple<br>- Constructores permitidos</div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Interfaz</div>
+          <div class="compare-code compare-code--light">- Sin estado (sólo constantes)<br>- Implementación múltiple<br>- Sin constructores</div>
+        </div>
+      </div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:19, file:'InterfacesDemo.java', hint:'Agrega interfaz Saltador'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===20">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">21</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Enumeraciones</h2>
+        <p class="lesson-sub">Una <strong>enumeración</strong> (<em>enum</em>) en Java es un tipo especial de clase que representa un <strong>conjunto fijo y limitado de valores constantes</strong>.</p>
+      </div>
+
+      <p class="lesson-sub" style="margin-bottom:12px">Por ejemplo, los días de la semana, los colores de un semáforo, los estados de un pedido, etc.</p>
+      <p class="lesson-sub" style="margin-bottom:16px">Los enums se introdujeron en <strong>Java 5</strong> y permiten definir constantes de una forma más segura y organizada que las clásicas <code>static final</code>.</p>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Ejemplo — enum EstadoPedido con atributo</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">public enum</span> <span class="a-type"> EstadoPedido</span> <span class="a-br">{{ '{' }}</span><br>
+            &nbsp;&nbsp;<span class="a-body">PENDIENTE</span><span class="a-paren">(</span><span class="a-str">"El pedido está pendiente"</span><span class="a-paren">)</span><span class="a-body">,</span><br>
+            &nbsp;&nbsp;<span class="a-body">EN_PROCESO</span><span class="a-paren">(</span><span class="a-str">"El pedido está en proceso"</span><span class="a-paren">)</span><span class="a-body">,</span><br>
+            &nbsp;&nbsp;<span class="a-body">ENVIADO</span><span class="a-paren">(</span><span class="a-str">"El pedido fue enviado"</span><span class="a-paren">)</span><span class="a-body">,</span><br>
+            &nbsp;&nbsp;<span class="a-body">ENTREGADO</span><span class="a-paren">(</span><span class="a-str">"El pedido fue entregado"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            <br>
+            &nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type"> String</span> descripcion<span class="a-body">;</span><br>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:20, file:'EnumDemo.java', hint:'Cambia el estado a ENVIADO'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===17">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">18</span><span class="lesson-mod">OOP</span></div>
+        <h2 class="lesson-title">Clases Abstractas</h2>
+        <p class="lesson-sub">Una clase abstracta <strong>no puede instanciarse</strong> directamente y puede contener métodos <strong>abstractos</strong> (sin implementación) y métodos <strong>concretos</strong> (con implementación). Se utiliza para definir una estructura común que deben seguir las clases hijas.</p>
+      </div>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Ejemplo — abstract class Animal</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">abstract class</span> <span class="a-type"> Animal</span> <span class="a-br">{{ '{' }}</span><br>
+            <br>
+            &nbsp;&nbsp;<span class="a-kw">abstract void</span> <span class="a-fn"> sonido</span><span class="a-paren">()</span><span class="a-body">;</span> <span class="a-comment">// sin implementación</span><br>
+            <br>
+            &nbsp;&nbsp;<span class="a-kw">void</span> <span class="a-fn"> dormir</span><span class="a-paren">()</span> <span class="a-br">{{ '{' }}</span> <span class="a-comment">// método concreto</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;System.<span class="a-body">out</span>.println<span class="a-paren">(</span><span class="a-str">"El animal está durmiendo"</span><span class="a-paren">)</span><span class="a-body">;</span><br>
+            &nbsp;&nbsp;<span class="a-br">{{ '}' }}</span><br>
+            <span class="a-br">{{ '}' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">Características</h3>
+      <ul class="lesson-intro-list">
+        <li>No es posible crear objetos de una clase abstracta.</li>
+        <li>Además de métodos abstractos, las clases abstractas pueden incluir atributos, constructores y métodos estándares.</li>
+        <li>Una clase que herede una clase abstracta está obligada a sobrescribir los métodos abstractos heredados (o declararse también como <code>abstract</code>).</li>
+        <li>El objetivo de los métodos abstractos es forzar a que todas las subclases tengan el mismo formato de método.</li>
+        <li>Puede haber clases abstractas sin ningún método abstracto.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Instanciación y polimorfismo</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-comment">// Animal a = new Animal();&nbsp;&nbsp;&#10060; ERROR — no se puede instanciar</span><br>
+            <br>
+            <span class="a-type">Animal</span> p = <span class="a-kw">new </span> <span class="a-fn">Perro</span><span class="a-paren">()</span><span class="a-body">;</span> <span class="a-comment">// ✓ uso de polimorfismo</span><br>
+            p.<span class="a-fn">hacerSonido</span><span class="a-paren">()</span><span class="a-body">;</span><br>
+            p.<span class="a-fn">dormir</span><span class="a-paren">()</span><span class="a-body">;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> No puedes hacer <code>new Animal()</code> si es abstracta. Debes crear una subclase concreta.</div>
+      <ng-container *ngTemplateOutlet="playground; context:{id:17, file:'AbstractaDemo.java', hint:'Añade class Ave extends Animal'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m2" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 2 — Programación Orientada a Objetos</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 30</div>
+          <div class="quiz-q">¿Qué palabra clave usa Java para que una clase herede de otra?</div>
+          <div class="quiz-options" id="em2q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">A</div> implements</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">B</div> inherits</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">C</div> derives</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q01',true)"><div class="quiz-letter">D</div> extends</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q01-ok">✓ <code>extends</code> establece herencia entre clases. <code>implements</code> es para interfaces.</div>
+          <div class="quiz-feedback fail" id="em2q01-fail">✗ Java usa <code>extends</code> para herencia de clases e <code>implements</code> para interfaces.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 30</div>
+          <div class="quiz-q">¿Cuántas clases puede extender simultáneamente una clase en Java?</div>
+          <div class="quiz-options" id="em2q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">A</div> Sin límite</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">B</div> Dos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">C</div> Tres</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q02',true)"><div class="quiz-letter">D</div> Una</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q02-ok">✓ Java solo permite herencia simple: una clase puede extender exactamente una superclase.</div>
+          <div class="quiz-feedback fail" id="em2q02-fail">✗ Java soporta solo herencia simple (una superclase). Para múltiple herencia se usan interfaces.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 30</div>
+          <div class="quiz-q">¿Qué modificador hace que un campo sea inaccesible desde fuera de la clase?</div>
+          <div class="quiz-options" id="em2q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">A</div> protected</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">B</div> default</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">C</div> public</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q03',true)"><div class="quiz-letter">D</div> private</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q03-ok">✓ <code>private</code> restringe el acceso a la propia clase. Es el pilar del encapsulamiento.</div>
+          <div class="quiz-feedback fail" id="em2q03-fail">✗ <code>private</code> limita el acceso solo a la clase. <code>protected</code> también lo permite en subclases.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 30</div>
+          <div class="quiz-q">¿Para qué sirve <code>super()</code> dentro de un constructor?</div>
+          <div class="quiz-options" id="em2q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">A</div> Crear una copia del objeto</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q04',true)"><div class="quiz-letter">B</div> Llamar al constructor de la clase padre</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">C</div> Inicializar campos estáticos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">D</div> Comparar el objeto con su padre</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q04-ok">✓ <code>super(args)</code> invoca el constructor de la superclase. Debe ser la primera instrucción.</div>
+          <div class="quiz-feedback fail" id="em2q04-fail">✗ <code>super()</code> llama al constructor de la clase padre. Debe ser la primera línea del constructor hijo.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 30</div>
+          <div class="quiz-q">¿Qué anotación verifica en compilación que un método sobreescribe correctamente a uno de la superclase?</div>
+          <div class="quiz-options" id="em2q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">A</div> @Interface</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">B</div> @Inherited</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">C</div> @Overload</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q05',true)"><div class="quiz-letter">D</div> @Override</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q05-ok">✓ <code>@Override</code> hace que el compilador verifique que la firma coincide exactamente con la del padre.</div>
+          <div class="quiz-feedback fail" id="em2q05-fail">✗ Usa <code>@Override</code>. Si la firma no coincide, el compilador detecta el error inmediatamente.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 30</div>
+          <div class="quiz-q">¿Puede una interfaz en Java 8+ tener métodos con implementación?</div>
+          <div class="quiz-options" id="em2q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">A</div> No, nunca</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q06',true)"><div class="quiz-letter">B</div> Sí, con <code>default</code> o <code>static</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">C</div> Solo con <code>static</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">D</div> Solo métodos abstractos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q06-ok">✓ Desde Java 8 las interfaces pueden tener métodos <code>default</code> (con implementación) y <code>static</code>.</div>
+          <div class="quiz-feedback fail" id="em2q06-fail">✗ Java 8 introdujo <code>default</code> y <code>static</code> en interfaces para añadir implementación sin romper compatibilidad.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 30</div>
+          <div class="quiz-q">¿Puede instanciarse directamente una clase <code>abstract</code>?</div>
+          <div class="quiz-options" id="em2q07">
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q07',true)"><div class="quiz-letter">A</div> No</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">B</div> Sí, siempre</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">C</div> Solo con <code>new Abstract()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">D</div> Depende del modificador de acceso</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q07-ok">✓ Una clase <code>abstract</code> no puede instanciarse. Solo sus subclases concretas pueden.</div>
+          <div class="quiz-feedback fail" id="em2q07-fail">✗ Las clases abstractas no se pueden instanciar con <code>new</code>. Debes crear una subclase concreta.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 30</div>
+          <div class="quiz-q">¿Cuántas interfaces puede implementar una clase en Java?</div>
+          <div class="quiz-options" id="em2q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">A</div> Solo una</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">B</div> Máximo dos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">C</div> Máximo cinco</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q08',true)"><div class="quiz-letter">D</div> Sin límite</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q08-ok">✓ Una clase puede implementar múltiples interfaces separadas por comas: <code>implements A, B, C</code>.</div>
+          <div class="quiz-feedback fail" id="em2q08-fail">✗ No hay límite. Una clase puede implementar tantas interfaces como sea necesario.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 30</div>
+          <div class="quiz-q">¿Qué es el polimorfismo dinámico (dynamic dispatch) en Java?</div>
+          <div class="quiz-options" id="em2q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">A</div> Sobrecarga de métodos en compilación</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">B</div> Uso de tipos genéricos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q09',true)"><div class="quiz-letter">C</div> El método correcto se elige en ejecución según el tipo real del objeto</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">D</div> Compilar Java directamente a código nativo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q09-ok">✓ En tiempo de ejecución la JVM llama al método de la clase real del objeto, no de la variable.</div>
+          <div class="quiz-feedback fail" id="em2q09-fail">✗ Dynamic dispatch significa que la JVM determina en tiempo de ejecución qué método invocar según el tipo real.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 30</div>
+          <div class="quiz-q">¿Qué genera Java automáticamente si no defines ningún constructor?</div>
+          <div class="quiz-options" id="em2q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">A</div> Error de compilación</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">B</div> Un constructor con todos los campos como parámetros</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q10',true)"><div class="quiz-letter">C</div> Un constructor sin parámetros (por defecto)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">D</div> Nada, el programa falla al instanciar</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q10-ok">✓ Si no defines constructores, Java añade implícitamente <code>ClaseNombre() {{ '{' }}{{ '}' }}</code>.</div>
+          <div class="quiz-feedback fail" id="em2q10-fail">✗ Java genera un constructor sin parámetros por defecto, pero desaparece en cuanto defines uno propio.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 30</div>
+          <div class="quiz-q">¿Qué método de un objeto se invoca automáticamente al pasarlo a <code>System.out.println()</code>?</div>
+          <div class="quiz-options" id="em2q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">A</div> hashCode()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">B</div> equals()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">C</div> getClass()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q11',true)"><div class="quiz-letter">D</div> toString()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q11-ok">✓ <code>println</code> llama a <code>String.valueOf(obj)</code>, que a su vez invoca <code>obj.toString()</code>.</div>
+          <div class="quiz-feedback fail" id="em2q11-fail">✗ Al imprimir un objeto se llama a <code>toString()</code>. Sobreescríbelo para mostrar información útil.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 30</div>
+          <div class="quiz-q">¿Cuál característica puede tener una clase abstracta pero NO una interfaz?</div>
+          <div class="quiz-options" id="em2q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">A</div> Múltiples implementadores</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">B</div> Métodos default</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q12',true)"><div class="quiz-letter">C</div> Constructores</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">D</div> Constantes estáticas</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q12-ok">✓ Las clases abstractas pueden tener constructores; las interfaces no. Ambas pueden tener constantes y métodos default.</div>
+          <div class="quiz-feedback fail" id="em2q12-fail">✗ Los constructores son exclusivos de las clases (incluyendo abstractas). Las interfaces no los tienen.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 30</div>
+          <div class="quiz-q">¿Qué hereda implícitamente toda clase de Java que no extiende explícitamente ninguna?</div>
+          <div class="quiz-options" id="em2q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">A</div> Runnable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">B</div> Comparable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">C</div> Cloneable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q13',true)"><div class="quiz-letter">D</div> Object</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q13-ok">✓ <code>java.lang.Object</code> es la raíz de toda la jerarquía de clases en Java.</div>
+          <div class="quiz-feedback fail" id="em2q13-fail">✗ Toda clase extiende implícitamente <code>Object</code>, que define <code>equals</code>, <code>hashCode</code>, <code>toString</code>, etc.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 30</div>
+          <div class="quiz-q">¿Cómo accede una subclase al método del padre que ha sobreescrito?</div>
+          <div class="quiz-options" id="em2q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">A</div> parent.metodo()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">B</div> base.metodo()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q14',true)"><div class="quiz-letter">C</div> super.metodo()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">D</div> this.parent.metodo()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q14-ok">✓ <code>super.metodo()</code> invoca la implementación de la superclase directa.</div>
+          <div class="quiz-feedback fail" id="em2q14-fail">✗ Usa <code>super.metodo()</code> para acceder a la versión del método definida en la clase padre.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 30</div>
+          <div class="quiz-q">¿Cuál es la diferencia principal entre interfaz y clase abstracta respecto a herencia/implementación?</div>
+          <div class="quiz-options" id="em2q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">A</div> La interfaz tiene constructor y la abstracta no</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q15',true)"><div class="quiz-letter">B</div> Una clase puede implementar múltiples interfaces pero solo extender una clase</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">C</div> No hay diferencia relevante entre ambas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">D</div> Solo la interfaz puede tener métodos estáticos</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q15-ok">✓ Esta es la razón principal para elegir interfaz: permite simular herencia múltiple.</div>
+          <div class="quiz-feedback fail" id="em2q15-fail">✗ Una clase puede implementar N interfaces pero solo extender una clase. Por eso las interfaces son preferidas para contratos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 30</div>
+          <div class="quiz-q">¿Puede una clase abstracta tener constructor en Java?</div>
+          <div class="quiz-options" id="em2q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">A</div> No, es inconcebible — las abstractas no se instancian</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q16',true)"><div class="quiz-letter">B</div> Sí, lo usan las subclases vía <code>super()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">C</div> Solo si se declara también como <code>final</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">D</div> Solo puede tener constructor sin parámetros</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q16-ok">✓ Las clases abstractas SÍ tienen constructor. Aunque no se instancian directamente, las subclases lo invocan con <code>super(params)</code> como primera línea de su propio constructor.</div>
+          <div class="quiz-feedback fail" id="em2q16-fail">✗ Las clases abstractas tienen constructor para inicializar su estado. Las subclases concretas lo llaman con <code>super()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 30</div>
+          <div class="quiz-q">¿Qué ocurre si omites <code>@Override</code> y tu método tiene una firma diferente a la del padre?</div>
+          <div class="quiz-options" id="em2q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">A</div> Sobreescritura silenciosa con la nueva firma</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q17',true)"><div class="quiz-letter">B</div> Se crea una sobrecarga (overload), no una sobreescritura</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">C</div> Error de compilación por firma ambigua</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">D</div> La JVM selecciona el método más específico en runtime</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q17-ok">✓ Sin <code>@Override</code>, si la firma no coincide exactamente, Java lo trata como <strong>sobrecarga</strong> (overload), no sobreescritura. <code>@Override</code> hace que el compilador detecte el error si no hay método padre coincidente.</div>
+          <div class="quiz-feedback fail" id="em2q17-fail">✗ Si la firma no coincide y no pones <code>@Override</code>, Java solo hace sobrecarga. Usa siempre <code>@Override</code> para que el compilador verifique la intención.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 30</div>
+          <div class="quiz-q">Una clase implementa dos interfaces con el mismo método <code>default void saludar()</code>. ¿Qué ocurre?</div>
+          <div class="quiz-options" id="em2q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">A</div> La primera interfaz tiene prioridad</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">B</div> Error de ejecución (RuntimeException)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q18',true)"><div class="quiz-letter">C</div> Error de compilación: la clase DEBE sobreescribir <code>saludar()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">D</div> Se crea un método compuesto automáticamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q18-ok">✓ El problema del diamante con <code>default</code> methods: si dos interfaces tienen el mismo método <code>default</code>, la clase implementadora DEBE sobreescribir el método o el compilador falla. Puede llamar a cualquiera con <code>InterfazA.super.saludar()</code>.</div>
+          <div class="quiz-feedback fail" id="em2q18-fail">✗ Conflicto de <code>default</code> methods → error de compilación. La clase debe resolver disambiguando con sobreescritura o llamando explícitamente <code>InterfazA.super.metodo()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 30</div>
+          <div class="quiz-q">¿Qué garantiza la palabra clave <code>sealed</code> en una clase (Java 17+)?</div>
+          <div class="quiz-options" id="em2q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">A</div> Que sus campos son inmutables</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">B</div> Que no puede tener métodos abstractos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q19',true)"><div class="quiz-letter">C</div> Que solo las clases listadas en <code>permits</code> pueden extenderla</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">D</div> Que es equivalente a una clase <code>final</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q19-ok">✓ <code>sealed class Figura permits Circulo, Rect {{ '{' }}{{ '}' }}</code> restringe la jerarquía: SOLO <code>Circulo</code> y <code>Rect</code> pueden extender <code>Figura</code>. Permite al compilador verificar exhaustividad en <code>switch</code> de pattern matching.</div>
+          <div class="quiz-feedback fail" id="em2q19-fail">✗ <code>sealed</code> + <code>permits</code> restringe qué clases pueden extender la sealed class. Cada subclase debe ser <code>final</code>, <code>sealed</code> o <code>non-sealed</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 30</div>
+          <div class="quiz-q">¿Qué tipo de retorno puede devolver una subclase que sobreescribe un método con tipo de retorno <code>Animal</code>?</div>
+          <div class="quiz-options" id="em2q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">A</div> Solo <code>Animal</code> exactamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">B</div> Cualquier tipo compatible con <code>Object</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q20',true)"><div class="quiz-letter">C</div> <code>Animal</code> o cualquier subclase de <code>Animal</code> (tipo covariante)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">D</div> No se puede cambiar el tipo de retorno nunca</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q20-ok">✓ Java soporta <strong>tipos de retorno covariantes</strong>: si el padre declara <code>Animal crear()</code>, la subclase puede sobreescribir con <code>Perro crear()</code> (siendo Perro subclase de Animal). Esto mejora la API sin forzar cast al llamador.</div>
+          <div class="quiz-feedback fail" id="em2q20-fail">✗ Java permite <em>covariant return types</em> desde Java 5: la subclase puede retornar un tipo más específico. <code>Perro extends Animal</code> → el override puede retornar <code>Perro</code> donde el padre retorna <code>Animal</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 21 de 30</div>
+          <div class="quiz-q">Dado el siguiente código, ¿qué imprime?<br><code>class A {{ '{' }} String f() {{ '{' }} return "A"; {{ '}' }} {{ '}' }}<br>class B extends A {{ '{' }} String f() {{ '{' }} return "B"; {{ '}' }} {{ '}' }}<br>A obj = new B();<br>System.out.println(obj.f());</code></div>
+          <div class="quiz-options" id="em2q21">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q21',false)"><div class="quiz-letter">A</div> <code>A</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q21',true)"><div class="quiz-letter">B</div> <code>B</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q21',false)"><div class="quiz-letter">C</div> Error de compilación</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q21',false)"><div class="quiz-letter">D</div> Error en tiempo de ejecución</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q21-ok">✓ <strong>Dynamic dispatch</strong>: aunque la variable es de tipo <code>A</code>, el objeto real es <code>B</code>. Java resuelve el método en tiempo de ejecución según el tipo real, por lo que se invoca <code>B.f()</code> → imprime <code>B</code>.</div>
+          <div class="quiz-feedback fail" id="em2q21-fail">✗ En Java, la resolución de métodos de instancia es dinámica (runtime). El tipo de la referencia solo importa para la compilación; el tipo real del objeto determina qué método se ejecuta.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 22 de 30 </div>
+          <div class="quiz-q">¿Cuál de las siguientes afirmaciones sobre <code>interface</code> vs <code>abstract class</code> es correcta en Java 8+?</div>
+          <div class="quiz-options" id="em2q22">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q22',false)"><div class="quiz-letter">A</div> Una interfaz puede tener constructores con lógica de inicialización</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q22',false)"><div class="quiz-letter">B</div> Una clase abstracta puede implementar múltiples clases abstractas</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q22',true)"><div class="quiz-letter">C</div> Una interfaz puede tener métodos <code>default</code> con implementación, pero no puede tener estado de instancia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q22',false)"><div class="quiz-letter">D</div> Una clase abstracta no puede implementar una interfaz</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q22-ok">✓ Desde Java 8, las interfaces admiten <code>default</code> y <code>static</code> methods con cuerpo. Sin embargo, <strong>no pueden tener campos de instancia</strong> (solo constantes <code>public static final</code>). Las clases abstractas sí pueden tener estado.</div>
+          <div class="quiz-feedback fail" id="em2q22-fail">✗ Las interfaces en Java 8+ permiten <code>default</code> methods, pero no campos de instancia ni constructores. Solo una clase abstracta puede tener atributos no estáticos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 23 de 30 </div>
+          <div class="quiz-q">¿Qué ocurre si una clase concreta implementa dos interfaces que declaran el mismo método <code>default</code> con idéntica firma?</div>
+          <div class="quiz-options" id="em2q23">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q23',false)"><div class="quiz-letter">A</div> Java usa la implementación de la primera interfaz declarada</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q23',false)"><div class="quiz-letter">B</div> Se lanza una excepción en tiempo de ejecución</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q23',true)"><div class="quiz-letter">C</div> Error de compilación: la clase debe sobreescribir el método para resolver el conflicto</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q23',false)"><div class="quiz-letter">D</div> Java fusiona automáticamente ambas implementaciones</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q23-ok">✓ Conflicto de <code>default</code> methods: el compilador exige que la clase concreta sobreescriba el método para resolver la ambigüedad. Puede delegar a una usando <code>InterfazA.super.metodo()</code>.</div>
+          <div class="quiz-feedback fail" id="em2q23-fail">✗ Java no resuelve automáticamente conflictos de métodos <code>default</code>. La clase implementadora <strong>debe</strong> sobreescribir el método o el código no compilará.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 24 de 30 </div>
+          <div class="quiz-q">¿Cuál es el resultado de este código?<br><code>class P {{ '{' }} P() {{ '{' }} System.out.print("P"); {{ '}' }} {{ '}' }}<br>class H extends P {{ '{' }} H() {{ '{' }} System.out.print("H"); {{ '}' }} {{ '}' }}<br>new H();</code></div>
+          <div class="quiz-options" id="em2q24">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q24',false)"><div class="quiz-letter">A</div> <code>H</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q24',true)"><div class="quiz-letter">B</div> <code>PH</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q24',false)"><div class="quiz-letter">C</div> <code>HP</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q24',false)"><div class="quiz-letter">D</div> Error de compilación</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q24-ok">✓ Si el constructor de la subclase no llama explícitamente a <code>super()</code>, Java inserta automáticamente <code>super()</code> como primera instrucción. Por ello el constructor padre <code>P()</code> se ejecuta primero → imprime <code>PH</code>.</div>
+          <div class="quiz-feedback fail" id="em2q24-fail">✗ Java siempre invoca el constructor padre antes que el hijo. Si no hay <code>super()</code> explícito, el compilador añade <code>super()</code> implícito como primera línea del constructor hijo.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 25 de 30 </div>
+          <div class="quiz-q">¿Puede un método <code>static</code> de una subclase "sobreescribir" (<code>@Override</code>) un método <code>static</code> de la superclase?</div>
+          <div class="quiz-options" id="em2q25">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q25',false)"><div class="quiz-letter">A</div> Sí, con <code>@Override</code> exactamente igual que los métodos de instancia</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q25',true)"><div class="quiz-letter">B</div> No; se produce <em>method hiding</em>, no <em>overriding</em>; la resolución es estática (en compilación)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q25',false)"><div class="quiz-letter">C</div> Sí, pero solo si la subclase también es <code>static</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q25',false)"><div class="quiz-letter">D</div> Los métodos estáticos no pueden redefinirse en una subclase</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q25-ok">✓ Los métodos <code>static</code> se resuelven en <strong>tiempo de compilación</strong> según el tipo de la referencia, no del objeto real. Esto se llama <em>method hiding</em>. <code>@Override</code> en un método estático produce error de compilación.</div>
+          <div class="quiz-feedback fail" id="em2q25-fail">✗ Los métodos <code>static</code> pertenecen a la clase, no al objeto. No participan en el polimorfismo dinámico; se aplica <em>method hiding</em> y la resolución es estática.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 26 de 30 </div>
+          <div class="quiz-q">¿Qué modificador de acceso tienen implícitamente todos los métodos declarados en una <code>interface</code> (sin <code>default</code> ni <code>static</code>)?</div>
+          <div class="quiz-options" id="em2q26">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q26',false)"><div class="quiz-letter">A</div> <code>protected abstract</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q26',true)"><div class="quiz-letter">B</div> <code>public abstract</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q26',false)"><div class="quiz-letter">C</div> <code>package-private abstract</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q26',false)"><div class="quiz-letter">D</div> <code>public final</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q26-ok">✓ En Java, todos los métodos de una interfaz sin cuerpo son implícitamente <strong><code>public abstract</code></strong>. No es necesario escribirlo, pero el compilador lo infiere. Intentar declararlos <code>private</code> o <code>protected</code> produce error de compilación (excepto <code>private</code> desde Java 9).</div>
+          <div class="quiz-feedback fail" id="em2q26-fail">✗ Los métodos abstractos de una interfaz son siempre <code>public abstract</code> de forma implícita. Las clases que implementan la interfaz deben proporcionar implementaciones <code>public</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 27 de 30 </div>
+          <div class="quiz-q">Una clase tiene el constructor <code>Persona(String n, int e)</code>. Se define una subclase <code>Empleado</code> sin ningún constructor. ¿Qué ocurre?</div>
+          <div class="quiz-options" id="em2q27">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q27',false)"><div class="quiz-letter">A</div> El compilador genera automáticamente <code>Empleado(String n, int e)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q27',true)"><div class="quiz-letter">B</div> Error de compilación porque <code>Persona</code> no tiene constructor sin argumentos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q27',false)"><div class="quiz-letter">C</div> Se puede instanciar <code>Empleado</code> con <code>new Empleado()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q27',false)"><div class="quiz-letter">D</div> Java hereda el constructor padre automáticamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q27-ok">✓ El compilador genera un constructor por defecto <code>Empleado()</code> que llama implícitamente a <code>super()</code>. Pero <code>Persona</code> no tiene constructor sin argumentos, por lo que el compilador lanza un <strong>error de compilación</strong>.</div>
+          <div class="quiz-feedback fail" id="em2q27-fail">✗ Java no hereda constructores. El constructor por defecto de la subclase llama a <code>super()</code> sin args, pero la superclase solo tiene un constructor con parámetros → error de compilación.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 28 de 30 </div>
+          <div class="quiz-q">¿Cuál de las siguientes combinaciones de modificadores para un atributo en una clase es válida en Java?</div>
+          <div class="quiz-options" id="em2q28">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q28',false)"><div class="quiz-letter">A</div> <code>private public int x;</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q28',false)"><div class="quiz-letter">B</div> <code>protected private int x;</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q28',true)"><div class="quiz-letter">C</div> <code>private static final int X = 10;</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q28',false)"><div class="quiz-letter">D</div> <code>public abstract int x;</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q28-ok">✓ <code>private static final int X = 10;</code> es perfectamente válido: acceso restringido a la clase, miembro de clase (no de instancia) e inmutable. Es el patrón estándar para constantes privadas.</div>
+          <div class="quiz-feedback fail" id="em2q28-fail">✗ Solo se puede usar <strong>un</strong> modificador de acceso. <code>private public</code> o <code>protected private</code> son ilegales. <code>abstract</code> solo aplica a métodos y clases, no a atributos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 29 de 30 </div>
+          <div class="quiz-q">¿Qué garantiza el principio de <strong>Liskov Substitution Principle (LSP)</strong> en el diseño OOP?</div>
+          <div class="quiz-options" id="em2q29">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q29',false)"><div class="quiz-letter">A</div> Que toda subclase debe sobreescribir todos los métodos del padre</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q29',true)"><div class="quiz-letter">B</div> Que un objeto de una subclase debe poder sustituir a uno de la superclase sin alterar la corrección del programa</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q29',false)"><div class="quiz-letter">C</div> Que toda clase debe implementar al menos una interfaz</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q29',false)"><div class="quiz-letter">D</div> Que los métodos de la subclase deben ser más restrictivos que los del padre</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q29-ok">✓ LSP (Barbara Liskov, 1987): si <code>S</code> es subtipo de <code>T</code>, cualquier programa que use objetos de tipo <code>T</code> debe funcionar correctamente con objetos de tipo <code>S</code> sin modificarse. Viola LSP, por ejemplo, un <code>Cuadrado extends Rectángulo</code> que cambia el comportamiento de <code>setAncho/setAlto</code>.</div>
+          <div class="quiz-feedback fail" id="em2q29-fail">✗ El LSP establece que las subclases deben ser <strong>sustituibles</strong> por sus superclases sin romper el comportamiento esperado. No exige sobreescribir todos los métodos ni que los métodos sean más restrictivos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 30 de 30 </div>
+          <div class="quiz-q">¿Cuál es el resultado de compilar y ejecutar el siguiente código?<br><code>interface I {{ '{' }} default String m() {{ '{' }} return "I"; {{ '}' }} {{ '}' }}<br>class A implements I {{ '{' }} public String m() {{ '{' }} return "A"; {{ '}' }} {{ '}' }}<br>class B extends A implements I {{ '{' }}{{ '}' }}<br>System.out.println(new B().m());</code></div>
+          <div class="quiz-options" id="em2q30">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q30',false)"><div class="quiz-letter">A</div> <code>I</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q30',true)"><div class="quiz-letter">B</div> <code>A</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q30',false)"><div class="quiz-letter">C</div> Error de compilación por ambigüedad</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q30',false)"><div class="quiz-letter">D</div> Error en tiempo de ejecución</div>
+          </div>
+          <div class="quiz-feedback ok" id="em2q30-ok">✓ La regla de resolución de Java: <strong>la implementación de una clase siempre gana sobre un método <code>default</code> de interfaz</strong>. <code>A.m()</code> sobreescribe el <code>default I.m()</code>, y <code>B</code> hereda <code>A.m()</code> → imprime <code>A</code>. No hay ambigüedad.</div>
+          <div class="quiz-feedback fail" id="em2q30-fail">✗ En Java, la prioridad es: clase concreta &gt; interfaz <code>default</code>. <code>B</code> hereda <code>m()</code> de <code>A</code> (que tiene prioridad sobre el <code>default</code> de <code>I</code>), por lo que se imprime <code>A</code>.</div>
+        </div>
+      </div>
+
+</ng-container>

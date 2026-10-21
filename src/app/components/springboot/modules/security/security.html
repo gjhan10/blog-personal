@@ -1,0 +1,625 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===26">
+    <div class="lesson-header">
+      <span class="lesson-num">26</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">Spring Security Intro</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">FilterChain · SecurityContext · Authentication · AuthenticationProvider</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></span>
+        <div class="tc-title">FilterChain</div>
+        <div class="tc-body">Spring Security se integra como una cadena de filtros Servlet. Cada request pasa por <strong>SecurityFilterChain</strong> antes de llegar al controlador. Los filtros se ejecutan en orden y pueden cortar la cadena si la autenticación falla.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-folder" aria-hidden="true"></i></span>
+        <div class="tc-title">SecurityContext</div>
+        <div class="tc-body"><strong>SecurityContextHolder</strong> almacena el contexto de seguridad del thread actual (estrategia ThreadLocal por defecto). Contiene el objeto <strong>Authentication</strong> con la información del usuario autenticado.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-idcard" aria-hidden="true"></i></span>
+        <div class="tc-title">Authentication Object</div>
+        <div class="tc-body">Interfaz que encapsula: <strong>principal</strong> (identidad del usuario), <strong>credentials</strong> (contraseña u otros datos), <strong>authorities</strong> (roles/permisos) y el flag <strong>isAuthenticated</strong>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-user" aria-hidden="true"></i></span>
+        <div class="tc-title">Principal</div>
+        <div class="tc-body">Representa la identidad autenticada. Normalmente es un objeto <strong>UserDetails</strong>. Se puede obtener via <code>SecurityContextHolder.getContext().getAuthentication().getPrincipal()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></span>
+        <div class="tc-title">AuthenticationProvider</div>
+        <div class="tc-body">Responsable de verificar las credenciales. <strong>DaoAuthenticationProvider</strong> usa un <code>UserDetailsService</code> y un <code>PasswordEncoder</code>. Puedes implementar providers personalizados para LDAP, OAuth, JWT, etc.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      Flujo básico: Request → DelegatingFilterProxy → SecurityFilterChain → AuthenticationManager → AuthenticationProvider → UserDetailsService → SecurityContext
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Obtener el usuario autenticado desde cualquier parte</span></div>
+      <div class="anatomy-line"><span class="a-type">Authentication</span> <span class="a-kw">auth</span> = <span class="a-type">SecurityContextHolder</span>.getContext().getAuthentication();</div>
+      <div class="anatomy-line"><span class="a-type">String</span> <span class="a-kw">username</span> = auth.getName();</div>
+      <div class="anatomy-line"><span class="a-type">Object</span> <span class="a-kw">principal</span> = auth.getPrincipal();</div>
+      <div class="anatomy-line"><span class="a-type">Collection</span>&lt;? <span class="a-kw">extends</span> <span class="a-type">GrantedAuthority</span>&gt; <span class="a-kw">authorities</span> = auth.getAuthorities();</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===27">
+    <div class="lesson-header">
+      <span class="lesson-num">27</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">Configuración básica</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">SecurityFilterChain · permitAll · CSRF · HttpSecurity DSL · formLogin vs httpBasic</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></span>
+        <div class="tc-title">SecurityFilterChain @Bean</div>
+        <div class="tc-body">Desde Spring Security 5.7+ se configura declarando un <strong>@Bean</strong> de tipo <code>SecurityFilterChain</code>. Se reemplaza la extensión de <code>WebSecurityConfigurerAdapter</code> (deprecada). El método recibe un <code>HttpSecurity</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-signal" aria-hidden="true"></i></span>
+        <div class="tc-title">permitAll / authenticated</div>
+        <div class="tc-body"><strong>permitAll()</strong> permite el acceso sin autenticación. <strong>authenticated()</strong> exige que el usuario esté autenticado. <strong>hasRole("ADMIN")</strong> restringe a un rol. Se configuran con <code>authorizeHttpRequests()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-shield" aria-hidden="true"></i></span>
+        <div class="tc-title">CSRF</div>
+        <div class="tc-body">Cross-Site Request Forgery. Activado por defecto para formularios HTML. Se puede <strong>deshabilitar</strong> cuando la API es stateless y usa tokens (JWT/Bearer), ya que no hay cookies de sesión que explotar.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></span>
+        <div class="tc-title">formLogin vs httpBasic</div>
+        <div class="tc-body"><strong>formLogin()</strong>: redirige a una página de login HTML (para aplicaciones web tradicionales). <strong>httpBasic()</strong>: envía credenciales en el header Authorization codificadas en Base64 (para APIs/servicios).</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">SecurityFilterChain</span> securityFilterChain(<span class="a-type">HttpSecurity</span> http) <span class="a-kw">throws</span> <span class="a-type">Exception</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;http</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.authorizeHttpRequests(auth -&gt; auth</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.requestMatchers(<span class="a-str">"/public/**"</span>).permitAll()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.requestMatchers(<span class="a-str">"/admin/**"</span>).hasRole(<span class="a-str">"ADMIN"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.anyRequest().authenticated()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.csrf(csrf -&gt; csrf.disable()) <span class="a-cm">// API stateless</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.httpBasic(<span class="a-type">Customizer</span>.withDefaults());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> http.build();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="warn-box">
+      No deshabilites CSRF en aplicaciones con sesión y cookies. Solo es seguro hacerlo en APIs REST stateless que usan tokens Bearer.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===28">
+    <div class="lesson-header">
+      <span class="lesson-num">28</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">JWT Authentication</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">Estructura JWT · JwtEncoder/JwtDecoder · Bearer flow · Stateless · Secret vs RSA</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-coin" aria-hidden="true"></i></span>
+        <div class="tc-title">Estructura JWT</div>
+        <div class="tc-body">Formato: <strong>header.payload.signature</strong>. Header: algoritmo y tipo. Payload: claims (sub, iat, exp, roles). Signature: HMAC o RSA sobre header+payload. Los claims son <strong>públicos</strong> — no almacenar datos sensibles sin cifrado.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></span>
+        <div class="tc-title">JwtEncoder / JwtDecoder</div>
+        <div class="tc-body"><strong>JwtEncoder</strong> genera tokens firmados a partir de <code>JwsHeader</code> y <code>JwtClaimsSet</code>. <strong>JwtDecoder</strong> valida y parsea el token. Spring Security los provee con <code>NimbusJwtEncoder/Decoder</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></span>
+        <div class="tc-title">Bearer Token Flow</div>
+        <div class="tc-body">1. Cliente envía credenciales → 2. Servidor genera JWT → 3. Cliente guarda el token → 4. Cliente envía <strong>Authorization: Bearer &lt;token&gt;</strong> en cada request → 5. Servidor valida y extrae el usuario.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></span>
+        <div class="tc-title">Stateless Session</div>
+        <div class="tc-body">Con JWT la sesión es <strong>stateless</strong>: el servidor no guarda estado. Se configura con <code>sessionManagement(s -&gt; s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</code>. Mejora la escalabilidad horizontal.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></span>
+        <div class="tc-title">Secret vs RSA Keys</div>
+        <div class="tc-body"><strong>HMAC/Secret</strong> (HS256): clave simétrica compartida, más simple. <strong>RSA</strong> (RS256): par público/privado, el servidor firma con la privada y los clientes verifican con la pública. RSA es preferido en producción.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Generar JWT con JwtEncoder</span></div>
+      <div class="anatomy-line"><span class="a-type">JwtClaimsSet</span> claims = <span class="a-type">JwtClaimsSet</span>.builder()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.issuer(<span class="a-str">"self"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.issuedAt(<span class="a-type">Instant</span>.now())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expiresAt(<span class="a-type">Instant</span>.now().plus(<span class="a-num">1</span>, <span class="a-type">ChronoUnit</span>.HOURS))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.subject(username)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.claim(<span class="a-str">"roles"</span>, roles)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.build();</div>
+      <div class="anatomy-line"><span class="a-type">String</span> token = jwtEncoder.encode(<span class="a-type">JwtEncoderParameters</span>.from(claims)).getTokenValue();</div>
+    </div>
+
+    <div class="info-box">
+      Un JWT expirado no puede ser revocado sin una lista negra (blocklist). Para revocar tokens antes de expirar, implementa una blocklist con Redis o usa tokens de corta duración con refresh tokens.
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===29">
+    <div class="lesson-header">
+      <span class="lesson-num">29</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">SecurityFilterChain — Filtros personalizados</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">OncePerRequestFilter · addFilterBefore/After · UsernamePasswordAuthenticationFilter · ExceptionTranslationFilter</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></span>
+        <div class="tc-title">OncePerRequestFilter</div>
+        <div class="tc-body">Clase base para filtros personalizados que garantiza que se ejecuten <strong>exactamente una vez</strong> por request, incluso en forward/include internos. Implementa <code>doFilterInternal(request, response, chain)</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></span>
+        <div class="tc-title">addFilterBefore / addFilterAfter</div>
+        <div class="tc-body">Posiciona tu filtro en la cadena relativo a un filtro existente. <strong>addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class)</strong>: ejecuta antes. <strong>addFilterAt</strong>: reemplaza en esa posición.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-unlock" aria-hidden="true"></i></span>
+        <div class="tc-title">UsernamePasswordAuthenticationFilter</div>
+        <div class="tc-body">Filtro estándar de Spring Security para autenticación por formulario. Intercepta POST en <code>/login</code> y extrae <code>username</code> y <code>password</code>. Se puede personalizar o reemplazar con un filtro JWT.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></span>
+        <div class="tc-title">ExceptionTranslationFilter</div>
+        <div class="tc-body">Captura excepciones de seguridad: <strong>AuthenticationException</strong> → redirige a login (401). <strong>AccessDeniedException</strong> → devuelve 403. Es el puente entre las excepciones de Spring Security y las respuestas HTTP.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">JwtAuthFilter</span> <span class="a-kw">extends</span> <span class="a-type">OncePerRequestFilter</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Override</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected void</span> doFilterInternal(<span class="a-type">HttpServletRequest</span> req, <span class="a-type">HttpServletResponse</span> res, <span class="a-type">FilterChain</span> chain)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">throws</span> <span class="a-type">ServletException</span>, <span class="a-type">IOException</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">String</span> header = req.getHeader(<span class="a-str">"Authorization"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">if</span> (header != <span class="a-kw">null</span> &amp;&amp; header.startsWith(<span class="a-str">"Bearer "</span>)) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">String</span> token = header.substring(<span class="a-num">7</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-cm">// validar y setear SecurityContext</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;chain.doFilter(req, res);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span>Crear clase que extiende <code>OncePerRequestFilter</code></div>
+      <div class="step"><span class="step-n">2</span>Implementar lógica de extracción y validación del token</div>
+      <div class="step"><span class="step-n">3</span>Setear <code>UsernamePasswordAuthenticationToken</code> en <code>SecurityContextHolder</code></div>
+      <div class="step"><span class="step-n">4</span>Registrar con <code>http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)</code></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===30">
+    <div class="lesson-header">
+      <span class="lesson-num">30</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">Method Security</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">@EnableMethodSecurity · @PreAuthorize · @PostAuthorize · SpEL · @Secured</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></span>
+        <div class="tc-title">@EnableMethodSecurity</div>
+        <div class="tc-body">Anotación de clase de configuración que habilita la seguridad a nivel de método. Reemplaza a <code>@EnableGlobalMethodSecurity</code> (deprecada en Spring Security 5.6). Activa <code>prePostEnabled=true</code> por defecto.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></span>
+        <div class="tc-title">@PreAuthorize</div>
+        <div class="tc-body">Evalúa una expresión SpEL <strong>antes</strong> de ejecutar el método. Lanza <code>AccessDeniedException</code> si falla. Ejemplo: <code>@PreAuthorize("hasRole('ADMIN')")</code> o <code>@PreAuthorize("#username == authentication.name")</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-upload" aria-hidden="true"></i></span>
+        <div class="tc-title">@PostAuthorize</div>
+        <div class="tc-body">Evalúa una expresión SpEL <strong>después</strong> de ejecutar el método, con acceso al valor de retorno via <code>returnObject</code>. Útil para verificar que el recurso pertenece al usuario actual. El método ya se ejecutó.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></span>
+        <div class="tc-title">SpEL Expressions</div>
+        <div class="tc-body"><code>hasRole('ADMIN')</code>, <code>hasAuthority('READ')</code>, <code>hasAnyRole(...)</code>, <code>isAuthenticated()</code>, <code>isAnonymous()</code>, <code>authentication.name</code>, <code>#param</code> (parámetro del método), <code>returnObject</code>.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-tag" aria-hidden="true"></i></span>
+        <div class="tc-title">@Secured</div>
+        <div class="tc-body">Alternativa más simple que no usa SpEL. Acepta roles directamente: <code>@Secured({{ '{' }}"ROLE_ADMIN", "ROLE_MOD"{{ '}' }})</code>. Menos expresivo que <code>@PreAuthorize</code>. Requiere <code>securedEnabled=true</code> en <code>@EnableMethodSecurity</code>.</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label good">Method Security</div>
+        <div class="compare-code">
+          <div class="anatomy-line"><span class="a-kw">@PreAuthorize</span>(<span class="a-str">"hasRole('ADMIN')"</span>)</div>
+          <div class="anatomy-line"><span class="a-kw">public void</span> deleteUser(<span class="a-type">Long</span> id) {{ '{' }} ... {{ '}' }}</div>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">URL Security</div>
+        <div class="compare-code">
+          <div class="anatomy-line">.requestMatchers(<span class="a-str">"/admin/**"</span>)</div>
+          <div class="anatomy-line">&nbsp;&nbsp;.hasRole(<span class="a-str">"ADMIN"</span>)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      Method security y URL security pueden coexistir. URL security filtra a nivel de routing (más rápido), Method security es más granular y puede usarse en cualquier @Service o @Repository, no solo en controladores.
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">@EnableMethodSecurity</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">SecurityConfig</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;</div>
+      <div class="anatomy-line"><span class="a-kw">@PostAuthorize</span>(<span class="a-str">"returnObject.owner == authentication.name"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Document</span> getDocument(<span class="a-type">Long</span> id) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> documentRepository.findById(id).orElseThrow();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===31">
+    <div class="lesson-header">
+      <span class="lesson-num">31</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">OAuth2 Basics</span>
+    </div>
+    <div class="lesson-meta">
+      <span class="lesson-sub">Authorization Code · Resource Server · Client Credentials · Scopes · oauth2-resource-server</span>
+    </div>
+
+    <div class="theory-grid">
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-shuffle" aria-hidden="true"></i></span>
+        <div class="tc-title">Authorization Code Flow</div>
+        <div class="tc-body">Flujo principal de OAuth2 para aplicaciones web: 1. App redirige a Authorization Server. 2. Usuario autentica y autoriza. 3. AS devuelve <strong>authorization code</strong>. 4. App intercambia el code por <strong>access token</strong> (server-to-server).</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></span>
+        <div class="tc-title">Resource Server</div>
+        <div class="tc-body">Servidor que protege los recursos y valida tokens. Con Spring Boot se habilita con <code>spring-security-oauth2-resource-server</code>. Configura <code>oauth2ResourceServer(o -&gt; o.jwt(...))</code> para aceptar Bearer tokens JWT.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-cpu" aria-hidden="true"></i></span>
+        <div class="tc-title">Client Credentials</div>
+        <div class="tc-body">Flujo para comunicación <strong>machine-to-machine</strong> sin usuario. El cliente (servicio) autentica directamente con sus propias credenciales y obtiene un token. Ideal para microservicios, cron jobs y daemons.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></span>
+        <div class="tc-title">Scopes</div>
+        <div class="tc-body">Definen el <strong>alcance de acceso</strong> del token. Ejemplos: <code>read</code>, <code>write</code>, <code>openid</code>, <code>profile</code>. Los scopes limitan qué puede hacer el cliente, a diferencia de los roles que definen qué puede hacer el usuario.</div>
+      </div>
+      <div class="theory-card">
+        <span class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></span>
+        <div class="tc-title">oauth2-resource-server</div>
+        <div class="tc-body">Dependencia <code>spring-boot-starter-oauth2-resource-server</code> incluye soporte para validar JWT y tokens opacos (introspección). Configura automáticamente <code>JwtDecoder</code> con la propiedad <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code>.</div>
+      </div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml — Resource Server con JWT</span></div>
+      <div class="anatomy-line"><span class="a-kw">spring</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">security</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">oauth2</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">resourceserver</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">jwt</span>:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">issuer-uri</span>: <span class="a-str">https://auth.example.com</span></div>
+    </div>
+
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// SecurityFilterChain para Resource Server</span></div>
+      <div class="anatomy-line">http</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.authorizeHttpRequests(auth -&gt; auth.anyRequest().authenticated())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.oauth2ResourceServer(oauth2 -&gt; oauth2</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(myConverter())));</div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span>Agregar dependencia <code>spring-boot-starter-oauth2-resource-server</code></div>
+      <div class="step"><span class="step-n">2</span>Configurar <code>issuer-uri</code> o <code>jwk-set-uri</code> del Authorization Server</div>
+      <div class="step"><span class="step-n">3</span>Implementar <code>JwtAuthenticationConverter</code> para mapear claims a authorities</div>
+      <div class="step"><span class="step-n">4</span>Proteger endpoints con <code>hasAuthority("SCOPE_read")</code> o <code>@PreAuthorize</code></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="isEval">
+    <div class="lesson-header">
+      <span class="lesson-num">M5</span>
+      <span class="lesson-mod">Módulo 5 · Spring Security</span>
+      <span class="lesson-title">Evaluación — 20 preguntas avanzadas</span>
+    </div>
+
+    <div class="quiz-section">
+
+      <div class="quiz-box" id="em5q01">
+        <div class="quiz-label">Pregunta 1 / 20</div>
+        <div class="quiz-q">¿Dónde almacena Spring Security el objeto Authentication por defecto?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><span class="quiz-letter">A</span>En la sesión HTTP del servidor</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q01',true)"><span class="quiz-letter">B</span>En un ThreadLocal del SecurityContextHolder</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><span class="quiz-letter">C</span>En una cookie de sesión del cliente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q01',false)"><span class="quiz-letter">D</span>En Redis automáticamente</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q01-ok">Correcto. La estrategia por defecto es MODE_THREADLOCAL: cada thread tiene su propio SecurityContext.</div>
+        <div class="quiz-feedback fail" id="em5q01-fail">Incorrecto. Spring Security usa un ThreadLocal (MODE_THREADLOCAL) para aislar el contexto por thread.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q02">
+        <div class="quiz-label">Pregunta 2 / 20</div>
+        <div class="quiz-q">¿Cuándo es seguro deshabilitar la protección CSRF?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><span class="quiz-letter">A</span>Siempre que la aplicación use HTTPS</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><span class="quiz-letter">B</span>Cuando se usa autenticación básica (httpBasic)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q02',true)"><span class="quiz-letter">C</span>En APIs REST stateless que autentican mediante tokens Bearer, no cookies</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q02',false)"><span class="quiz-letter">D</span>Cuando el frontend está en el mismo dominio</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q02-ok">Correcto. CSRF explota cookies de sesión. Si la API usa tokens Bearer (no cookies), no hay vector de ataque CSRF.</div>
+        <div class="quiz-feedback fail" id="em5q02-fail">Incorrecto. Solo es seguro deshabilitar CSRF cuando la API es stateless y usa tokens Bearer en vez de cookies.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q03">
+        <div class="quiz-label">Pregunta 3 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia principal entre CORS y CSRF?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><span class="quiz-letter">A</span>Son el mismo ataque con distinto nombre</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q03',true)"><span class="quiz-letter">B</span>CORS es un mecanismo del navegador para controlar orígenes; CSRF es un ataque que usa cookies involuntariamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><span class="quiz-letter">C</span>CORS protege contra CSRF automáticamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q03',false)"><span class="quiz-letter">D</span>CSRF es una política del servidor; CORS es un ataque</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q03-ok">Correcto. CORS (Cross-Origin Resource Sharing) controla qué orígenes pueden hacer requests. CSRF (Cross-Site Request Forgery) es un ataque que fuerza acciones no deseadas via cookies.</div>
+        <div class="quiz-feedback fail" id="em5q03-fail">Incorrecto. CORS es una política del navegador para orígenes cruzados. CSRF es un tipo de ataque que explota la autenticación por cookies.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q04">
+        <div class="quiz-label">Pregunta 4 / 20</div>
+        <div class="quiz-q">¿Qué claim de un JWT se valida para verificar que no ha expirado?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><span class="quiz-letter">A</span>iat (issued at)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><span class="quiz-letter">B</span>nbf (not before)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q04',true)"><span class="quiz-letter">C</span>exp (expiration time)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q04',false)"><span class="quiz-letter">D</span>sub (subject)</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q04-ok">Correcto. El claim <code>exp</code> contiene el timestamp Unix de expiración. Spring Security lo valida automáticamente con JwtDecoder.</div>
+        <div class="quiz-feedback fail" id="em5q04-fail">Incorrecto. El claim de expiración es <code>exp</code> (expiration time). <code>iat</code> es cuando fue emitido, <code>nbf</code> es "no válido antes de".</div>
+      </div>
+
+      <div class="quiz-box" id="em5q05">
+        <div class="quiz-label">Pregunta 5 / 20</div>
+        <div class="quiz-q">¿Para qué sirve <code>jwtAuthenticationConverter</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><span class="quiz-letter">A</span>Para codificar el JWT en Base64</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q05',true)"><span class="quiz-letter">B</span>Para convertir los claims del JWT en GrantedAuthorities de Spring Security</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><span class="quiz-letter">C</span>Para firmar el JWT con la clave privada</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q05',false)"><span class="quiz-letter">D</span>Para validar la firma del JWT</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q05-ok">Correcto. El converter extrae claims (como roles) del JWT y los mapea a <code>GrantedAuthority</code> para que funcionen con <code>hasRole</code> y <code>hasAuthority</code>.</div>
+        <div class="quiz-feedback fail" id="em5q05-fail">Incorrecto. <code>jwtAuthenticationConverter</code> convierte los claims del JWT en authorities de Spring Security (GrantedAuthority).</div>
+      </div>
+
+      <div class="quiz-box" id="em5q06">
+        <div class="quiz-label">Pregunta 6 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia entre <code>GrantedAuthority</code> y un Role en Spring Security?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q06',true)"><span class="quiz-letter">A</span>Un Role es un GrantedAuthority con el prefijo "ROLE_"; hasRole agrega ese prefijo automáticamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><span class="quiz-letter">B</span>Son exactamente lo mismo, solo nombres distintos</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><span class="quiz-letter">C</span>GrantedAuthority solo se usa con JWT y Role con formLogin</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q06',false)"><span class="quiz-letter">D</span>hasRole ignora el prefijo ROLE_ siempre</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q06-ok">Correcto. <code>hasRole('ADMIN')</code> busca la authority <code>ROLE_ADMIN</code>. <code>hasAuthority('ROLE_ADMIN')</code> es equivalente pero requiere el prefijo explícito.</div>
+        <div class="quiz-feedback fail" id="em5q06-fail">Incorrecto. Un Role es una GrantedAuthority cuyo nombre lleva el prefijo <code>ROLE_</code>. <code>hasRole('ADMIN')</code> agrega ese prefijo automáticamente.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q07">
+        <div class="quiz-label">Pregunta 7 / 20</div>
+        <div class="quiz-q">¿Qué diferencia hay entre <code>hasAuthority('READ')</code> y <code>hasRole('READ')</code> en SpEL?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><span class="quiz-letter">A</span>No hay diferencia, son equivalentes</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q07',true)"><span class="quiz-letter">B</span>hasAuthority busca exactamente "READ"; hasRole busca "ROLE_READ" automáticamente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><span class="quiz-letter">C</span>hasRole busca exactamente "READ"; hasAuthority agrega "ROLE_"</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q07',false)"><span class="quiz-letter">D</span>hasAuthority solo funciona con OAuth2 scopes</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q07-ok">Correcto. <code>hasAuthority</code> usa el string tal cual. <code>hasRole</code> antepone automáticamente el prefijo <code>ROLE_</code> al valor dado.</div>
+        <div class="quiz-feedback fail" id="em5q07-fail">Incorrecto. <code>hasAuthority('READ')</code> busca exactamente "READ". <code>hasRole('READ')</code> busca "ROLE_READ" porque agrega el prefijo.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q08">
+        <div class="quiz-label">Pregunta 8 / 20</div>
+        <div class="quiz-q">¿Cuáles son las estrategias disponibles para <code>SecurityContextHolder</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><span class="quiz-letter">A</span>THREAD_LOCAL, GLOBAL y SESSION</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q08',true)"><span class="quiz-letter">B</span>MODE_THREADLOCAL, MODE_INHERITABLETHREADLOCAL y MODE_GLOBAL</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><span class="quiz-letter">C</span>SYNC, ASYNC y DISTRIBUTED</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q08',false)"><span class="quiz-letter">D</span>PER_REQUEST, PER_SESSION y PER_APP</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q08-ok">Correcto. MODE_THREADLOCAL (default), MODE_INHERITABLETHREADLOCAL (propaga a threads hijos) y MODE_GLOBAL (contexto compartido por toda la JVM).</div>
+        <div class="quiz-feedback fail" id="em5q08-fail">Incorrecto. Las estrategias son MODE_THREADLOCAL, MODE_INHERITABLETHREADLOCAL y MODE_GLOBAL.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q09">
+        <div class="quiz-label">Pregunta 9 / 20</div>
+        <div class="quiz-q">¿Qué hace la funcionalidad Remember-Me de Spring Security?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><span class="quiz-letter">A</span>Guarda la contraseña del usuario en localStorage</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q09',true)"><span class="quiz-letter">B</span>Emite una cookie persistente para re-autenticar al usuario automáticamente entre sesiones</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><span class="quiz-letter">C</span>Recuerda los endpoints visitados por el usuario</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q09',false)"><span class="quiz-letter">D</span>Almacena el token JWT en una cookie HttpOnly</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q09-ok">Correcto. Remember-Me usa una cookie persistente (hash o token en BD) que permite re-autenticar sin credenciales al vencer la sesión.</div>
+        <div class="quiz-feedback fail" id="em5q09-fail">Incorrecto. Remember-Me emite una cookie persistente para re-autenticar automáticamente al usuario entre sesiones del navegador.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q10">
+        <div class="quiz-label">Pregunta 10 / 20</div>
+        <div class="quiz-q">¿Qué es la protección contra "session fixation" y cómo la implementa Spring Security?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><span class="quiz-letter">A</span>Bloquea múltiples sesiones simultáneas del mismo usuario</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q10',true)"><span class="quiz-letter">B</span>Crea un nuevo ID de sesión tras la autenticación para invalidar el ID pre-existente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><span class="quiz-letter">C</span>Fija la sesión a una IP específica</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q10',false)"><span class="quiz-letter">D</span>Invalida la sesión después de 30 minutos de inactividad</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q10-ok">Correcto. Session fixation ocurre cuando un atacante inyecta un session ID conocido. Spring Security lo mitiga creando un nuevo session ID en cada login exitoso.</div>
+        <div class="quiz-feedback fail" id="em5q10-fail">Incorrecto. La protección contra session fixation crea un nuevo session ID tras autenticar, evitando que un atacante que inyectó el ID previo tenga acceso.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q11">
+        <div class="quiz-label">Pregunta 11 / 20</div>
+        <div class="quiz-q">¿Cómo se configura una Content Security Policy (CSP) en Spring Security?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><span class="quiz-letter">A</span>Con <code>@ContentSecurityPolicy</code> en el controlador</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q11',true)"><span class="quiz-letter">B</span>Con <code>http.headers(h -&gt; h.contentSecurityPolicy(csp -&gt; csp.policyDirectives("...")))</code></div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><span class="quiz-letter">C</span>Añadiendo el header manualmente en cada respuesta del controlador</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q11',false)"><span class="quiz-letter">D</span>Configurándola en el archivo <code>application.properties</code></div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q11-ok">Correcto. Spring Security permite configurar CSP via el DSL de headers, añadiendo el header <code>Content-Security-Policy</code> a todas las respuestas.</div>
+        <div class="quiz-feedback fail" id="em5q11-fail">Incorrecto. La CSP se configura con <code>http.headers(h -&gt; h.contentSecurityPolicy(...))</code> en la configuración de Spring Security.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q12">
+        <div class="quiz-label">Pregunta 12 / 20</div>
+        <div class="quiz-q">¿Qué impacto tiene aumentar los rounds de <code>BCryptPasswordEncoder</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><span class="quiz-letter">A</span>Aumenta la longitud del hash resultante</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><span class="quiz-letter">B</span>Hace el hash más corto y fácil de almacenar</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q12',true)"><span class="quiz-letter">C</span>Aumenta el tiempo de cómputo exponencialmente, dificultando ataques de fuerza bruta</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q12',false)"><span class="quiz-letter">D</span>Genera un salt diferente en cada round</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q12-ok">Correcto. BCrypt tiene un factor de coste (rounds = 2^n operaciones). Mayor coste = más tiempo por intento de ataque. El valor por defecto es 10 (2^10 = 1024 iteraciones).</div>
+        <div class="quiz-feedback fail" id="em5q12-fail">Incorrecto. El número de rounds en BCrypt define el coste computacional (2^rounds iteraciones), dificultando exponencialmente los ataques de fuerza bruta.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q13">
+        <div class="quiz-label">Pregunta 13 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia entre OAuth2 scopes y Spring Security roles?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q13',true)"><span class="quiz-letter">A</span>Scopes definen qué puede hacer una aplicación cliente; roles definen qué puede hacer un usuario</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><span class="quiz-letter">B</span>Son lo mismo, solo cambia el prefijo</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><span class="quiz-letter">C</span>Los scopes son más granulares que los roles</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q13',false)"><span class="quiz-letter">D</span>Los roles se usan solo con JWT y los scopes con tokens opacos</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q13-ok">Correcto. Scopes limitan las capacidades del cliente OAuth2 (qué puede pedir). Roles autorizan al usuario final (qué puede hacer). En Spring Security los scopes se mapean como <code>SCOPE_xxx</code>.</div>
+        <div class="quiz-feedback fail" id="em5q13-fail">Incorrecto. Scopes son permisos del cliente OAuth2; roles son permisos del usuario. Un scope <code>read</code> se mapea a authority <code>SCOPE_read</code>.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q14">
+        <div class="quiz-label">Pregunta 14 / 20</div>
+        <div class="quiz-q">¿Cómo valida un Resource Server un token JWT de entrada?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><span class="quiz-letter">A</span>Preguntando al cliente que envió el token</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><span class="quiz-letter">B</span>Descodificando el payload y confiando en el issuer</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q14',true)"><span class="quiz-letter">C</span>Verificando la firma con la clave pública del Authorization Server (jwk-set-uri) y validando claims como exp e iss</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q14',false)"><span class="quiz-letter">D</span>Enviando el token al Authorization Server en cada request</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q14-ok">Correcto. El Resource Server descarga las claves públicas del AS (JWK Set URI) para verificar la firma del JWT localmente, sin necesidad de contactar al AS en cada request.</div>
+        <div class="quiz-feedback fail" id="em5q14-fail">Incorrecto. El Resource Server verifica la firma del JWT usando la clave pública del Authorization Server (obtenida del JWK Set URI) y valida los claims estándar.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q15">
+        <div class="quiz-label">Pregunta 15 / 20</div>
+        <div class="quiz-q">¿Cuándo usar token introspection en lugar de JWT local validation?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><span class="quiz-letter">A</span>Cuando el JWT es muy grande</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q15',true)"><span class="quiz-letter">B</span>Cuando se necesita verificar revocación en tiempo real o el token es opaco (no JWT)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><span class="quiz-letter">C</span>Cuando se usa HMAC en lugar de RSA</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q15',false)"><span class="quiz-letter">D</span>Siempre es mejor que la validación local de JWT</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q15-ok">Correcto. La introspección consulta al AS en cada request, permitiendo verificar si el token fue revocado. JWT local es más eficiente pero no detecta revocación inmediata.</div>
+        <div class="quiz-feedback fail" id="em5q15-fail">Incorrecto. La introspección es útil para tokens opacos o cuando se necesita detectar revocación en tiempo real. JWT local es más eficiente pero no soporta revocación sin blocklist.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q16">
+        <div class="quiz-label">Pregunta 16 / 20</div>
+        <div class="quiz-q">¿Cómo se determina el orden de ejecución cuando hay múltiples beans <code>SecurityFilterChain</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><span class="quiz-letter">A</span>Por el orden de declaración en la clase de configuración</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q16',true)"><span class="quiz-letter">B</span>Por la anotación <code>@Order</code> en el bean o en la clase de configuración</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><span class="quiz-letter">C</span>Por el nombre del método @Bean (orden alfabético)</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q16',false)"><span class="quiz-letter">D</span>Siempre se ejecutan todos en paralelo</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q16-ok">Correcto. <code>@Order(1)</code> tiene mayor prioridad. Solo se aplica la primera cadena que coincide con el request matcher del filter chain.</div>
+        <div class="quiz-feedback fail" id="em5q16-fail">Incorrecto. El orden se controla con <code>@Order</code>. Solo se aplica la primera <code>SecurityFilterChain</code> cuyo <code>requestMatcher</code> coincide con la request.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q17">
+        <div class="quiz-label">Pregunta 17 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia entre <code>permitAll()</code> e ignorar una ruta con <code>WebSecurity</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q17',true)"><span class="quiz-letter">A</span>permitAll() pasa por los filtros de seguridad pero no requiere autenticación; ignorar la ruta omite completamente la cadena de filtros</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><span class="quiz-letter">B</span>Son equivalentes en rendimiento y seguridad</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><span class="quiz-letter">C</span>ignorar la ruta es más seguro porque aplica más filtros</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q17',false)"><span class="quiz-letter">D</span>permitAll() es solo para endpoints públicos de actuator</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q17-ok">Correcto. Con <code>permitAll()</code> los filtros de seguridad se ejecutan (incluyendo headers de seguridad). Al ignorar la ruta, ningún filtro de Spring Security actúa, lo cual puede ser un riesgo.</div>
+        <div class="quiz-feedback fail" id="em5q17-fail">Incorrecto. <code>permitAll()</code> permite acceso sin autenticación pero mantiene los filtros activos (headers de seguridad, etc.). Ignorar la ruta la excluye completamente de Spring Security.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q18">
+        <div class="quiz-label">Pregunta 18 / 20</div>
+        <div class="quiz-q">¿Qué añade PKCE al flujo Authorization Code de OAuth2?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><span class="quiz-letter">A</span>Cifrado del access token con la clave pública del cliente</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q18',true)"><span class="quiz-letter">B</span>Un code_verifier/code_challenge que evita que un atacante intercambie un authorization code robado por un token</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><span class="quiz-letter">C</span>Un segundo factor de autenticación para el usuario</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q18',false)"><span class="quiz-letter">D</span>Firma digital del authorization code por el cliente</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q18-ok">Correcto. PKCE (Proof Key for Code Exchange) usa un code_verifier secreto y su hash (code_challenge). Sin el verifier original, el code interceptado es inútil.</div>
+        <div class="quiz-feedback fail" id="em5q18-fail">Incorrecto. PKCE protege el flujo Authorization Code generando un code_verifier aleatorio cuyo hash (code_challenge) se envía con la solicitud de autorización, evitando ataques de interceptación.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q19">
+        <div class="quiz-label">Pregunta 19 / 20</div>
+        <div class="quiz-q">¿Para qué sirve el grant type <code>refresh_token</code> en OAuth2?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><span class="quiz-letter">A</span>Para renovar el client_secret del cliente OAuth2</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><span class="quiz-letter">B</span>Para reautenticar al usuario con biometría</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q19',true)"><span class="quiz-letter">C</span>Para obtener un nuevo access token sin que el usuario vuelva a autenticarse, usando un refresh token de larga duración</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q19',false)"><span class="quiz-letter">D</span>Para extender la duración del access token existente</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q19-ok">Correcto. El refresh token tiene mayor duración y permite obtener nuevos access tokens de corta duración sin interrumpir la experiencia del usuario.</div>
+        <div class="quiz-feedback fail" id="em5q19-fail">Incorrecto. El grant <code>refresh_token</code> permite al cliente obtener un nuevo access token usando el refresh token de larga vida, sin necesidad de que el usuario se autentique de nuevo.</div>
+      </div>
+
+      <div class="quiz-box" id="em5q20">
+        <div class="quiz-label">Pregunta 20 / 20</div>
+        <div class="quiz-q">¿Cuál es la diferencia entre <code>@EnableGlobalMethodSecurity</code> y <code>@EnableMethodSecurity</code>?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><span class="quiz-letter">A</span>Son idénticas, solo cambia el nombre</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><span class="quiz-letter">B</span>@EnableMethodSecurity solo funciona con JWT</div>
+          <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em5q20',true)"><span class="quiz-letter">C</span>@EnableMethodSecurity es la nueva API (Spring Security 5.6+) que habilita prePostEnabled por defecto y usa AuthorizationManager; @EnableGlobalMethodSecurity está deprecada</div>
+          <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em5q20',false)"><span class="quiz-letter">D</span>@EnableGlobalMethodSecurity es más reciente y recomendada</div>
+        </div>
+        <div class="quiz-feedback ok" id="em5q20-ok">Correcto. <code>@EnableMethodSecurity</code> (Spring Security 5.6+) usa la nueva arquitectura basada en <code>AuthorizationManager</code>, activa <code>@PreAuthorize</code>/<code>@PostAuthorize</code> por defecto y reemplaza a la anotación deprecada.</div>
+        <div class="quiz-feedback fail" id="em5q20-fail">Incorrecto. <code>@EnableMethodSecurity</code> es la anotación moderna introducida en Spring Security 5.6. Habilita pre/post por defecto, usa AuthorizationManager y reemplaza a <code>@EnableGlobalMethodSecurity</code>, que está deprecada.</div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-container>

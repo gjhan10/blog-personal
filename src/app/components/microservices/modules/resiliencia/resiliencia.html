@@ -1,0 +1,500 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===12">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">13</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Circuit Breaker con Resilience4j</h2>
+      <p class="lesson-sub">El Circuit Breaker previene la propagación de fallos en cascada. Cuando un servicio destino falla repetidamente, el circuito "abre" y las llamadas subsiguientes se rechazan inmediatamente sin esperar el timeout.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Estado CLOSED</div>
+        <div class="tc-body">Operación normal. Las llamadas pasan al servicio. Se monitorizan fallos y latencias. Si la tasa de error supera el umbral, el circuito abre.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Estado OPEN</div>
+        <div class="tc-body">Las llamadas fallan inmediatamente sin contactar el servicio (fail-fast). Se ejecuta el fallback. Después de <code>waitDurationInOpenState</code>, pasa a HALF_OPEN.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-dot" aria-hidden="true"></i></div>
+        <div class="tc-title">Estado HALF_OPEN</div>
+        <div class="tc-body">Se permiten N llamadas de prueba. Si tienen éxito, el circuito cierra. Si fallan, vuelve a OPEN. Permite recuperación automática sin intervención manual.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Sliding Window</div>
+        <div class="tc-body">Resilience4j usa ventana deslizante (COUNT_BASED o TIME_BASED) para calcular la tasa de error. Es más preciso que un simple contador de fallos consecutivos.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># application.yml</span></div>
+      <div class="anatomy-line">resilience4j.circuitbreaker.instances.inventory:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;slidingWindowSize: 10</div>
+      <div class="anatomy-line">&nbsp;&nbsp;failureRateThreshold: 50</div>
+      <div class="anatomy-line">&nbsp;&nbsp;waitDurationInOpenState: 10s</div>
+      <div class="anatomy-line">&nbsp;&nbsp;permittedNumberOfCallsInHalfOpenState: 3</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Java — anotación</span></div>
+      <div class="anatomy-line">@CircuitBreaker(name = <span class="a-str">"inventory"</span>, fallbackMethod = <span class="a-str">"fallbackStock"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Stock</span> getStock(<span class="a-type">String</span> id) {{ '{' }} <span class="a-kw">return</span> inventoryClient.get(id); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">private</span> <span class="a-type">Stock</span> fallbackStock(<span class="a-type">String</span> id, <span class="a-type">Exception</span> e) {{ '{' }} <span class="a-kw">return</span> <span class="a-type">Stock</span>.empty(); {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===13">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">14</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Bulkhead Pattern</h2>
+      <p class="lesson-sub">El patrón Bulkhead (mamparo de barco) aísla los recursos por funcionalidad. Si las llamadas al servicio A saturan el thread pool, el servicio B sigue funcionando normalmente con su propio pool.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Semaphore Bulkhead</div>
+        <div class="tc-body">Limita el número de llamadas concurrentes con un semáforo. Más ligero en recursos. Cuando el semáforo está lleno, las llamadas adicionales reciben un fallback inmediatamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-branch" aria-hidden="true"></i></div>
+        <div class="tc-title">Thread Pool Bulkhead</div>
+        <div class="tc-body">Ejecuta las llamadas en un pool dedicado de threads. Permite timeout verdadero y aislamiento completo. Mayor overhead de contexto pero más robusto para I/O bloqueante.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-scale" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usar cada uno</div>
+        <div class="tc-body">Semaphore: operaciones no bloqueantes o reactivas. Thread Pool: llamadas síncronas que pueden bloquearse, donde necesitas timeout real y aislamiento de CPU.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Combinado con CB</div>
+        <div class="tc-body">Bulkhead + Circuit Breaker = defensa en profundidad. El Bulkhead evita que una dependencia lenta consuma todos los threads; el CB evita llamadas cuando la dependencia falla.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Bulkhead de semáforo</span></div>
+      <div class="anatomy-line">resilience4j.bulkhead.instances.inventory:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;maxConcurrentCalls: 10</div>
+      <div class="anatomy-line">&nbsp;&nbsp;maxWaitDuration: 0</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Anotación combinada</span></div>
+      <div class="anatomy-line">@Bulkhead(name = <span class="a-str">"inventory"</span>, type = <span class="a-type">Bulkhead.Type.SEMAPHORE</span>)</div>
+      <div class="anatomy-line">@CircuitBreaker(name = <span class="a-str">"inventory"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">Stock</span> getStock(<span class="a-type">String</span> id) {{ '{' }} ... {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===14">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">15</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Retry & Fallback</h2>
+      <p class="lesson-sub">El Retry automático maneja fallos transitorios (red inestable, servicio reiniciando). El exponential backoff con jitter evita el "thundering herd" cuando múltiples clientes reintentan simultáneamente.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">Exponential Backoff</div>
+        <div class="tc-body">El tiempo de espera entre reintentos se duplica: 100ms, 200ms, 400ms. Reduce la presión sobre un servicio en recuperación sin saturarlo con reintentos agresivos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shuffle" aria-hidden="true"></i></div>
+        <div class="tc-title">Jitter (aleatoriedad)</div>
+        <div class="tc-body">Añade un componente aleatorio al backoff. Sin jitter, todos los clientes que fallaron simultáneamente reintentarían al mismo tiempo. El jitter los distribuye en el tiempo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Excepciones a reintentar</div>
+        <div class="tc-body">Solo reintentar excepciones transitorias: timeout, 503, network error. NUNCA reintentar errores de negocio (400, 404) ya que el reintento no cambiará el resultado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-shield" aria-hidden="true"></i></div>
+        <div class="tc-title">Fallback</div>
+        <div class="tc-body">Respuesta alternativa cuando el servicio no está disponible: retornar datos en caché, un valor por defecto o una respuesta degradada que permita al usuario continuar.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Retry con backoff</span></div>
+      <div class="anatomy-line">resilience4j.retry.instances.inventory:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;maxAttempts: 3</div>
+      <div class="anatomy-line">&nbsp;&nbsp;waitDuration: 500ms</div>
+      <div class="anatomy-line">&nbsp;&nbsp;enableExponentialBackoff: <span class="a-kw">true</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;exponentialBackoffMultiplier: 2</div>
+      <div class="anatomy-line">&nbsp;&nbsp;retryExceptions: [java.net.ConnectException, feign.RetryableException]</div>
+      <div class="anatomy-line">&nbsp;&nbsp;ignoreExceptions: [com.example.BusinessException]</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===15">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">16</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Timeout Patterns</h2>
+      <p class="lesson-sub">Sin timeouts, una dependencia lenta puede retener threads indefinidamente, agotando el pool y haciendo que todo el servicio deje de responder. Los timeouts son la primera línea de defensa.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">Connection Timeout</div>
+        <div class="tc-body">Tiempo máximo para establecer la conexión TCP. Si el servidor no responde en este tiempo, se lanza un ConnectTimeoutException. Típicamente 1-5 segundos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-book" aria-hidden="true"></i></div>
+        <div class="tc-title">Read Timeout</div>
+        <div class="tc-body">Tiempo máximo para recibir datos una vez conectado. Si el servidor acepta la conexión pero no envía respuesta en este tiempo, se lanza ReadTimeoutException.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bell" aria-hidden="true"></i></div>
+        <div class="tc-title">Resilience4j TimeLimiter</div>
+        <div class="tc-body">Complementa los timeouts de red con un timeout de ejecución más fino. Útil cuando el cliente HTTP no expone bien los timeouts o para limitar código asíncrono.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ruler" aria-hidden="true"></i></div>
+        <div class="tc-title">Timeout Budget</div>
+        <div class="tc-body">En cadenas de servicios, el timeout de cada llamada debe ser menor que el timeout del servicio padre. Si A tiene 3s, B (llamado por A) debe tener &lt;3s para dejar margen.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Timeout en Feign Client</span></div>
+      <div class="anatomy-line">feign.client.config.inventory-service:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;connectTimeout: 2000</div>
+      <div class="anatomy-line">&nbsp;&nbsp;readTimeout: 5000</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Resilience4j TimeLimiter</span></div>
+      <div class="anatomy-line">resilience4j.timelimiter.instances.inventory:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;timeoutDuration: 3s</div>
+      <div class="anatomy-line">&nbsp;&nbsp;cancelRunningFuture: <span class="a-kw">true</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===16">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">17</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Rate Limiting</h2>
+      <p class="lesson-sub">El Rate Limiting protege los servicios de sobrecarga limitando el número de peticiones que un cliente puede hacer en un período de tiempo. Es esencial tanto en el API Gateway como en servicios individuales.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Token Bucket</div>
+        <div class="tc-body">Los tokens se añaden al cubo a una tasa constante. Cada petición consume un token. Permite bursts hasta la capacidad del cubo. El algoritmo más usado por su flexibilidad.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-droplet" aria-hidden="true"></i></div>
+        <div class="tc-title">Leaky Bucket</div>
+        <div class="tc-body">Las peticiones salen a una tasa constante independientemente del ritmo de entrada. Suaviza los picos de tráfico pero puede introducir latencia en peticiones que esperan en la cola.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Fixed Window</div>
+        <div class="tc-body">Limita N peticiones por ventana de tiempo fija. Simple pero vulnerable al "double burst": N peticiones al final de una ventana + N al inicio de la siguiente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Sliding Window Log</div>
+        <div class="tc-body">Rastrea el timestamp de cada petición. Más preciso que Fixed Window pero requiere más memoria. Ideal para límites estrictos donde la exactitud es crítica.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Resilience4j RateLimiter</span></div>
+      <div class="anatomy-line">resilience4j.ratelimiter.instances.orders-api:</div>
+      <div class="anatomy-line">&nbsp;&nbsp;limitForPeriod: 100</div>
+      <div class="anatomy-line">&nbsp;&nbsp;limitRefreshPeriod: 1s</div>
+      <div class="anatomy-line">&nbsp;&nbsp;timeoutDuration: 0</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">@RateLimiter(name = <span class="a-str">"orders-api"</span>, fallbackMethod = <span class="a-str">"rateLimitFallback"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">OrderDto</span> createOrder(<span class="a-type">OrderRequest</span> req) {{ '{' }} ... {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===17">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">18</span><span class="lesson-mod">M3 · Resiliencia</span></div>
+      <h2 class="lesson-title">Chaos Engineering</h2>
+      <p class="lesson-sub">Chaos Engineering es la disciplina de experimentar deliberadamente sobre un sistema en producción para descubrir debilidades antes de que lo hagan los fallos reales. Popularizado por Netflix con Chaos Monkey.</p>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Define el <strong>estado estable</strong>: métricas que indican que el sistema funciona correctamente (latencia p99, error rate, throughput).</div></div>
+      <div class="step"><span class="step-n">2</span><div>Genera la <strong>hipótesis</strong>: "Si el servicio de pagos tiene 200ms de latencia extra, el checkout seguirá funcionando".</div></div>
+      <div class="step"><span class="step-n">3</span><div>Introduce <strong>variables reales</strong>: latencia, errores, pérdida de paquetes, kill de instancias, agotamiento de disco.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Observa si el sistema <strong>regresa al estado estable</strong>. Si no, encontraste una debilidad real.</div></div>
+      <div class="step"><span class="step-n">5</span><div><strong>Minimiza el radio de blast</strong>: empieza en staging, luego un pequeño porcentaje de producción (con feature flags).</div></div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-activity" aria-hidden="true"></i></div>
+        <div class="tc-title">Chaos Monkey for Spring Boot</div>
+        <div class="tc-body">Librería que inyecta fallos en beans de Spring: latencia, excepciones, kill de instancias. Configurable por perfil para no afectar producción.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-wrench" aria-hidden="true"></i></div>
+        <div class="tc-title">Chaos Mesh (Kubernetes)</div>
+        <div class="tc-body">Plataforma de chaos engineering para Kubernetes. Inyecta fallos de red, CPU stress, memory pressure y pod failures a nivel de contenedor sin modificar el código.</div>
+      </div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Chaos Engineering no es "romper cosas aleatoriamente". Es experimentación científica controlada para validar la resiliencia y encontrar puntos débiles antes que los usuarios.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-ms-m3" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 3 — Resiliencia y Tolerancia a Fallos</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuáles son los tres estados del Circuit Breaker y cómo transicionan?</div>
+      <div class="quiz-options" id="msm3q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q01',false)"><div class="quiz-letter">A</div> Active, Inactive, Recovery — transicionan por tiempo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q01',true)"><div class="quiz-letter">B</div> CLOSED (normal) → OPEN (fallos exceden umbral) → HALF_OPEN (llamadas de prueba) → CLOSED/OPEN según resultado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q01',false)"><div class="quiz-letter">C</div> On, Off, Standby — transicionan por número de peticiones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q01',false)"><div class="quiz-letter">D</div> Up, Down, Degraded — transicionan por health check</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q01-ok">✓ CLOSED: operación normal. OPEN: fallos superan umbral, fail-fast. HALF_OPEN: prueba si el servicio recuperó. Si tiene éxito → CLOSED; si falla → OPEN.</div>
+      <div class="quiz-feedback fail" id="msm3q01-fail">✗ CLOSED (normal) → OPEN cuando la tasa de error supera el umbral. Después del waitDuration → HALF_OPEN (prueba con N llamadas). Éxito → CLOSED, fallo → OPEN.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Por qué el exponential backoff con jitter es mejor que el backoff fijo para reintentos?</div>
+      <div class="quiz-options" id="msm3q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q02',false)"><div class="quiz-letter">A</div> Porque siempre es más rápido que el backoff fijo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q02',true)"><div class="quiz-letter">B</div> El exponential reduce la presión acumulada en el servicio en recuperación, y el jitter distribuye los reintentos en el tiempo evitando el thundering herd</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q02',false)"><div class="quiz-letter">C</div> Porque no necesita configuración adicional</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q02',false)"><div class="quiz-letter">D</div> El jitter garantiza que no haya dos reintentos en el mismo segundo</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q02-ok">✓ Sin jitter, todos los clientes que fallaron simultáneamente reintentan exactamente al mismo tiempo → thundering herd. El jitter los desincroniza, suavizando la carga.</div>
+      <div class="quiz-feedback fail" id="msm3q02-fail">✗ El exponential backoff aumenta el tiempo entre reintentos (100ms, 200ms, 400ms). El jitter añade variación aleatoria para evitar que miles de clientes ataquen el servicio simultáneamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre el Bulkhead de semáforo y el de thread pool en Resilience4j?</div>
+      <div class="quiz-options" id="msm3q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q03',false)"><div class="quiz-letter">A</div> El semáforo usa threads; el thread pool usa semáforos internamente</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q03',true)"><div class="quiz-letter">B</div> El semáforo limita concurrencia con un contador; el thread pool ejecuta en threads dedicados, permitiendo timeout real y aislamiento completo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q03',false)"><div class="quiz-letter">C</div> Son funcionalmente equivalentes, solo cambia la implementación interna</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q03',false)"><div class="quiz-letter">D</div> El thread pool solo funciona con WebFlux; el semáforo con Spring MVC</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q03-ok">✓ Semaphore: ligero, ejecuta en el thread del caller, sin timeout verdadero. Thread Pool: ejecuta en threads dedicados, permite cancelar timeouts reales, más overhead pero aislamiento total.</div>
+      <div class="quiz-feedback fail" id="msm3q03-fail">✗ Semaphore Bulkhead: contador de concurrencia, más ligero, el caller espera. ThreadPool Bulkhead: ejecuta en pool propio, permite timeout real con Future.cancel(), más overhead pero aislamiento fuerte.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Por qué NUNCA se debería reintentar un error 400 Bad Request?</div>
+      <div class="quiz-options" id="msm3q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q04',false)"><div class="quiz-letter">A</div> Porque los errores 400 son de red y no de la aplicación</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q04',true)"><div class="quiz-letter">B</div> Un 400 indica que la petición es inválida; reintentar la misma petición producirá el mismo error 400 indefinidamente, desperdiciando recursos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q04',false)"><div class="quiz-letter">C</div> Porque los errores 400 solo ocurren en producción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q04',false)"><div class="quiz-letter">D</div> Porque el servidor puede cambiar la respuesta si se intenta de nuevo</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q04-ok">✓ Los errores 4xx son errores del cliente (datos incorrectos, recurso no encontrado). Reintentar no cambia la respuesta. Solo reintentar errores transitorios: 503, timeout, network error.</div>
+      <div class="quiz-feedback fail" id="msm3q04-fail">✗ Un 400 significa que el request es inválido. La misma petición inválida producirá 400 siempre. Solo reintentar errores transitorios (503, timeout) donde la condición puede cambiar.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Qué es el "thundering herd" y cómo lo previene el jitter en los reintentos?</div>
+      <div class="quiz-options" id="msm3q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q05',false)"><div class="quiz-letter">A</div> Un bug de concurrencia en la JVM al crear muchos threads</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q05',true)"><div class="quiz-letter">B</div> Miles de clientes reintentan exactamente al mismo tiempo, generando un pico de carga que puede impedir la recuperación del servicio. El jitter distribuye los reintentos en el tiempo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q05',false)"><div class="quiz-letter">C</div> Una condición de carrera cuando múltiples threads escriben en la misma base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q05',false)"><div class="quiz-letter">D</div> El consumo excesivo de memoria por parte de las colas de mensajes</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q05-ok">✓ Si 10,000 clientes fallan simultáneamente y todos reintentan a los 500ms exactos, el servicio recibe 10,000 peticiones en ese instante, lo que puede impedir que se recupere.</div>
+      <div class="quiz-feedback fail" id="msm3q05-fail">✗ Thundering herd = reintento sincronizado de miles de clientes. Jitter = añadir variación aleatoria (±random ms) para que los reintentos se distribuyan a lo largo del tiempo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué configura <code>failureRateThreshold: 50</code> en el Circuit Breaker de Resilience4j?</div>
+      <div class="quiz-options" id="msm3q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q06',false)"><div class="quiz-letter">A</div> El máximo de 50 llamadas por segundo que puede recibir el circuito</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q06',true)"><div class="quiz-letter">B</div> Si el 50% o más de las llamadas en la ventana deslizante fallan, el circuito pasa a OPEN</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q06',false)"><div class="quiz-letter">C</div> Se permiten hasta 50 fallos antes de abrir el circuito</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q06',false)"><div class="quiz-letter">D</div> El circuito permanece abierto durante 50 segundos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q06-ok">✓ failureRateThreshold es un porcentaje. Si el 50% de las llamadas en la ventana deslizante (slidingWindowSize) fallan, el circuito abre.</div>
+      <div class="quiz-feedback fail" id="msm3q06-fail">✗ failureRateThreshold=50 significa: si el 50% de las últimas N llamadas (slidingWindowSize) tienen error, el circuito pasa a OPEN y las llamadas nuevas reciben el fallback inmediatamente.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre el connection timeout y el read timeout?</div>
+      <div class="quiz-options" id="msm3q07">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q07',false)"><div class="quiz-letter">A</div> El connection timeout controla el timeout total de la petición; el read timeout solo el cuerpo</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q07',true)"><div class="quiz-letter">B</div> El connection timeout es el tiempo máximo para establecer la conexión TCP; el read timeout es el tiempo máximo para recibir datos tras conectar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q07',false)"><div class="quiz-letter">C</div> Son equivalentes en Java; solo difieren en el nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q07',false)"><div class="quiz-letter">D</div> El connection timeout es para HTTP; el read timeout es para HTTPS</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q07-ok">✓ Connection timeout: cuánto esperar para el handshake TCP. Read timeout: cuánto esperar para recibir datos del servidor (después de conectar). Ambos son necesarios.</div>
+      <div class="quiz-feedback fail" id="msm3q07-fail">✗ Connection timeout → tiempo para el handshake TCP (el servidor puede estar caído). Read timeout → tiempo para que el servidor envíe datos (el servidor acepta pero procesa lento).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Qué es el patrón "Timeout Budget" en cadenas de microservicios?</div>
+      <div class="quiz-options" id="msm3q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q08',false)"><div class="quiz-letter">A</div> El límite de dinero que puede gastarse en infraestructura de cloud por mes</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q08',true)"><div class="quiz-letter">B</div> Cada servicio en la cadena debe configurar un timeout menor que el del servicio upstream para garantizar que el error sea manejado antes de que expire el timeout del padre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q08',false)"><div class="quiz-letter">C</div> El número total de reintentos permitidos en un flujo de negocio completo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q08',false)"><div class="quiz-letter">D</div> El presupuesto de latencia asignado a cada equipo para sus microservicios</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q08-ok">✓ Si A espera 5s y B (llamado por A) tiene timeout de 5s, cuando B vence el timeout, A ya habrá agotado su propio timeout sin haber recibido respuesta de B. Cada nivel debe tener un timeout menor.</div>
+      <div class="quiz-feedback fail" id="msm3q08-fail">✗ En A→B→C: C debe tener el timeout más pequeño, B algo mayor, A el mayor. Esto garantiza que cada nivel tiene tiempo para manejar el error del nivel inferior.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre el algoritmo Token Bucket y Leaky Bucket para rate limiting?</div>
+      <div class="quiz-options" id="msm3q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q09',false)"><div class="quiz-letter">A</div> Token Bucket rechaza las peticiones que exceden el límite; Leaky Bucket acepta todas y las procesa más lento</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q09',true)"><div class="quiz-letter">B</div> Token Bucket permite bursts hasta la capacidad del cubo; Leaky Bucket procesa a tasa constante independientemente de los picos de entrada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q09',false)"><div class="quiz-letter">C</div> Son idénticos funcionalmente con distinta nomenclatura</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q09',false)"><div class="quiz-letter">D</div> Token Bucket es para HTTP; Leaky Bucket es para mensajería</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q09-ok">✓ Token Bucket: acumula tokens en el tiempo, permite burst. Leaky Bucket: procesa a tasa fija, suaviza tráfico, puede introducir cola y latencia. Ambos limitan el throughput promedio.</div>
+      <div class="quiz-feedback fail" id="msm3q09-fail">✗ Token Bucket: permite bursts (100 requests en un instante si hay tokens). Leaky Bucket: suaviza el tráfico procesando a ritmo constante (10 req/s siempre), introduciendo latencia en picos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Qué es el "estado estable" en Chaos Engineering?</div>
+      <div class="quiz-options" id="msm3q10">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q10',false)"><div class="quiz-letter">A</div> El estado en que ningún servicio tiene errores</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q10',true)"><div class="quiz-letter">B</div> Las métricas que indican que el sistema funciona correctamente y que se usan como baseline para verificar si el experimento de caos lo afecta</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q10',false)"><div class="quiz-letter">C</div> El estado en que todos los servicios tienen exactamente 0ms de latencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q10',false)"><div class="quiz-letter">D</div> La configuración de producción antes de aplicar actualizaciones</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q10-ok">✓ El estado estable es el comportamiento normal: latencia p99 < 200ms, error rate < 0.1%, throughput > 1000 rps. Si el caos no altera estas métricas, la hipótesis se confirma.</div>
+      <div class="quiz-feedback fail" id="msm3q10-fail">✗ El estado estable son las métricas baseline del sistema funcionando: latencia, error rate, throughput. Se verifica que el experimento de caos no altera significativamente estas métricas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Qué hace <code>permittedNumberOfCallsInHalfOpenState: 3</code> en Resilience4j?</div>
+      <div class="quiz-options" id="msm3q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q11',false)"><div class="quiz-letter">A</div> Solo permite 3 instancias concurrentes del servicio</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q11',true)"><div class="quiz-letter">B</div> En estado HALF_OPEN, permite exactamente 3 llamadas de prueba para determinar si el servicio recuperó</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q11',false)"><div class="quiz-letter">C</div> El circuito abre si más de 3 llamadas tienen error</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q11',false)"><div class="quiz-letter">D</div> El servicio acepta máximo 3 peticiones por segundo en estado HALF_OPEN</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q11-ok">✓ En HALF_OPEN, se permiten 3 llamadas de prueba. Si las 3 tienen éxito, el circuito cierra. Si alguna falla (según failureRateThreshold), el circuito vuelve a OPEN.</div>
+      <div class="quiz-feedback fail" id="msm3q11-fail">✗ permittedNumberOfCallsInHalfOpenState controla cuántas llamadas de prueba se hacen en estado HALF_OPEN antes de decidir si cerrar o reabrir el circuito.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Por qué se recomienda combinar Circuit Breaker con Bulkhead?</div>
+      <div class="quiz-options" id="msm3q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q12',false)"><div class="quiz-letter">A</div> Porque Resilience4j solo funciona si se usan ambos juntos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q12',true)"><div class="quiz-letter">B</div> El Bulkhead previene que una dependencia lenta agote los threads; el Circuit Breaker previene llamadas cuando la dependencia falla. Defensa en profundidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q12',false)"><div class="quiz-letter">C</div> Porque son equivalentes y combinados son más eficientes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q12',false)"><div class="quiz-letter">D</div> Para cumplir con los estándares PCI-DSS de seguridad</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q12-ok">✓ Bulkhead: limita cuántas llamadas concurrentes a una dependencia. Circuit Breaker: deja de llamar cuando la dependencia falla. Juntos forman una defensa completa.</div>
+      <div class="quiz-feedback fail" id="msm3q12-fail">✗ Bulkhead aísla recursos (evita saturación de threads). Circuit Breaker corta cuando hay muchos fallos. Combinados: el bulkhead evita la saturación mientras el CB acumula métricas para decidir abrir.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué es el patrón Fallback y cuáles son ejemplos válidos de implementación?</div>
+      <div class="quiz-options" id="msm3q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q13',false)"><div class="quiz-letter">A</div> Lanzar una excepción especial que el cliente pueda manejar</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q13',true)"><div class="quiz-letter">B</div> Una respuesta alternativa ante fallos: datos en caché, lista vacía, valor por defecto o respuesta degradada que permite continuar la experiencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q13',false)"><div class="quiz-letter">C</div> Reintentar la misma operación con un usuario diferente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q13',false)"><div class="quiz-letter">D</div> Escalar automáticamente el servicio que falló</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q13-ok">✓ Buenos fallbacks: retornar último valor en caché, lista vacía con mensaje "temporalmente no disponible", precio estimado en lugar del real, funcionalidad reducida.</div>
+      <div class="quiz-feedback fail" id="msm3q13-fail">✗ El fallback proporciona una respuesta degradada pero funcional: caché, default, lista vacía. Evita propagar el error al usuario cuando es posible ofrecer una experiencia parcial.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cuándo usarías el Resilience4j TimeLimiter en lugar de los timeouts del cliente HTTP?</div>
+      <div class="quiz-options" id="msm3q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q14',false)"><div class="quiz-letter">A</div> Siempre es preferible al timeout del cliente HTTP</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q14',true)"><div class="quiz-letter">B</div> Cuando el cliente HTTP no expone timeouts configurables, para código asíncrono (CompletableFuture) o para aplicar un timeout uniforme independientemente del transporte</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q14',false)"><div class="quiz-letter">C</div> Solo en entornos de Kubernetes donde los timeouts de red no funcionan</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q14',false)"><div class="quiz-letter">D</div> Para reemplazar el thread pool bulkhead cuando se necesita timeout</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q14-ok">✓ TimeLimiter es ideal para: envolver CompletableFuture con timeout, aplicar timeout uniforme independiente del transporte, o cuando quieres que el timeout sea gestionado por Resilience4j con métricas.</div>
+      <div class="quiz-feedback fail" id="msm3q14-fail">✗ TimeLimiter complementa los timeouts HTTP: gestiona CompletableFuture con timeout, integra métricas en Micrometer y permite configuración uniforme para cualquier tipo de operación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Cuál es el riesgo de usar un "Fixed Window" para rate limiting?</div>
+      <div class="quiz-options" id="msm3q15">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q15',false)"><div class="quiz-letter">A</div> Usa demasiada memoria para guardar el contador</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q15',true)"><div class="quiz-letter">B</div> Permite "double burst": N peticiones al final de una ventana + N al inicio de la siguiente, permitiendo 2N en un intervalo corto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q15',false)"><div class="quiz-letter">C</div> No funciona con múltiples instancias del servicio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q15',false)"><div class="quiz-letter">D</div> Solo permite un tipo de petición por ventana de tiempo</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q15-ok">✓ Con límite 100 req/minuto y ventana fija: 100 peticiones en el segundo 59, reset, 100 más en el segundo 61. El servicio recibe 200 peticiones en 2 segundos.</div>
+      <div class="quiz-feedback fail" id="msm3q15-fail">✗ Fixed Window es vulnerable al "boundary burst": 100 req al segundo 59 + 100 req al segundo 61 = 200 req en 2 segundos, violando el límite efectivo. Sliding Window Log lo evita.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Qué es el "radio de blast" en Chaos Engineering y por qué se minimiza?</div>
+      <div class="quiz-options" id="msm3q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q16',false)"><div class="quiz-letter">A</div> El impacto de la explosión de un servidor físico en el datacenter</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q16',true)"><div class="quiz-letter">B</div> El alcance del impacto del experimento de caos sobre usuarios reales. Se minimiza empezando en staging o con un pequeño porcentaje de tráfico de producción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q16',false)"><div class="quiz-letter">C</div> El número de servicios que se pueden escalar horizontalmente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q16',false)"><div class="quiz-letter">D</div> La cantidad de memoria que consume el experimento de caos</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q16-ok">✓ El blast radius define cuántos usuarios se ven afectados. Se minimiza: comenzar en staging, usar feature flags para el 1% del tráfico, tener un kill switch para detener el experimento.</div>
+      <div class="quiz-feedback fail" id="msm3q16-fail">✗ Blast radius = cuántos usuarios/servicios son impactados. Se minimiza con: experimentación en staging, feature flags limitando el porcentaje de producción expuesto y kill switch automático.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Qué métricas expone Resilience4j a través de Micrometer para observar el Circuit Breaker?</div>
+      <div class="quiz-options" id="msm3q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q17',false)"><div class="quiz-letter">A</div> Solo el estado actual (OPEN/CLOSED/HALF_OPEN)</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q17',true)"><div class="quiz-letter">B</div> Estado del circuito, tasa de éxito/fallo, número de llamadas, latencia y número de llamadas no permitidas (circuit open)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q17',false)"><div class="quiz-letter">C</div> Solo métricas de JVM como heap y garbage collection</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q17',false)"><div class="quiz-letter">D</div> El número de threads activos en el pool de la aplicación</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q17-ok">✓ Resilience4j + Micrometer expone: resilience4j.circuitbreaker.state, calls.total, calls.failed, calls.success.rate, not.permitted.calls. Visible en Grafana con dashboards dedicados.</div>
+      <div class="quiz-feedback fail" id="msm3q17-fail">✗ Las métricas clave del CB: estado (gauge), llamadas totales/exitosas/fallidas, tasa de fallo, llamadas no permitidas (circuito abierto). Todas accesibles vía Prometheus/Grafana.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué es una estrategia de "graceful degradation" en resiliencia?</div>
+      <div class="quiz-options" id="msm3q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q18',false)"><div class="quiz-letter">A</div> Apagar el servicio gradualmente para reducir el impacto de un despliegue</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q18',true)"><div class="quiz-letter">B</div> Mantener la funcionalidad esencial cuando los componentes no esenciales fallan, ofreciendo una experiencia reducida en lugar de un fallo total</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q18',false)"><div class="quiz-letter">C</div> Reducir la capacidad del servicio gradualmente para ahorrar costos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q18',false)"><div class="quiz-letter">D</div> Enviar tráfico gradualmente al nuevo servicio durante un despliegue</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q18-ok">✓ Ejemplo: si el servicio de recomendaciones falla, el checkout sigue funcionando sin sugerencias. La funcionalidad core continúa; las features non-críticas se degradan gracefully.</div>
+      <div class="quiz-feedback fail" id="msm3q18-fail">✗ Graceful degradation: si el servicio de reseñas falla, muestra el producto sin reseñas. Si las recomendaciones fallan, muestra trending products. La funcionalidad esencial (comprar) siempre funciona.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre resilience4j.retry y @Retryable de Spring Retry?</div>
+      <div class="quiz-options" id="msm3q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q19',false)"><div class="quiz-letter">A</div> Son idénticos; uno es de Spring y otro de una librería de terceros</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q19',true)"><div class="quiz-letter">B</div> Resilience4j integra métricas con Micrometer, es más configurable y se combina con otros patrones (CB, Bulkhead); Spring Retry es más simple pero sin métricas integradas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q19',false)"><div class="quiz-letter">C</div> @Retryable es reactivo; Resilience4j solo es síncrono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q19',false)"><div class="quiz-letter">D</div> Solo Resilience4j soporta backoff exponencial</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q19-ok">✓ Resilience4j ofrece observabilidad integrada con Micrometer, composición de patrones y configuración rica. Spring Retry es más simple y fácil de empezar pero con menos visibilidad.</div>
+      <div class="quiz-feedback fail" id="msm3q19-fail">✗ Resilience4j: métricas en Micrometer, composición con CB+Bulkhead, configuración externa en YAML. Spring Retry: simple, anotación @Retryable, sin métricas nativas. Para sistemas complejos, Resilience4j.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué determina si Resilience4j usa COUNT_BASED o TIME_BASED sliding window para el Circuit Breaker?</div>
+      <div class="quiz-options" id="msm3q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q20',false)"><div class="quiz-letter">A</div> El tipo de excepción que lanza el servicio</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'msm3q20',true)"><div class="quiz-letter">B</div> La propiedad <code>slidingWindowType</code>: COUNT_BASED analiza las últimas N llamadas; TIME_BASED analiza las llamadas de los últimos N segundos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q20',false)"><div class="quiz-letter">C</div> El volumen de tráfico automáticamente determina cuál usar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'msm3q20',false)"><div class="quiz-letter">D</div> La versión de Java que usa el microservicio</div>
+      </div>
+      <div class="quiz-feedback ok" id="msm3q20-ok">✓ COUNT_BASED: más predecible, análisis de N últimas llamadas. TIME_BASED: refleja mejor el estado actual para tráfico variable. Elige según el patrón de tráfico de tu servicio.</div>
+      <div class="quiz-feedback fail" id="msm3q20-fail">✗ slidingWindowType: COUNT_BASED usa las últimas N llamadas (bueno para tráfico constante); TIME_BASED usa las llamadas de los últimos N segundos (mejor para tráfico variable).</div>
+    </div>
+  </div>
+
+</ng-container>

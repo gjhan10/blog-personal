@@ -1,0 +1,596 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===12">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">13</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Chain of Responsibility</h2>
+      <p class="lesson-sub">Evita acoplar el emisor de una solicitud a su receptor al encadenar objetos receptores. Cada handler decide si procesa la solicitud o la pasa al siguiente en la cadena.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 420 100" style="width:100%;max-width:420px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="110" height="70" rx="3" fill="#f0fdf4" stroke="#059669" stroke-width="1.5"/>
+        <text x="65" y="28" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#047857">&#171;abstract&#187;</text>
+        <text x="65" y="44" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#064e3b">Handler</text>
+        <text x="15" y="62" font-family="monospace" font-size="9" fill="#374151">- next: Handler</text>
+        <text x="15" y="76" font-family="monospace" font-size="9" fill="#374151">+ handle(req)</text>
+        <rect x="155" y="10" width="110" height="70" rx="3" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+        <text x="210" y="44" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#064e3b">ConcreteH1</text>
+        <text x="160" y="62" font-family="monospace" font-size="9" fill="#374151">+ handle(req)</text>
+        <rect x="295" y="10" width="110" height="70" rx="3" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+        <text x="350" y="44" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#064e3b">ConcreteH2</text>
+        <text x="300" y="62" font-family="monospace" font-size="9" fill="#374151">+ handle(req)</text>
+        <line x1="120" y1="45" x2="154" y2="45" stroke="#059669" stroke-width="1.5"/>
+        <polygon points="150,41 155,45 150,49" fill="#059669"/>
+        <line x1="265" y1="45" x2="294" y2="45" stroke="#059669" stroke-width="1.5"/>
+        <polygon points="290,41 295,45 290,49" fill="#059669"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div><div class="tc-title">Intención</div><div class="tc-body">Cada handler tiene una referencia al siguiente. Procesa si puede, si no, delega. El cliente solo conoce el primer handler de la cadena.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — Filtros de Log</div><div class="tc-body">Cadena de filtros de nivel: Debug → Info → Warning → Error. Cada filtro procesa mensajes de su nivel y los pasa hacia arriba si el nivel es mayor.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Cadenas de aprobación (gastos), pipelines de middleware, filtros de seguridad donde el conjunto y orden de handlers puede variar.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">Cuidado</div><div class="tc-body">Si ningún handler procesa la solicitud, puede perderse silenciosamente. Siempre tener un handler final por defecto que maneje el caso no atendido.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">abstract class</span> <span class="a-type">Approver</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected</span> <span class="a-type">Approver</span> next;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Approver</span> setNext(<span class="a-type">Approver</span> n) {{ '{' }} <span class="a-kw">this</span>.next = n; <span class="a-kw">return</span> n; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public abstract void</span> approve(<span class="a-kw">int</span> amount);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Manager</span> <span class="a-kw">extends</span> <span class="a-type">Approver</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> approve(<span class="a-kw">int</span> amount) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">if</span> (amount &lt;= 1000) System.out.println(<span class="a-str">"Manager approves"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">else if</span> (next != <span class="a-kw">null</span>) next.approve(amount);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===13">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">14</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Command</h2>
+      <p class="lesson-sub">Encapsula una solicitud como un objeto, permitiendo parametrizar clientes con diferentes solicitudes, soportar deshacer/rehacer, y colas de operaciones.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 380 120" style="width:100%;max-width:380px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="30" width="80" height="50" rx="3" fill="#eff4ff" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="50" y="52" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e3a8a">Invoker</text>
+        <text x="15" y="70" font-family="monospace" font-size="9" fill="#374151">setCmd(cmd)</text>
+        <rect x="140" y="10" width="90" height="50" rx="3" fill="#eff4ff" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="185" y="28" text-anchor="middle" font-family="monospace" font-size="9" font-style="italic" fill="#1e3a8a">&#171;interface&#187;</text>
+        <text x="185" y="44" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e3a8a">Command</text>
+        <text x="145" y="56" font-family="monospace" font-size="9" fill="#374151">+ execute()</text>
+        <rect x="140" y="75" width="90" height="40" rx="3" fill="#dbe5fb" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="185" y="100" text-anchor="middle" font-family="monospace" font-size="10" font-weight="bold" fill="#1e3a8a">ConcreteCmd</text>
+        <rect x="280" y="30" width="80" height="50" rx="3" fill="#eff4ff" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="320" y="60" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e3a8a">Receiver</text>
+        <line x1="90" y1="55" x2="139" y2="35" stroke="#3558c8" stroke-width="1"/>
+        <line x1="185" y1="60" x2="185" y2="74" stroke="#3558c8" stroke-width="1.5"/>
+        <polygon points="181,70 185,75 189,70" fill="#3558c8"/>
+        <line x1="230" y1="95" x2="279" y2="60" stroke="#3558c8" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div><div class="tc-title">Encapsulación de acción</div><div class="tc-body">La acción se convierte en objeto con método execute(). El Invoker no sabe qué hace el comando, solo lo ejecuta. Permite encolamiento, logging y deshacer.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-undo" aria-hidden="true"></i></div><div class="tc-title">Undo/Redo</div><div class="tc-body">Añadir undo() al Command y mantener un historial (stack). Para deshacer: recorrer el stack hacia atrás llamando undo(). Para rehacer: redo(). Editores de texto, operaciones de DB.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — Transacciones</div><div class="tc-body">Cada operación de DB es un Command con execute() y rollback(). TransactionManager mantiene el historial. Si falla, recorre la lista llamando rollback() en orden inverso.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Operaciones que requieren deshacer/rehacer, colas de tareas asíncronas, logging de operaciones para auditoría o recuperación ante fallos.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Command</span> {{ '{' }} <span class="a-kw">void</span> execute(); <span class="a-kw">void</span> undo(); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">MoveCommand</span> <span class="a-kw">implements</span> <span class="a-type">Command</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">Shape</span> shape; <span class="a-kw">private final int</span> dx, dy;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> execute() {{ '{' }} shape.move(dx, dy); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> undo() {{ '{' }} shape.move(-dx, -dy); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Invoker — history</span></div>
+      <div class="anatomy-line"><span class="a-type">Deque</span>&lt;<span class="a-type">Command</span>&gt; history = <span class="a-kw">new</span> <span class="a-type">ArrayDeque</span>&lt;&gt;();</div>
+      <div class="anatomy-line"><span class="a-kw">void</span> executeCmd(<span class="a-type">Command</span> c) {{ '{' }} c.execute(); history.push(c); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">void</span> undoLast() {{ '{' }} <span class="a-kw">if</span> (!history.isEmpty()) history.pop().undo(); {{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===14">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">15</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Iterator</h2>
+      <p class="lesson-sub">Proporciona una forma de acceder secuencialmente a los elementos de una colección sin exponer su implementación interna. Separa el recorrido de la estructura de datos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div><div class="tc-title">Interfaz Iterator</div><div class="tc-body">hasNext(): boolean, next(): T, remove(). El cliente usa la interfaz sin conocer si es un array, lista enlazada, árbol o cualquier estructura de datos.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — Iterable</div><div class="tc-body">Implementar Iterable&lt;T&gt; con iterator() permite usar el for-each de Java. Las colecciones de Java (List, Set, Queue) todas implementan Iterable. El patrón está en el JDK.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-leaf" aria-hidden="true"></i></div><div class="tc-title">Tree Iterator</div><div class="tc-body">Un árbol puede tener iteradores con diferentes estrategias: inorder, preorder, postorder, BFS. El cliente usa la misma interfaz independientemente del recorrido elegido.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">ConcurrentModification</div><div class="tc-body">En Java, modificar la colección durante la iteración lanza ConcurrentModificationException. Usar Iterator.remove() si es necesario eliminar durante el recorrido.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">NumberRange</span> <span class="a-kw">implements</span> <span class="a-type">Iterable</span>&lt;<span class="a-type">Integer</span>&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final int</span> start, end;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;@Override <span class="a-kw">public</span> <span class="a-type">Iterator</span>&lt;<span class="a-type">Integer</span>&gt; iterator() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return new</span> <span class="a-type">Iterator</span>&lt;&gt;() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">int</span> curr = start;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">public boolean</span> hasNext() {{ '{' }} <span class="a-kw">return</span> curr &lt;= end; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Integer</span> next() {{ '{' }} <span class="a-kw">return</span> curr++; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;{{ '}' }};</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===15">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">16</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Mediator</h2>
+      <p class="lesson-sub">Define un objeto que encapsula cómo interactúan un conjunto de objetos. Reduce las dependencias directas entre clases al hacer que se comuniquen a través del mediador.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div><div class="tc-title">Problema</div><div class="tc-body">Sin mediador: N componentes con N×(N-1)/2 conexiones. Con mediador: N componentes, cada uno solo conoce al mediador. Menos acoplamiento, más mantenible.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-vehicle" aria-hidden="true"></i></div><div class="tc-title">Torre de control</div><div class="tc-body">Los aviones (componentes) no se comunican entre sí directamente. Todos hablan con la torre de control (mediador) que coordina el tráfico aéreo.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — Event Bus</div><div class="tc-body">Un EventBus (Guava, Spring ApplicationEventPublisher) actúa como mediador. Los componentes publican eventos y se suscriben a tipos de eventos sin conocerse entre sí.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">God Object</div><div class="tc-body">El Mediator puede convertirse en un God Object si acumula demasiada lógica. Mantenerlo como coordinador puro sin lógica de negocio. La lógica pertenece a los componentes.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">ChatMediator</span> {{ '{' }} <span class="a-kw">void</span> sendMessage(<span class="a-type">String</span> msg, <span class="a-type">User</span> sender); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ChatRoom</span> <span class="a-kw">implements</span> <span class="a-type">ChatMediator</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">List</span>&lt;<span class="a-type">User</span>&gt; users = <span class="a-kw">new</span> <span class="a-type">ArrayList</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> sendMessage(<span class="a-type">String</span> msg, <span class="a-type">User</span> sender) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;users.stream().filter(u -&gt; u != sender)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.forEach(u -&gt; u.receive(msg));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===16">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">17</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Memento</h2>
+      <p class="lesson-sub">Permite capturar y externalizar el estado interno de un objeto sin violar su encapsulación, para poder restaurarlo posteriormente (undo/redo, snapshots).</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-camera" aria-hidden="true"></i></div><div class="tc-title">Tres roles</div><div class="tc-body">Originator: el objeto cuyo estado se guarda. Memento: el snapshot del estado (opaco al Caretaker). Caretaker: gestiona el historial de Mementos sin acceder a su contenido.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-undo" aria-hidden="true"></i></div><div class="tc-title">Undo/Redo</div><div class="tc-body">Originator crea Memento (save state), Caretaker guarda en stack. Para deshacer: Caretaker devuelve el Memento al Originator que restaura su estado. El estado nunca se expone.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — Serialización</div><div class="tc-body">El estado se puede serializar a bytes/JSON como Memento. Para restaurar, deserializar. Útil para persistir checkpoints de aplicación o implementar autosave.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">Memoria</div><div class="tc-body">Guardar muchos snapshots puede consumir mucha memoria. Estrategias: límite en el historial, snapshots incrementales (solo el delta), o compresión del estado.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Editor</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> content;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Snapshot</span> save() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">Snapshot</span>(content); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> restore(<span class="a-type">Snapshot</span> s) {{ '{' }} <span class="a-kw">this</span>.content = s.getContent(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">Snapshot</span>(<span class="a-type">String</span> content) {{ '{' }}{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Caretaker</span></div>
+      <div class="anatomy-line"><span class="a-type">Deque</span>&lt;<span class="a-type">Snapshot</span>&gt; history = <span class="a-kw">new</span> <span class="a-type">ArrayDeque</span>&lt;&gt;();</div>
+      <div class="anatomy-line">history.push(editor.save());</div>
+      <div class="anatomy-line">editor.restore(history.pop());</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===17">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">18</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Observer</h2>
+      <p class="lesson-sub">Define una dependencia uno-a-muchos entre objetos. Cuando el Subject cambia de estado, todos los observadores son notificados automáticamente. Fundamento de los sistemas reactivos.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 360 110" style="width:100%;max-width:360px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="15" width="110" height="80" rx="3" fill="#eff4ff" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="65" y="33" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e3a8a">Subject</text>
+        <text x="15" y="50" font-family="monospace" font-size="9" fill="#374151">+ attach(obs)</text>
+        <text x="15" y="64" font-family="monospace" font-size="9" fill="#374151">+ detach(obs)</text>
+        <text x="15" y="78" font-family="monospace" font-size="9" fill="#374151">+ notifyAll()</text>
+        <rect x="240" y="15" width="110" height="60" rx="3" fill="#dbe5fb" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="295" y="33" text-anchor="middle" font-family="monospace" font-size="9" font-style="italic" fill="#1e3a8a">&#171;interface&#187;</text>
+        <text x="295" y="48" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e3a8a">Observer</text>
+        <text x="245" y="67" font-family="monospace" font-size="9" fill="#374151">+ update(event)</text>
+        <line x1="120" y1="55" x2="239" y2="45" stroke="#3558c8" stroke-width="1.5"/>
+        <text x="170" y="45" font-family="monospace" font-size="9" fill="#3558c8">notifies</text>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-radio" aria-hidden="true"></i></div><div class="tc-title">Publish-Subscribe</div><div class="tc-body">El Subject no sabe quiénes son sus observadores ni cuántos hay. Solo llama update() en todos. Los observers se registran y desregistran dinámicamente.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — PropertyChangeListener</div><div class="tc-body">java.beans.PropertyChangeListener es el Observer estándar de Java. Spring usa ApplicationListener. Reactive: java.util.concurrent.Flow (RxJava, Project Reactor).</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Sistemas de eventos (GUI), notificaciones en tiempo real, sincronización de estado entre vistas, cualquier situación donde múltiples objetos dependen del estado de otro.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">Memory Leaks</div><div class="tc-body">Olvidar deregistrar observers crea memory leaks (el Subject mantiene referencias). Usar WeakReference para observers o siempre hacer unsubscribe en el ciclo de vida.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Observer</span>&lt;<span class="a-type">T</span>&gt; {{ '{' }} <span class="a-kw">void</span> update(<span class="a-type">T</span> event); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">EventBus</span>&lt;<span class="a-type">T</span>&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">List</span>&lt;<span class="a-type">Observer</span>&lt;<span class="a-type">T</span>&gt;&gt; observers = <span class="a-kw">new</span> <span class="a-type">CopyOnWriteArrayList</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> subscribe(<span class="a-type">Observer</span>&lt;<span class="a-type">T</span>&gt; o) {{ '{' }} observers.add(o); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> publish(<span class="a-type">T</span> event) {{ '{' }} observers.forEach(o -&gt; o.update(event)); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===18">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">19</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">State</h2>
+      <p class="lesson-sub">Permite que un objeto altere su comportamiento cuando su estado interno cambia. El objeto parecerá que cambia de clase. Elimina los condicionales de estado con polimorfismo.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div><div class="tc-title">vs Strategy</div><div class="tc-body">Strategy: el cliente elige el algoritmo explícitamente. State: el objeto cambia de estado (y comportamiento) automáticamente según las transiciones internas. El Context gestiona el estado actual.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — enum State Machine</div><div class="tc-body">Los enums en Java pueden tener métodos. Cada constante implementa el comportamiento de su estado. Transiciones definidas por métodos del enum. Alternativa idiomática al State clásico.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Máquinas de estado finito: pedidos (PENDING→CONFIRMED→SHIPPED→DELIVERED), conexiones (CONNECTING→CONNECTED→DISCONNECTED), semáforos, vending machines.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div><div class="tc-title">Beneficio</div><div class="tc-body">Elimina grandes bloques if-else o switch por estado. Agregar un nuevo estado = añadir una clase/constante, sin modificar las existentes (Open/Closed Principle).</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">OrderState</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> confirm(<span class="a-type">Order</span> o);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> ship(<span class="a-type">Order</span> o);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">PendingState</span> <span class="a-kw">implements</span> <span class="a-type">OrderState</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> confirm(<span class="a-type">Order</span> o) {{ '{' }} o.setState(<span class="a-kw">new</span> <span class="a-type">ConfirmedState</span>()); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> ship(<span class="a-type">Order</span> o) {{ '{' }} <span class="a-kw">throw new</span> <span class="a-type">IllegalStateException</span>(<span class="a-str">"Confirm first"</span>); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===19">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">20</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Strategy</h2>
+      <p class="lesson-sub">Define una familia de algoritmos, los encapsula y los hace intercambiables. El cliente puede seleccionar el algoritmo en tiempo de ejecución sin cambiar el código que lo usa.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div><div class="tc-title">Eliminación de condicionales</div><div class="tc-body">Reemplaza switch/if-else de tipo de algoritmo con polimorfismo. Cada Strategy es una clase con su implementación. Agregar un nuevo algoritmo = nueva clase, sin modificar el Context.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java 8+ — Lambdas</div><div class="tc-body">Si la Strategy es una interfaz funcional (@FunctionalInterface), puede implementarse con lambdas. Comparator.comparing() en streams usa Strategy. Muy idiomático en Java moderno.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-card" aria-hidden="true"></i></div><div class="tc-title">Ejemplo — Pagos</div><div class="tc-body">PaymentStrategy con implementaciones: CreditCardPayment, PayPalPayment, CryptoPayment. El Checkout usa PaymentStrategy sin conocer el método concreto. Se configura en runtime.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Múltiples algoritmos de ordenamiento/compresión/cifrado, métodos de pago, estrategias de validación, estrategias de log, cualquier familia de algoritmos intercambiables.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line">@FunctionalInterface</div>
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">SortStrategy</span>&lt;<span class="a-type">T</span>&gt; {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> sort(<span class="a-type">List</span>&lt;<span class="a-type">T</span>&gt; list);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Uso con lambda — sin nueva clase</span></div>
+      <div class="anatomy-line"><span class="a-type">SortStrategy</span>&lt;<span class="a-type">Integer</span>&gt; asc = list -&gt; <span class="a-type">Collections</span>.sort(list);</div>
+      <div class="anatomy-line"><span class="a-type">SortStrategy</span>&lt;<span class="a-type">Integer</span>&gt; desc = list -&gt; list.sort(<span class="a-type">Comparator</span>.reverseOrder());</div>
+      <div class="anatomy-line"><span class="a-kw">var</span> sorter = <span class="a-kw">new</span> <span class="a-type">Sorter</span>&lt;&gt;(asc);</div>
+      <div class="anatomy-line">sorter.setStrategy(desc);</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===20">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">21</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Template Method</h2>
+      <p class="lesson-sub">Define el esqueleto de un algoritmo en la clase base, dejando que las subclases implementen los pasos variables. Evita duplicación del flujo manteniendo variabilidad en los detalles.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div><div class="tc-title">Pasos fijos vs variables</div><div class="tc-body">El método template en la clase base llama pasos en orden. Pasos fijos: implementados en la base (final). Pasos variables: abstract o con implementación por defecto (hook methods).</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — JdbcTemplate</div><div class="tc-body">Spring JdbcTemplate es Template Method en acción. El template gestiona obtener conexión, ejecutar y limpiar. Tú defines la query y el ResultSet mapper. Flujo fijo, comportamiento variable.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Preparación de bebidas</div><div class="tc-body">El algoritmo: hervir agua, preparar bebida, servir, añadir condimentos. El Template define el orden. Las subclases (Té, Café) implementan "preparar bebida" y "añadir condimentos".</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">vs Strategy</div><div class="tc-body">Template Method usa herencia (subclase extiende). Strategy usa composición (objeto delega a strategy). Template Method viola Open/Closed menos fácilmente que Strategy. Preferir Strategy en diseño moderno.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">abstract class</span> <span class="a-type">DataProcessor</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public final void</span> process() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;readData(); validateData(); transformData(); writeData();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected abstract void</span> readData();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected void</span> validateData() {{ '{' }}{{ '}' }} <span class="a-cm">// hook — override opcional</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected abstract void</span> transformData();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected abstract void</span> writeData();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===21">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">22</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Visitor</h2>
+      <p class="lesson-sub">Permite agregar nuevas operaciones a una jerarquía de clases sin modificarlas. El Visitor implementa Double Dispatch: el elemento acepta al Visitor que invoca la operación correcta.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div><div class="tc-title">Double Dispatch</div><div class="tc-body">Element.accept(visitor) llama visitor.visit(this). El tipo de visitor determina la operación; el tipo de elemento determina la sobrecarga. Ambos participan en la selección del método.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — AST Visitors</div><div class="tc-body">Compiladores y parsers (JavaParser, ANTLR, ByteBuddy) usan Visitor para recorrer el AST. Cada nodo acepta al Visitor que puede hacer análisis, transformación o generación de código.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div><div class="tc-title">Ejemplo — Reporte fiscal</div><div class="tc-body">Elementos: Libro, Electrónico, Alimento. Visitor: FiscalReportVisitor con visit(Book), visit(Electronic), visit(Food). Cada tipo tiene IVA diferente. Nueva operación = nuevo Visitor, sin tocar los elementos.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">Desventaja</div><div class="tc-body">Si se añade un nuevo tipo de elemento, hay que modificar todos los Visitors. Adecuado cuando la jerarquía de elementos es estable pero las operaciones cambian frecuentemente.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">TaxVisitor</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">double</span> visit(<span class="a-type">Book</span> b);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">double</span> visit(<span class="a-type">Electronic</span> e);</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Book</span> <span class="a-kw">implements</span> <span class="a-type">Item</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public double</span> accept(<span class="a-type">TaxVisitor</span> v) {{ '{' }} <span class="a-kw">return</span> v.visit(<span class="a-kw">this</span>); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">SpainTax</span> <span class="a-kw">implements</span> <span class="a-type">TaxVisitor</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public double</span> visit(<span class="a-type">Book</span> b) {{ '{' }} <span class="a-kw">return</span> b.price * 0.04; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public double</span> visit(<span class="a-type">Electronic</span> e) {{ '{' }} <span class="a-kw">return</span> e.price * 0.21; {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===22">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">23</span><span class="lesson-mod">M3 · Comportamiento</span></div>
+      <h2 class="lesson-title">Interpreter</h2>
+      <p class="lesson-sub">Dado un lenguaje, define una representación de su gramática junto con un intérprete que usa dicha representación para interpretar sentencias del lenguaje.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div><div class="tc-title">Cuándo usarlo</div><div class="tc-body">Para lenguajes de consulta simples, expresiones regulares, motores de reglas de negocio, DSLs, parsers de expresiones matemáticas o de configuración.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div><div class="tc-title">Java — SpEL</div><div class="tc-body">Spring Expression Language (SpEL) es un Interpreter. También java.util.regex.Pattern, javax.el en JSF, y motores de reglas como Drools implementan este patrón a gran escala.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-leaf" aria-hidden="true"></i></div><div class="tc-title">Abstract Syntax Tree</div><div class="tc-body">La gramática se representa como un árbol. Las expresiones terminales son nodos hoja; las no terminales son nodos internos. Evaluar = recorrer el árbol llamando interpret() en cada nodo.</div></div>
+      <div class="theory-card"><div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div><div class="tc-title">Complejidad</div><div class="tc-body">Para gramáticas complejas, el número de clases crece rápidamente. Preferir herramientas como ANTLR o PEG para gramáticas no triviales. Interpreter es adecuado para lenguajes pequeños y simples.</div></div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Expression</span> {{ '{' }} <span class="a-kw">int</span> interpret(); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">Number</span>(<span class="a-kw">int</span> val) <span class="a-kw">implements</span> <span class="a-type">Expression</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public int</span> interpret() {{ '{' }} <span class="a-kw">return</span> val; {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">Add</span>(<span class="a-type">Expression</span> l, <span class="a-type">Expression</span> r) <span class="a-kw">implements</span> <span class="a-type">Expression</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public int</span> interpret() {{ '{' }} <span class="a-kw">return</span> l.interpret() + r.interpret(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// new Add(new Number(3), new Number(4)).interpret() = 7</span></div>
+    </div>
+  </div>
+
+  <div class="quiz-section" id="eval-dp-m3" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación M3 — Patrones de Comportamiento</div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuál es el propósito principal del patrón Chain of Responsibility?</div>
+      <div class="quiz-options" id="dpq301">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq301',false)"><div class="quiz-letter">A</div> Crear cadenas de objetos que compartan el mismo estado</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq301',true)"><div class="quiz-letter">B</div> Desacoplar emisor y receptor encadenando handlers; cada uno procesa la solicitud o la pasa al siguiente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq301',false)"><div class="quiz-letter">C</div> Garantizar que solo un handler procese cada solicitud en el sistema</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq301',false)"><div class="quiz-letter">D</div> Encadenar métodos fluent en un Builder</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq301-ok">✓ El cliente envía a H1; si no puede procesarlo → H2 → H3... Ejemplo: filtros de autenticación → autorización → logging en Spring Security.</div>
+      <div class="quiz-feedback fail" id="dpq301-fail">✗ Chain of Responsibility: cadena de handlers donde cada uno puede procesar o delegar. El emisor no sabe qué handler resolverá la petición.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué capacidades añade el patrón Command sobre una llamada directa a un método?</div>
+      <div class="quiz-options" id="dpq302">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq302',false)"><div class="quiz-letter">A</div> Mayor rendimiento porque evita la creación de objetos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq302',true)"><div class="quiz-letter">B</div> Undo/Redo, encolamiento, logging, transacciones y parametrización de acciones porque la solicitud se encapsula como objeto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq302',false)"><div class="quiz-letter">C</div> Verificación estática de tipos en tiempo de compilación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq302',false)"><div class="quiz-letter">D</div> Sincronización automática entre threads</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq302-ok">✓ La solicitud = objeto → puede guardarse (historial), encolarse (async), serializarse (RPC), revertirse (undo) o auditarse (logging). Llamada directa no permite ninguna de estas cosas.</div>
+      <div class="quiz-feedback fail" id="dpq302-fail">✗ Command: encapsula acción en objeto. Beneficios: undo/redo (historial de Commands), cola de tareas, transacciones (rollback), macros (lista de Commands), logging de operaciones.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre el patrón Observer y el Mediator?</div>
+      <div class="quiz-options" id="dpq303">
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq303',true)"><div class="quiz-letter">A</div> Observer: el Subject notifica a múltiples observers directamente (1-N). Mediator: todos se comunican a través de un objeto central, nadie se conoce directamente (N-N via mediador)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq303',false)"><div class="quiz-letter">B</div> Son idénticos; Observer es el nombre antiguo y Mediator el moderno</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq303',false)"><div class="quiz-letter">C</div> Observer es síncrono; Mediator es siempre asíncrono</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq303',false)"><div class="quiz-letter">D</div> Mediator es para GUI; Observer es solo para bases de datos</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq303-ok">✓ Observer: Subject conoce a sus Observers (los mantiene en lista). Mediator: los componentes solo conocen al Mediator. Observer dispersa la comunicación; Mediator la centraliza.</div>
+      <div class="quiz-feedback fail" id="dpq303-fail">✗ Observer: 1 sujeto → N observadores directos. Mediator: N componentes <i class="ico ico-arrows" aria-hidden="true"></i> 1 mediador <i class="ico ico-arrows" aria-hidden="true"></i> N componentes. Mediator elimina las conexiones directas entre pares que Observer no elimina.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Cuáles son los tres participantes del patrón Memento?</div>
+      <div class="quiz-options" id="dpq304">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq304',false)"><div class="quiz-letter">A</div> Creator, Storage, Restorer</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq304',true)"><div class="quiz-letter">B</div> Originator (crea/restaura el memento), Memento (snapshot del estado), Caretaker (guarda mementos sin acceder a su contenido)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq304',false)"><div class="quiz-letter">C</div> Subject, State, Observer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq304',false)"><div class="quiz-letter">D</div> Context, ConcreteState, AbstractState</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq304-ok">✓ Originator: sabe cómo crear y restaurar su estado. Memento: objeto opaco que guarda el estado. Caretaker: mantiene el historial de mementos pero no puede leer su contenido (encapsulación preservada).</div>
+      <div class="quiz-feedback fail" id="dpq304-fail">✗ Memento pattern: Originator.save() → Memento. Caretaker guarda el stack de Mementos. Para undo: Caretaker devuelve último Memento → Originator.restore(memento).</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es la principal diferencia entre Strategy y Template Method?</div>
+      <div class="quiz-options" id="dpq305">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq305',false)"><div class="quiz-letter">A</div> Template Method es más rápido en runtime que Strategy</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq305',true)"><div class="quiz-letter">B</div> Template Method usa herencia (subclase extiende e implementa pasos), Strategy usa composición (objeto delega a una strategy intercambiable en runtime)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq305',false)"><div class="quiz-letter">C</div> Strategy solo se puede usar con interfaces funcionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq305',false)"><div class="quiz-letter">D</div> Template Method no puede tener pasos con implementación por defecto</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq305-ok">✓ Template Method: herencia, el esqueleto está en la clase base. Strategy: composición, el algoritmo es un objeto inyectable. Strategy es más flexible (cambio en runtime, más testeable). Preferir Strategy sobre Template Method en diseño moderno.</div>
+      <div class="quiz-feedback fail" id="dpq305-fail">✗ Template Method: extends + override métodos hook. Strategy: implements + inject. Composición &gt; herencia en OO moderno. Template Method = acoplamiento estático vía herencia; Strategy = acoplamiento dinámico vía interfaz.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Por qué el patrón Visitor viola el principio Open/Closed desde la perspectiva de los elementos?</div>
+      <div class="quiz-options" id="dpq306">
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq306',true)"><div class="quiz-letter">A</div> Si añades un nuevo tipo de elemento, debes modificar todos los Visitors existentes para añadir el método visit() correspondiente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq306',false)"><div class="quiz-letter">B</div> El Visitor accede a los campos privados de los elementos violando encapsulación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq306',false)"><div class="quiz-letter">C</div> Visitor requiere que los elementos sean inmutables</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq306',false)"><div class="quiz-letter">D</div> No viola Open/Closed; es totalmente abierto para extensión</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq306-ok">✓ Visitor es O/C desde la perspectiva de operaciones (añadir Visitor = nueva clase, sin modificar elementos). Pero NO desde los elementos: añadir nuevo tipo = modificar la interfaz Visitor y todas sus implementaciones.</div>
+      <div class="quiz-feedback fail" id="dpq306-fail">✗ Tradeoff: añadir operaciones = nuevo Visitor (O/C ✓). Añadir elementos = modificar todos los Visitors (O/C ✗). Usar Visitor cuando la jerarquía de elementos es estable pero las operaciones varían.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿Qué es el "Double Dispatch" en el contexto del patrón Visitor?</div>
+      <div class="quiz-options" id="dpq307">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq307',false)"><div class="quiz-letter">A</div> Llamar al mismo método dos veces para garantizar consistencia</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq307',true)"><div class="quiz-letter">B</div> La resolución del método depende de dos tipos: el tipo del elemento (que llama accept) y el tipo del Visitor (que determina qué sobrecarga de visit() se invoca)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq307',false)"><div class="quiz-letter">C</div> Enviar el evento a dos handlers diferentes simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq307',false)"><div class="quiz-letter">D</div> Un patrón para enviar mensajes entre dos procesos diferentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq307-ok">✓ Java tiene single dispatch (solo el tipo del receptor). element.accept(visitor) → visitor.visit(this) — el 'this' tiene el tipo concreto del elemento. Combinando ambas llamadas se logra double dispatch.</div>
+      <div class="quiz-feedback fail" id="dpq307-fail">✗ Single dispatch: la JVM elige el método según el tipo del objeto receptor. Double dispatch: Book.accept(SpainTax visitor) → SpainTax.visit(Book this). Dos tipos determinan el método: tipo del elemento + tipo del visitor.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Cuál es la forma más idiomática de implementar Strategy en Java moderno (Java 8+)?</div>
+      <div class="quiz-options" id="dpq308">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq308',false)"><div class="quiz-letter">A</div> Usando herencia abstracta con clases anónimas</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq308',true)"><div class="quiz-letter">B</div> Con interfaces funcionales (@FunctionalInterface) que permiten implementar las strategies como lambdas o method references en lugar de crear nuevas clases</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq308',false)"><div class="quiz-letter">C</div> Usando reflection para seleccionar el método correcto en runtime</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq308',false)"><div class="quiz-letter">D</div> Mediante enums con métodos abstractos</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq308-ok">✓ @FunctionalInterface + lambda = Strategy sin clase. Comparator es Strategy, por eso Comparator.comparing(Person::getName) funciona. Menos verbosidad, mismo patrón conceptual.</div>
+      <div class="quiz-feedback fail" id="dpq308-fail">✗ Java 8+: interfaz funcional = 1 método abstracto → implementable con lambda. Validator v = input -&gt; input.length() &gt; 3; // sin nueva clase. Igual de polimórfico, mucho más conciso.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia principal entre el patrón State y el patrón Strategy?</div>
+      <div class="quiz-options" id="dpq309">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq309',false)"><div class="quiz-letter">A</div> State es para colecciones; Strategy es para algoritmos individuales</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq309',true)"><div class="quiz-letter">B</div> En State, los objetos transicionan de estado automáticamente basados en eventos internos. En Strategy, el cliente elige explícitamente el algoritmo desde fuera del Context</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq309',false)"><div class="quiz-letter">C</div> State requiere herencia; Strategy solo usa interfaces</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq309',false)"><div class="quiz-letter">D</div> Son idénticos estructuralmente, solo difieren en intención</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq309-ok">✓ Estructuralmente similares pero intención diferente. State: el estado cambia según lógica interna (el propio estado puede pedir la transición). Strategy: el Context o el cliente eligen el algoritmo externamente.</div>
+      <div class="quiz-feedback fail" id="dpq309-fail">✗ State: transiciones automáticas (order.confirm() cambia estado interno). Strategy: inyección externa (sorter.setStrategy(desc)). State encapsula ciclo de vida; Strategy encapsula selección de algoritmo.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Por qué el patrón Mediator puede convertirse en un "God Object" anti-patrón?</div>
+      <div class="quiz-options" id="dpq310">
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq310',true)"><div class="quiz-letter">A</div> Si el Mediator acumula toda la lógica de negocio al centralizar la comunicación, se vuelve una clase masiva con demasiadas responsabilidades que es difícil de mantener</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq310',false)"><div class="quiz-letter">B</div> Porque el Mediator tiene acceso a todos los objetos del sistema</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq310',false)"><div class="quiz-letter">C</div> Porque el Mediator no puede ser testeado con unit tests</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq310',false)"><div class="quiz-letter">D</div> Nunca se convierte en God Object; es siempre el patrón correcto</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq310-ok">✓ El Mediator debe ser un coordinador puro: "cuando A hace X, notificar a B". La lógica pertenece a los componentes. Si empieza a tomar decisiones de negocio, está asumiendo demasiado.</div>
+      <div class="quiz-feedback fail" id="dpq310-fail">✗ Mediator mal usado: en vez de que los componentes tengan lógica propia, toda la lógica migra al Mediator → fat mediator = God Object. Solución: Mediator solo orquesta, la lógica en los componentes.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">¿Cuál es el riesgo de olvidar deregistrar Observers y cómo prevenirlo?</div>
+      <div class="quiz-options" id="dpq311">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq311',false)"><div class="quiz-letter">A</div> Se producen NullPointerExceptions cuando el Subject notifica a Observers desactualizados</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq311',true)"><div class="quiz-letter">B</div> Memory leaks: el Subject mantiene referencias a Observers ya no necesarios, impidiendo su recolección por GC. Prevención: siempre hacer unsubscribe en el ciclo de vida o usar WeakReference</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq311',false)"><div class="quiz-letter">C</div> El Subject lanza ConcurrentModificationException al iterar la lista</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq311',false)"><div class="quiz-letter">D</div> Los Observers se ejecutan dos veces por notificación</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq311-ok">✓ El Subject retiene refs a todos sus observers. Si el observer debería haberse destruido pero no hizo unsubscribe, el GC no puede recolectarlo. Leak acumulativo. WeakReference: la referencia no impide la recolección.</div>
+      <div class="quiz-feedback fail" id="dpq311-fail">✗ Subject.observers lista fuerte → observer no se GC aunque nadie más lo referencie. En Android: registrar BroadcastReceiver sin desregistrar = leak de Activity. Patrón Closeable/AutoCloseable con subscription.close().</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Cuándo es más apropiado usar el patrón Interpreter?</div>
+      <div class="quiz-options" id="dpq312">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq312',false)"><div class="quiz-letter">A</div> Para lenguajes de programación complejos como Java o Python</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq312',true)"><div class="quiz-letter">B</div> Para DSLs pequeños, motores de reglas simples, expresiones matemáticas o lenguajes de consulta básicos donde la gramática es sencilla y no cambia frecuentemente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq312',false)"><div class="quiz-letter">C</div> Siempre que se necesite parsear texto de cualquier tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq312',false)"><div class="quiz-letter">D</div> Para implementar compiladores de lenguajes de alto rendimiento</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq312-ok">✓ Ejemplos adecuados: motor de reglas de negocio simple, calculadora, parser de queries de búsqueda. Para gramáticas complejas usar ANTLR, PEG, parser combinators. El patrón no escala bien a gramáticas grandes.</div>
+      <div class="quiz-feedback fail" id="dpq312-fail">✗ Interpreter: una clase por regla de gramática. Gramática compleja = cientos de clases = mantenimiento difícil. Para grammars pequeñas y estables es perfecto. SpEL, EL, mini-SQL → Interpreter. Java completo → ANTLR.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Qué ventaja tiene el patrón Iterator al recorrer una colección?</div>
+      <div class="quiz-options" id="dpq313">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq313',false)"><div class="quiz-letter">A</div> Siempre es más rápido que el acceso directo por índice</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq313',true)"><div class="quiz-letter">B</div> Separa el algoritmo de recorrido de la estructura de datos; el cliente recorre cualquier colección con la misma interfaz sin conocer si es lista, árbol, grafo o cualquier otro contenedor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq313',false)"><div class="quiz-letter">C</div> Permite modificar la colección durante el recorrido sin problemas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq313',false)"><div class="quiz-letter">D</div> Garantiza que los elementos se recorren en orden alfabético</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq313-ok">✓ Mismo código de cliente para ArrayList, LinkedList, TreeSet, o estructura propia. Cambiar de ArrayList a árbol = mismo código de recorrido. El algoritmo de recorrido encapsulado en el Iterator.</div>
+      <div class="quiz-feedback fail" id="dpq313-fail">✗ for (T item : collection) funciona para cualquier Iterable. La colección puede cambiar internamente (ArrayList→LinkedList) sin cambiar el for-each. Iterator separa "cómo recorrer" de "qué recorrer".</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cómo garantiza el patrón Template Method el principio de Inversión de Control (Hollywood Principle)?</div>
+      <div class="quiz-options" id="dpq314">
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq314',true)"><div class="quiz-letter">A</div> "No nos llames, nosotros te llamamos": la clase base controla el flujo e invoca los métodos hook de las subclases en el momento adecuado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq314',false)"><div class="quiz-letter">B</div> La subclase controla cuándo y cómo se ejecuta el algoritmo completo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq314',false)"><div class="quiz-letter">C</div> Un framework externo invoca los métodos del Template</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq314',false)"><div class="quiz-letter">D</div> La subclase puede modificar el orden de los pasos del algoritmo</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq314-ok">✓ Hollywood Principle: la clase base (framework) define cuándo llamar a cada paso. La subclase (aplicación) solo implementa los pasos. El flujo está invertido: no es la subclase quien orquesta.</div>
+      <div class="quiz-feedback fail" id="dpq314-fail">✗ Sin Template Method: la subclase orquesta todo (llama super.a(), super.b()...). Con Template Method: la base orquesta y llama abstractMethod() de la subclase. Control en la base = Hollywood Principle.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un método abstract y un "hook method" en Template Method?</div>
+      <div class="quiz-options" id="dpq315">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq315',false)"><div class="quiz-letter">A</div> Los hooks son métodos privados; abstract son públicos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq315',true)"><div class="quiz-letter">B</div> Abstract: las subclases DEBEN implementarlo. Hook: tiene implementación por defecto (puede ser vacía), las subclases pueden sobreescribirlo opcionalmente para añadir comportamiento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq315',false)"><div class="quiz-letter">C</div> Hook es un tipo de diseño de interfaz; abstract es de herencia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq315',false)"><div class="quiz-letter">D</div> No existe diferencia; son términos sinónimos en Template Method</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq315-ok">✓ Abstract = obligatorio (el compilador lo exige). Hook = opcional (implementación por defecto vacía o básica). Hook da flexibilidad sin forzar a todas las subclases a implementar pasos irrelevantes para ellas.</div>
+      <div class="quiz-feedback fail" id="dpq315-fail">✗ Abstract: protected abstract void step() — cada subclase DEBE implementar. Hook: protected void step() {{ '{' }}{{ '}' }} — implementación vacía, override opcional. DataProcessor.validateData() como hook: solo lo implementan los processors que necesitan validación.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿Por qué los enums de Java son una forma idiomática de implementar máquinas de estado?</div>
+      <div class="quiz-options" id="dpq316">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq316',false)"><div class="quiz-letter">A</div> Porque los enums tienen valueOf() que busca estados por nombre</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq316',true)"><div class="quiz-letter">B</div> Los enums en Java pueden tener métodos abstractos que cada constante implementa diferente; las constantes son los estados, los métodos son las transiciones o comportamientos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq316',false)"><div class="quiz-letter">C</div> Porque son Singleton por naturaleza y el estado debe ser único</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq316',false)"><div class="quiz-letter">D</div> Los enums no son apropiados para máquinas de estado</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq316-ok">✓ enum TrafficLight {{ '{' }} RED {{ '{' }} @Override public TrafficLight next() {{ '{' }} return GREEN; {{ '}' }} {{ '}' }}, GREEN {{ '{' }} ... {{ '}' }} {{ '}' }} — cada estado implementa la transición. Compacto, seguro en tipos, sin herencia extra.</div>
+      <div class="quiz-feedback fail" id="dpq316-fail">✗ Java enum: las constantes pueden sobreescribir métodos abstractos del enum. enum State {{ '{' }} PENDING {{ '{' }} void confirm(Order o) {{ '{' }} o.setState(CONFIRMED); {{ '}' }} {{ '}' }}, CONFIRMED {{ '{' }} ... {{ '}' }} {{ '}' }} — más conciso que clases State separadas.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿En qué se diferencia Chain of Responsibility de Decorator?</div>
+      <div class="quiz-options" id="dpq317">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq317',false)"><div class="quiz-letter">A</div> Son el mismo patrón con diferente nombre</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq317',true)"><div class="quiz-letter">B</div> Decorator: TODOS los decoradores procesan la solicitud (añaden comportamiento). Chain of Responsibility: SOLO UN handler procesa y los demás pasan la solicitud sin modificarla</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq317',false)"><div class="quiz-letter">C</div> Decorator es creacional; Chain of Responsibility es estructural</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq317',false)"><div class="quiz-letter">D</div> En Chain of Responsibility la cadena es circular; en Decorator es lineal</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq317-ok">✓ Decorator: logging wrapper + compression wrapper + encryption wrapper — todos se ejecutan. CoR: handler de autenticación → autorización → rate limiting — si autenticación falla, detiene la cadena o decide no pasar.</div>
+      <div class="quiz-feedback fail" id="dpq317-fail">✗ Decorator añade comportamiento en cada eslabón (wraparound). CoR delega la solicitud hasta que un handler decide procesarla (y puede terminar la cadena). Estructuralmente similares, semánticamente distintos.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Qué es un "macro" en el contexto del patrón Command y cómo se implementa?</div>
+      <div class="quiz-options" id="dpq318">
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq318',true)"><div class="quiz-letter">A</div> Un Command compuesto que contiene una lista de Commands. execute() itera la lista llamando execute() en cada uno. Permite agrupar múltiples operaciones en una sola acción atómica</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq318',false)"><div class="quiz-letter">B</div> Un Command que ejecuta código mediante reflection</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq318',false)"><div class="quiz-letter">C</div> Una anotación Java que genera Commands automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq318',false)"><div class="quiz-letter">D</div> Un Command que se ejecuta en un thread separado</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq318-ok">✓ MacroCommand implements Command {{ '{' }} List&lt;Command&gt; cmds; void execute() {{ '{' }} cmds.forEach(Command::execute); {{ '}' }} {{ '}' }}. Combina Command + Composite. Permite grabar y reproducir secuencias de acciones.</div>
+      <div class="quiz-feedback fail" id="dpq318-fail">✗ Macro = Command que contiene lista de Commands (Composite Pattern + Command). Útil para: batch operations, grabar acciones del usuario, scripts de automatización, transacciones multi-paso.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Cuál de los siguientes es un ejemplo real del patrón Memento en Java/Spring?</div>
+      <div class="quiz-options" id="dpq319">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq319',false)"><div class="quiz-letter">A</div> java.util.Iterator y su método hasNext()</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq319',true)"><div class="quiz-letter">B</div> Serialización de entidades JPA para auditoría, implementaciones de undo en editores de texto, o el historial de estados en Axon Framework (Event Sourcing guarda snapshots)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq319',false)"><div class="quiz-letter">C</div> Spring @Transactional que revierte cambios en la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq319',false)"><div class="quiz-letter">D</div> java.lang.Cloneable para copiar objetos</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq319-ok">✓ Envers (Hibernate) guarda snapshots de entidades = Memento. Axon: Aggregate snapshots. Editores: cada keystroke crea un Memento. @Transactional hace rollback de DB pero no restaura estado de objetos Java.</div>
+      <div class="quiz-feedback fail" id="dpq319-fail">✗ Memento: capturar estado para restaurar. Hibernate Envers: versioning de entidades (snapshot por versión). Axon snapshot: Aggregate state serializado para evitar replay de todos los eventos. Ambos son Memento.</div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Cuándo debería preferirse el patrón Mediator sobre el Observer para gestionar la comunicación entre componentes?</div>
+      <div class="quiz-options" id="dpq320">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq320',false)"><div class="quiz-letter">A</div> Siempre; Mediator es estrictamente superior a Observer en todos los casos</div>
+        <div class="quiz-opt" role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dpq320',true)"><div class="quiz-letter">B</div> Cuando la comunicación es muchos-a-muchos y los componentes necesitan conocerse mutuamente (creando dependencias cruzadas). Mediator centraliza y simplifica esas conexiones complejas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq320',false)"><div class="quiz-letter">C</div> Solo cuando los componentes son instancias de la misma clase</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dpq320',false)"><div class="quiz-letter">D</div> Observer siempre es más apropiado para comunicación entre componentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="dpq320-ok">✓ Observer: 1 fuente, N receptores (limpio). N fuentes <i class="ico ico-arrows" aria-hidden="true"></i> N receptores = spaghetti de conexiones. Mediator: todos conocen solo al mediador. Ejemplo: formulario complejo donde cambiar campo A afecta B, C y D.</div>
+      <div class="quiz-feedback fail" id="dpq320-fail">✗ Observer: ideal cuando hay una fuente clara (stock price) y muchos subscriptores independientes. Mediator: cuando cualquier componente puede iniciar comunicación con cualquier otro y las dependencias formarían una malla.</div>
+    </div>
+  </div>
+
+</ng-container>

@@ -1,0 +1,61 @@
+<app-course-layout class="cl-course" [c]="this">
+  @if (view === 'lesson') {
+    @switch (activeModule) {
+      @case (0) {
+        <app-module-m1 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m1>
+      }
+      @case (1) {
+        <app-module-m2 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m2>
+      }
+      @case (2) {
+        <app-module-m3 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m3>
+      }
+      @case (3) {
+        <app-module-m4 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m4>
+      }
+      @case (4) {
+        <app-module-m5 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m5>
+      }
+      @case (5) {
+        <app-module-m6 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m6>
+      }
+      @case (6) {
+        <app-module-m7 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m7>
+      }
+      @case (7) {
+        <app-module-m8 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m8>
+      }
+      @case (8) {
+        <app-module-m9 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [playground]="playgroundTpl" [answer]="boundAnswer"></app-module-m9>
+      }
+    }
+  }
+</app-course-layout>
+<ng-template #playgroundTpl let-id="id" let-file="file" let-hint="hint">
+  <div class="playground">
+    <div class="play-topbar">
+      <div class="play-dots"><div class="pd pd-r"></div><div class="pd pd-y"></div><div class="pd pd-g"></div></div>
+      <span class="play-filename">{{ file }}</span>
+      <span class="play-lang">JAVA</span>
+    </div>
+    <div class="editor-wrap">
+      <div class="line-gutter" [id]="'g'+id"></div>
+      <div class="editor-inner">
+        <div class="code-highlight" [id]="'h'+id" aria-hidden="true"></div>
+        <textarea class="code-textarea" [id]="'c'+id" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+    </div>
+    <div class="play-bottom">
+      <button class="btn-run" (click)="runCode('c'+id,'o'+id,$event)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2l11 6-11 6V2z"/></svg> <span class="run-label">Ejecutar</span>
+      </button>
+      <button class="btn-reset" (click)="resetCode('c'+id,'h'+id,'g'+id,id)">↺ Reiniciar</button>
+      <span class="play-hint">{{ hint }}</span>
+    </div>
+    <p class="play-note">El ejemplo original muestra la salida obtenida con OpenJDK 21. Si cambias el código, se compila y ejecuta en Wandbox, un compilador público en línea.</p>
+    <div class="play-output" [id]="'o'+id" aria-live="polite">
+      <div class="out-header"><div class="out-dot" [id]="'o'+id+'d'"></div><span [id]="'o'+id+'l'">Salida</span></div>
+      <div class="out-text ok" [id]="'o'+id+'t'"></div>
+    </div>
+  </div>
+</ng-template>

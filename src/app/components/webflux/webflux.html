@@ -1,0 +1,30 @@
+<app-course-layout class="cl-course" [c]="this">
+  @if (view === 'lesson') {
+    @switch (activeModule) {
+      @case (0) {
+        <app-wf-module-m1 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m1>
+      }
+      @case (1) {
+        <app-wf-module-m2 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m2>
+      }
+      @case (2) {
+        <app-wf-module-m3 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m3>
+      }
+      @case (3) {
+        <app-wf-module-m4 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m4>
+      }
+      @case (4) {
+        <app-wf-module-m5 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m5>
+      }
+      @case (5) {
+        <app-wf-module-m6 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m6>
+      }
+      @case (6) {
+        <app-wf-module-m7 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m7>
+      }
+      @case (7) {
+        <app-wf-module-m8 [globalLesson]="globalLesson" [isEval]="isCurrentEval" [answer]="boundAnswer"></app-wf-module-m8>
+      }
+    }
+  }
+</app-course-layout>

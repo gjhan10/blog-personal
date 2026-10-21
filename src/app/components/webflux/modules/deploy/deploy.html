@@ -1,0 +1,405 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===41">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">42</span><span class="lesson-mod">Módulo 8 · Deploy</span></div>
+      <h2 class="lesson-title">Modelo de Hilos de Netty</h2>
+      <p class="lesson-sub">Cómo funciona el event loop de Netty — la razón por la que WebFlux necesita menos threads.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Event Loop Groups</div>
+        <div class="tc-body">Netty tiene dos grupos: <strong>Boss group</strong> — acepta conexiones entrantes (1 thread). <strong>Worker group</strong> — procesa I/O y lógica (por defecto: 2×núcleos CPU). Un NioEventLoop por thread.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">NioEventLoop</div>
+        <div class="tc-body">Cada NioEventLoop ejecuta un selector NIO que monitoriza múltiples canales. Un solo thread maneja miles de conexiones concurrentes sin bloquearse. No confundir "concurrente" con "paralelo".</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Thread count por defecto</div>
+        <div class="tc-body"><code>Runtime.getRuntime().availableProcessors() × 2</code>. En una máquina con 4 CPU → 8 worker threads. Mucho menos que el pool de 200 threads de Tomcat.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ban" aria-hidden="true"></i></div>
+        <div class="tc-title">No blocking en event loop</div>
+        <div class="tc-body">Regla fundamental: <strong>nunca bloquees en el event loop de Netty</strong>. Thread.sleep(), JDBC, files I/O bloqueante → pausa toda la cadena. Usa Schedulers.boundedElastic() para operaciones bloqueantes.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Configuración del servidor Netty en Spring Boot</span></div>
+      <div class="anatomy-line">server.netty.connection-timeout=5s</div>
+      <div class="anatomy-line">server.netty.idle-timeout=60s</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Configurar worker threads programáticamente</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">NettyReactiveWebServerFactory</span> serverFactory() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">NettyReactiveWebServerFactory</span> factory = <span class="a-kw">new</span> <span class="a-type">NettyReactiveWebServerFactory</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;factory.addServerCustomizers(server -&gt; server.runOn(</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">LoopResources</span>.create(<span class="a-str">"server"</span>, 4, <span class="a-kw">true</span>)));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">return</span> factory;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===42">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">43</span><span class="lesson-mod">Módulo 8 · Deploy</span></div>
+      <h2 class="lesson-title">BlockHound</h2>
+      <p class="lesson-sub">Detección en tests y desarrollo de código bloqueante ejecutado en threads reactivos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">¿Qué es BlockHound?</div>
+        <div class="tc-body">Agente Java que intercepta llamadas bloqueantes (Thread.sleep, I/O bloqueante, JDBC) cuando se ejecutan en threads marcados como non-blocking (event loops de Netty, parallel scheduler).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">BlockHound.install()</div>
+        <div class="tc-body">Debe llamarse al inicio de la JVM — antes de que cualquier class loader cargue clases bloqueantes. En Spring Boot: en el main() antes de SpringApplication.run() o en un @BeforeAll de test.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-tag" aria-hidden="true"></i></div>
+        <div class="tc-title">@NonBlocking</div>
+        <div class="tc-body">Anotación de Reactor para marcar threads como non-blocking. Los event loops de Netty ya están marcados. BlockHound lanza BlockingOperationException si detecta código bloqueante en un thread así marcado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Allowlist personalizada</div>
+        <div class="tc-body">Para permitir operaciones específicas: <code>BlockHound.install(b -&gt; b.allowBlockingCallsInside("ClassName", "methodName"))</code>. Úsalo solo cuando sea absolutamente necesario.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Dependencia</span></div>
+      <div class="anatomy-line">io.projectreactor.tools:blockhound:1.0.8.RELEASE</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Instalar en test base</span></div>
+      <div class="anatomy-line"><span class="a-kw">@BeforeAll</span></div>
+      <div class="anatomy-line"><span class="a-kw">static void</span> setUp() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">BlockHound</span>.install();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// BlockingOperationException stack trace:</span></div>
+      <div class="anatomy-line"><span class="a-cm">// BlockingOperationException: Blocking call! java.lang.Thread.sleep</span></div>
+      <div class="anatomy-line"><span class="a-cm">// Mirar el stack para encontrar dónde ocurre el bloqueo</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===43">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">44</span><span class="lesson-mod">Módulo 8 · Deploy</span></div>
+      <h2 class="lesson-title">Docker y Kubernetes para WebFlux</h2>
+      <p class="lesson-sub">Containerización optimizada para aplicaciones reactivas con Netty.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Dockerfile multi-stage</div>
+        <div class="tc-body">WebFlux con Netty no necesita servlet container (no Tomcat). El JAR incluye Netty embebido. Multi-stage: build con Maven/Gradle, runtime con JRE slim o distroless.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">Memoria reducida</div>
+        <div class="tc-body">WebFlux usa significativamente menos memoria que Spring MVC bajo carga: menos threads = menos stack memory. Typical: 256–512 MB vs 512 MB–1 GB para Spring MVC equivalente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Kubernetes probes</div>
+        <div class="tc-body">Spring Actuator con WebFlux expone endpoints reactivos. <code>/actuator/health/liveness</code> — el pod puede recibir tráfico. <code>/actuator/health/readiness</code> — la app está lista. Configura en K8s livenessProbe y readinessProbe.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-chart" aria-hidden="true"></i></div>
+        <div class="tc-title">Escalado horizontal</div>
+        <div class="tc-body">WebFlux es stateless (si evitas estado en memoria) → escala horizontalmente sin coordinación. HPA (Horizontal Pod Autoscaler) basado en métricas de CPU/memoria o métricas custom de Micrometer.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm"># Dockerfile multi-stage para WebFlux</span></div>
+      <div class="anatomy-line"><span class="a-kw">FROM</span> eclipse-temurin:21-jdk-alpine AS build</div>
+      <div class="anatomy-line"><span class="a-kw">WORKDIR</span> /app</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> . .</div>
+      <div class="anatomy-line"><span class="a-kw">RUN</span> ./mvnw package -DskipTests</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">FROM</span> eclipse-temurin:21-jre-alpine</div>
+      <div class="anatomy-line"><span class="a-kw">WORKDIR</span> /app</div>
+      <div class="anatomy-line"><span class="a-kw">COPY</span> --from=build /app/target/*.jar app.jar</div>
+      <div class="anatomy-line"><span class="a-cm"># Flags JVM para contenedores</span></div>
+      <div class="anatomy-line"><span class="a-kw">ENV</span> JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"</div>
+      <div class="anatomy-line"><span class="a-kw">EXPOSE</span> 8080</div>
+      <div class="anatomy-line"><span class="a-kw">ENTRYPOINT</span> ["sh","-c","java $JAVA_OPTS -jar app.jar"]</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm"># GitHub Actions: deploy a K8s</span></div>
+      <div class="anatomy-line">- name: Deploy</div>
+      <div class="anatomy-line">&nbsp;&nbsp;run: kubectl set image deployment/api api=${{ '{{' }} secrets.REGISTRY {{ '}}' }}/api:${{ '{{' }} github.sha {{ '}}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 8</div>
+
+    <div class="quiz-box" id="wf8q01">
+      <div class="quiz-label">wf8q01</div>
+      <div class="quiz-q">¿Cuántos worker threads tiene Netty por defecto en una máquina con 4 CPUs?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q01',false)"><span class="quiz-letter">A</span> 4</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q01',true)"><span class="quiz-letter">B</span> 8 (2 × número de CPUs)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q01',false)"><span class="quiz-letter">C</span> 200 (como Tomcat)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q01',false)"><span class="quiz-letter">D</span> 1 por canal de conexión</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q01-ok">Correcto — Netty usa 2 × availableProcessors() por defecto. Con 4 CPUs → 8 worker threads para I/O.</div>
+      <div class="quiz-feedback fail" id="wf8q01-fail">Incorrecto — Netty usa 2 × núcleos CPU por defecto. Con 4 CPUs = 8 worker threads, muy diferente a los 200 de Tomcat.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q02">
+      <div class="quiz-label">wf8q02</div>
+      <div class="quiz-q">¿Qué es el Boss Group en Netty?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q02',true)"><span class="quiz-letter">A</span> El grupo de event loops que acepta nuevas conexiones TCP (generalmente 1 thread)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q02',false)"><span class="quiz-letter">B</span> El grupo de threads que ejecuta la lógica de negocio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q02',false)"><span class="quiz-letter">C</span> El thread principal que coordina los workers</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q02',false)"><span class="quiz-letter">D</span> El pool que maneja operaciones de base de datos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q02-ok">Correcto — Boss group acepta conexiones TCP entrantes y las delega al Worker group para el procesamiento real.</div>
+      <div class="quiz-feedback fail" id="wf8q02-fail">Incorrecto — el Boss group acepta conexiones TCP. El Worker group procesa los canales I/O. Es la arquitectura master-worker de Netty.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q03">
+      <div class="quiz-label">wf8q03</div>
+      <div class="quiz-q">¿Qué pasa si haces <code>Thread.sleep(1000)</code> en un método de un controller WebFlux sin moverlo a boundedElastic?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q03',false)"><span class="quiz-letter">A</span> Funciona igual que en Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q03',true)"><span class="quiz-letter">B</span> Bloquea el thread del event loop de Netty — detiene el procesamiento de TODAS las otras peticiones en ese worker</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q03',false)"><span class="quiz-letter">C</span> Spring WebFlux lo detecta y lo mueve automáticamente a otro thread</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q03',false)"><span class="quiz-letter">D</span> Solo añade latencia a esa petición específica</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q03-ok">Correcto — un event loop de Netty puede manejar miles de conexiones. Bloquearlo 1 segundo detiene el procesamiento de TODAS esas conexiones.</div>
+      <div class="quiz-feedback fail" id="wf8q03-fail">Incorrecto — en WebFlux, bloquear el event loop paraliza el procesamiento de todas las conexiones en ese worker. Es el peor anti-patrón.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q04">
+      <div class="quiz-label">wf8q04</div>
+      <div class="quiz-q">¿Cuándo debe llamarse a <code>BlockHound.install()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q04',true)"><span class="quiz-letter">A</span> Lo antes posible al inicio de la JVM, antes de que Spring cargue cualquier clase</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q04',false)"><span class="quiz-letter">B</span> Después de SpringApplication.run()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q04',false)"><span class="quiz-letter">C</span> Solo en el contexto de un test JUnit</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q04',false)"><span class="quiz-letter">D</span> Cuando se detecta el primer bloqueo</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q04-ok">Correcto — BlockHound usa instrumentación de bytecode que debe aplicarse antes de que las clases sean cargadas. Por eso debe instalarse lo más pronto posible.</div>
+      <div class="quiz-feedback fail" id="wf8q04-fail">Incorrecto — BlockHound debe instalarse al inicio, antes de que las clases se carguen. Llamarlo después puede perder instrumentación.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q05">
+      <div class="quiz-label">wf8q05</div>
+      <div class="quiz-q">¿Para qué sirve <code>-XX:+UseContainerSupport</code> en la JVM dentro de Docker?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q05',true)"><span class="quiz-letter">A</span> Hace que la JVM detecte los límites de memoria y CPU del contenedor (cgroups) en lugar de los del host</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q05',false)"><span class="quiz-letter">B</span> Habilita la integración con Docker API</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q05',false)"><span class="quiz-letter">C</span> Reduce el tamaño del heap al 50% automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q05',false)"><span class="quiz-letter">D</span> Solo aplica a JVM versiones anteriores a Java 8</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q05-ok">Correcto — sin UseContainerSupport la JVM lee los recursos del host, no del contenedor. Con límites de 512 MB en K8s, sin este flag la JVM puede excederlos y ser matada.</div>
+      <div class="quiz-feedback fail" id="wf8q05-fail">Incorrecto — UseContainerSupport hace que la JVM lea cgroups del contenedor. Sin él, la JVM ve los recursos del host y puede ser matada por K8s al exceder limits.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q06">
+      <div class="quiz-label">wf8q06</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>livenessProbe</code> y <code>readinessProbe</code> en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q06',true)"><span class="quiz-letter">A</span> Liveness: el pod está vivo (si falla, se reinicia). Readiness: el pod puede recibir tráfico (si falla, se retira del load balancer)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q06',false)"><span class="quiz-letter">B</span> Son equivalentes con diferente nombre</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q06',false)"><span class="quiz-letter">C</span> Readiness se ejecuta una vez al inicio; liveness continuamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q06',false)"><span class="quiz-letter">D</span> Liveness es para memoria; readiness es para CPU</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q06-ok">Correcto — liveness: ¿está vivo el proceso? Si falla → restart. Readiness: ¿puede atender tráfico? Si falla → el service no lo incluye en el load balancing.</div>
+      <div class="quiz-feedback fail" id="wf8q06-fail">Incorrecto — liveness: proceso vivo (fallo = restart del pod). Readiness: listo para tráfico (fallo = retirado del load balancer sin reiniciarse).</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q07">
+      <div class="quiz-label">wf8q07</div>
+      <div class="quiz-q">¿Qué ventaja tiene WebFlux sobre Spring MVC en términos de recursos del contenedor?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q07',true)"><span class="quiz-letter">A</span> Menos threads necesarios → menos memoria de stack → puede servir el mismo tráfico con menos memoria RAM</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q07',false)"><span class="quiz-letter">B</span> WebFlux tiene un JIT más agresivo que Spring MVC</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q07',false)"><span class="quiz-letter">C</span> WebFlux no necesita JVM — compila a nativo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q07',false)"><span class="quiz-letter">D</span> WebFlux usa menos CPU siempre que Spring MVC</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q07-ok">Correcto — cada thread Java ocupa ~1 MB de stack. Con 200 threads (Tomcat) vs 8 threads (Netty) bajo la misma carga, la diferencia de memoria es significativa.</div>
+      <div class="quiz-feedback fail" id="wf8q07-fail">Incorrecto — la ventaja de WebFlux en contenedores es principalmente memoria: menos threads = menos stack memory = pods más pequeños.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q08">
+      <div class="quiz-label">wf8q08</div>
+      <div class="quiz-q">¿Qué es un NioEventLoop en Netty?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q08',true)"><span class="quiz-letter">A</span> Un thread que ejecuta un selector NIO monitorizando múltiples canales de red</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q08',false)"><span class="quiz-letter">B</span> Un pool de threads para operaciones no-I/O</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q08',false)"><span class="quiz-letter">C</span> El scheduler global de Reactor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q08',false)"><span class="quiz-letter">D</span> El thread del servidor que parsea HTTP</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q08-ok">Correcto — NioEventLoop es un thread con un java.nio.Selector. Un selector puede monitorizar miles de canales simultáneamente, notificando cuando hay datos listos.</div>
+      <div class="quiz-feedback fail" id="wf8q08-fail">Incorrecto — NioEventLoop es un thread con un Selector NIO que puede monitorizar miles de canales de red de forma no bloqueante.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q09">
+      <div class="quiz-label">wf8q09</div>
+      <div class="quiz-q">¿Qué excepción lanza BlockHound cuando detecta código bloqueante?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q09',false)"><span class="quiz-letter">A</span> IllegalStateException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q09',true)"><span class="quiz-letter">B</span> BlockingOperationException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q09',false)"><span class="quiz-letter">C</span> NonBlockingViolationException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q09',false)"><span class="quiz-letter">D</span> ReactorBlockingException</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q09-ok">Correcto — BlockHound lanza BlockingOperationException con el stack trace indicando exactamente dónde ocurre el bloqueo.</div>
+      <div class="quiz-feedback fail" id="wf8q09-fail">Incorrecto — BlockHound lanza BlockingOperationException cuando detecta código bloqueante en un thread no-blocking.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q10">
+      <div class="quiz-label">wf8q10</div>
+      <div class="quiz-q">¿Por qué WebFlux no necesita un servlet container como Tomcat?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q10',true)"><span class="quiz-letter">A</span> WebFlux usa Reactive Streams directamente con Netty (o Undertow), sin la capa Servlet API bloqueante</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q10',false)"><span class="quiz-letter">B</span> Tomcat tiene soporte reactivo en versión 10+</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q10',false)"><span class="quiz-letter">C</span> WebFlux solo funciona con servidores HTTP/2</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q10',false)"><span class="quiz-letter">D</span> Tomcat tiene demasiada latencia para aplicaciones reactivas</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q10-ok">Correcto — la Servlet API está diseñada para el modelo bloqueante. WebFlux usa la ServerHttpRequest/Response reactiva directamente sin Servlet API.</div>
+      <div class="quiz-feedback fail" id="wf8q10-fail">Incorrecto — WebFlux bypasea la Servlet API bloqueante, conectándose directamente a servidores reactivos como Netty o Undertow.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q11">
+      <div class="quiz-label">wf8q11</div>
+      <div class="quiz-q">¿Qué es <code>-XX:MaxRAMPercentage=75.0</code> en la JVM?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q11',true)"><span class="quiz-letter">A</span> Limita el heap máximo al 75% de la RAM disponible (del contenedor con UseContainerSupport)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q11',false)"><span class="quiz-letter">B</span> Limita el uso de CPU al 75%</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q11',false)"><span class="quiz-letter">C</span> Asigna exactamente 75 MB al heap</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q11',false)"><span class="quiz-letter">D</span> Solo aplica si el contenedor tiene más de 1 GB de RAM</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q11-ok">Correcto — con UseContainerSupport, MaxRAMPercentage=75 limita el heap al 75% de la RAM del contenedor, dejando margen para stack, metaspace y off-heap.</div>
+      <div class="quiz-feedback fail" id="wf8q11-fail">Incorrecto — MaxRAMPercentage limita el heap máximo a ese porcentaje de RAM. Con UseContainerSupport, usa la RAM del contenedor, no del host.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q12">
+      <div class="quiz-label">wf8q12</div>
+      <div class="quiz-q">¿Cuál es el Scheduler apropiado para ejecutar operaciones JDBC bloqueantes en WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q12',false)"><span class="quiz-letter">A</span> Schedulers.parallel()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q12',true)"><span class="quiz-letter">B</span> Schedulers.boundedElastic()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q12',false)"><span class="quiz-letter">C</span> Schedulers.single()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q12',false)"><span class="quiz-letter">D</span> Schedulers.immediate()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q12-ok">Correcto — boundedElastic() está diseñado para operaciones bloqueantes I/O. Crea threads según demanda con un límite máximo (10× CPUs por defecto).</div>
+      <div class="quiz-feedback fail" id="wf8q12-fail">Incorrecto — parallel() es para CPU-bound. Las operaciones bloqueantes deben ir en boundedElastic() para no saturar el event loop.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q13">
+      <div class="quiz-label">wf8q13</div>
+      <div class="quiz-q">¿Qué endpoints de Spring Actuator se usan para los probes de K8s?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q13',false)"><span class="quiz-letter">A</span> /actuator/alive y /actuator/ready</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q13',true)"><span class="quiz-letter">B</span> /actuator/health/liveness y /actuator/health/readiness</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q13',false)"><span class="quiz-letter">C</span> /actuator/kubernetes/liveness y /actuator/kubernetes/readiness</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q13',false)"><span class="quiz-letter">D</span> /health y /ready (paths configurados manualmente)</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q13-ok">Correcto — Spring Boot 2.3+ con Actuator expone /actuator/health/liveness y /actuator/health/readiness específicamente para K8s.</div>
+      <div class="quiz-feedback fail" id="wf8q13-fail">Incorrecto — los endpoints son /actuator/health/liveness y /actuator/health/readiness. Habilita management.health.probes.enabled=true.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q14">
+      <div class="quiz-label">wf8q14</div>
+      <div class="quiz-q">¿Qué hace <code>@NonBlocking</code> (reactor.core.scheduler.NonBlocking)?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q14',true)"><span class="quiz-letter">A</span> Marca un thread/scheduler como non-blocking para que BlockHound lo monitorice</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q14',false)"><span class="quiz-letter">B</span> Garantiza que el método anotado no bloquea en tiempo de compilación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q14',false)"><span class="quiz-letter">C</span> Convierte automáticamente código bloqueante en reactivo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q14',false)"><span class="quiz-letter">D</span> Solo es una anotación de documentación sin efecto en runtime</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q14-ok">Correcto — NonBlocking es una interfaz marker que implementan los schedulers no-bloqueantes. BlockHound la usa para identificar qué threads monitorizar.</div>
+      <div class="quiz-feedback fail" id="wf8q14-fail">Incorrecto — NonBlocking es una interfaz marker en Reactor. BlockHound detecta threads que implementan esta interfaz y monitoriza las llamadas bloqueantes en ellos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q15">
+      <div class="quiz-label">wf8q15</div>
+      <div class="quiz-q">¿Cuál es la ventaja del Dockerfile multi-stage para aplicaciones WebFlux?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q15',true)"><span class="quiz-letter">A</span> La imagen final solo contiene el JRE y el JAR, sin Maven/Gradle ni fuentes — imagen más pequeña</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q15',false)"><span class="quiz-letter">B</span> Permite compilar para múltiples arquitecturas CPU simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q15',false)"><span class="quiz-letter">C</span> Elimina la necesidad de .dockerignore</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q15',false)"><span class="quiz-letter">D</span> El build es más rápido gracias al paralelismo de stages</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q15-ok">Correcto — multi-stage separa el entorno de build del runtime. La imagen final no incluye JDK, Maven, fuentes — puede ser 3-5× más pequeña.</div>
+      <div class="quiz-feedback fail" id="wf8q15-fail">Incorrecto — multi-stage produce imágenes finales pequeñas sin JDK ni build tools. Solo JRE + artefacto JAR en la imagen de producción.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q16">
+      <div class="quiz-label">wf8q16</div>
+      <div class="quiz-q">¿Cuándo conviene usar WebFlux en lugar de Spring MVC en producción?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q16',false)"><span class="quiz-letter">A</span> Siempre — WebFlux es siempre superior</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q16',true)"><span class="quiz-letter">B</span> Cuando hay muchas conexiones concurrentes I/O-bound, llamadas a servicios externos o streaming</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q16',false)"><span class="quiz-letter">C</span> Solo cuando se usa R2DBC como base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q16',false)"><span class="quiz-letter">D</span> Cuando la latencia debe ser inferior a 1ms</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q16-ok">Correcto — WebFlux brilla en casos I/O-bound con alta concurrencia: APIs que llaman a microservicios, streaming de datos, websockets, muchas conexiones simultáneas.</div>
+      <div class="quiz-feedback fail" id="wf8q16-fail">Incorrecto — WebFlux es ideal para alta concurrencia I/O-bound. Para CRUD simple con baja concurrencia, Spring MVC puede ser suficiente y más simple.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q17">
+      <div class="quiz-label">wf8q17</div>
+      <div class="quiz-q">¿Qué significa <code>management.health.probes.enabled=true</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q17',true)"><span class="quiz-letter">A</span> Habilita los endpoints /health/liveness y /health/readiness de Actuator para K8s</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q17',false)"><span class="quiz-letter">B</span> Habilita los health checks de la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q17',false)"><span class="quiz-letter">C</span> Activa el monitoreo activo de conexiones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q17',false)"><span class="quiz-letter">D</span> Solo aplica en entornos de Kubernetes automáticamente detectados</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q17-ok">Correcto — esta propiedad habilita los grupos de health "liveness" y "readiness" en Spring Actuator, necesarios para los probes de K8s.</div>
+      <div class="quiz-feedback fail" id="wf8q17-fail">Incorrecto — management.health.probes.enabled=true habilita los endpoints /health/liveness y /health/readiness para los probes de Kubernetes.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q18">
+      <div class="quiz-label">wf8q18</div>
+      <div class="quiz-q">¿Qué es un HPA (Horizontal Pod Autoscaler) en Kubernetes?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q18',true)"><span class="quiz-letter">A</span> Escala automáticamente el número de pods basándose en métricas (CPU, memoria, custom)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q18',false)"><span class="quiz-letter">B</span> Aumenta los recursos (CPU/RAM) de pods existentes sin reiniciarlos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q18',false)"><span class="quiz-letter">C</span> Distribuye el tráfico entre pods usando HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q18',false)"><span class="quiz-letter">D</span> Solo escala en respuesta a métricas de base de datos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q18-ok">Correcto — HPA monitoriza métricas y ajusta el número de réplicas automáticamente. Con Micrometer, WebFlux puede exponer métricas custom para el HPA.</div>
+      <div class="quiz-feedback fail" id="wf8q18-fail">Incorrecto — HPA (Horizontal Pod Autoscaler) escala el número de réplicas de forma horizontal basándose en métricas.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q19">
+      <div class="quiz-label">wf8q19</div>
+      <div class="quiz-q">¿Cuál es el scheduler de Reactor equivalente al pool de threads bloqueante de Tomcat?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q19',false)"><span class="quiz-letter">A</span> Schedulers.parallel()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q19',true)"><span class="quiz-letter">B</span> Schedulers.boundedElastic()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q19',false)"><span class="quiz-letter">C</span> Schedulers.newParallel("tomcat", 200)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q19',false)"><span class="quiz-letter">D</span> Schedulers.single()</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q19-ok">Correcto — boundedElastic() es el pool elástico para operaciones bloqueantes, con un límite máximo de threads (10×CPU por defecto).</div>
+      <div class="quiz-feedback fail" id="wf8q19-fail">Incorrecto — boundedElastic() es el pool para operaciones bloqueantes I/O, similar en concepto al pool de Tomcat pero con límite elástico.</div>
+    </div>
+
+    <div class="quiz-box" id="wf8q20">
+      <div class="quiz-label">wf8q20</div>
+      <div class="quiz-q">¿Qué herramienta de Spring permite compilar una app WebFlux a código nativo sin JVM?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q20',false)"><span class="quiz-letter">A</span> Spring Native con OpenJ9</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf8q20',true)"><span class="quiz-letter">B</span> Spring Boot + GraalVM Native Image</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q20',false)"><span class="quiz-letter">C</span> Spring Quarkus Native</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf8q20',false)"><span class="quiz-letter">D</span> Netty Native AOT</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf8q20-ok">Correcto — Spring Boot 3+ con GraalVM Native Image compila la app a un ejecutable nativo: arranque en milisegundos y uso de memoria mínimo. Ideal para contenedores.</div>
+      <div class="quiz-feedback fail" id="wf8q20-fail">Incorrecto — Spring Boot 3+ soporta compilación AOT con GraalVM Native Image para producir ejecutables nativos sin JVM.</div>
+    </div>
+
+  </div>
+
+</ng-container>

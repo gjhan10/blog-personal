@@ -1,0 +1,611 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===0">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">1</span><span class="lesson-mod">M1 · Creacionales</span></div>
+      <h2 class="lesson-title">Singleton</h2>
+      <p class="lesson-sub">Garantiza que una clase tenga una única instancia y proporciona un punto de acceso global.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 260 150" style="width:100%;max-width:260px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="8" width="220" height="130" rx="4" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="20" y1="32" x2="240" y2="32" stroke="#7c3aed" stroke-width="1"/>
+        <line x1="20" y1="60" x2="240" y2="60" stroke="#7c3aed" stroke-width="1"/>
+        <text x="130" y="23" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#6d28d9">&#171;singleton&#187;</text>
+        <text x="130" y="50" text-anchor="middle" font-family="monospace" font-size="13" font-weight="bold" fill="#1e1b4b">Singleton</text>
+        <text x="30" y="78" font-family="monospace" font-size="10" fill="#374151">&#8212; instance: Singleton</text>
+        <text x="30" y="98" font-family="monospace" font-size="10" fill="#374151">&#8212; Singleton()</text>
+        <text x="30" y="118" font-family="monospace" font-size="10" fill="#374151">+ getInstance(): Singleton</text>
+        <text x="30" y="133" font-family="monospace" font-size="10" fill="#374151">+ businessMethod()</text>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Controlar la instanciación de una clase para que solo exista un objeto. El constructor es privado y el acceso se realiza a través de un método estático.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando exactamente un objeto debe coordinar acciones: pool de conexiones, logger, registro de configuración, cache compartida.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Thread Safety</div>
+        <div class="tc-body">En Java moderno se prefiere el patrón "Initialization-on-demand holder" o un <code>enum</code>. El <code>enum</code> es thread-safe y resiste serialización.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ban" aria-hidden="true"></i></div>
+        <div class="tc-title">Anti-patrón frecuente</div>
+        <div class="tc-body">Overuso del Singleton convierte el estado global en dependencia oculta, dificulta el testing (difícil de mockear) y crea acoplamiento alto.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Forma recomendada en Java — Enum Singleton</span></div>
+      <div class="anatomy-line"><span class="a-kw">public enum</span> <span class="a-type">AppConfig</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;INSTANCE;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">Properties</span> props = <span class="a-kw">new</span> <span class="a-type">Properties</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">String</span> get(<span class="a-type">String</span> key) {{ '{' }} <span class="a-kw">return</span> props.getProperty(key); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Uso</span></div>
+      <div class="anatomy-line"><span class="a-type">String</span> val = <span class="a-type">AppConfig</span>.INSTANCE.get(<span class="a-str">"db.url"</span>);</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Alternativa: Initialization-on-demand holder</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">DatabasePool</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private static class</span> <span class="a-type">Holder</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">static final</span> <span class="a-type">DatabasePool</span> INSTANCE = <span class="a-kw">new</span> <span class="a-type">DatabasePool</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public static</span> <span class="a-type">DatabasePool</span> getInstance() {{ '{' }} <span class="a-kw">return</span> <span class="a-type">Holder</span>.INSTANCE; {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===1">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">2</span><span class="lesson-mod">M1 · Creacionales</span></div>
+      <h2 class="lesson-title">Factory Method</h2>
+      <p class="lesson-sub">Define una interfaz para crear un objeto, pero deja que las subclases decidan qué clase instanciar.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 440 220" style="width:100%;max-width:440px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="180" height="70" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="10" y1="32" x2="190" y2="32" stroke="#7c3aed" stroke-width="1"/>
+        <text x="100" y="24" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#6d28d9">&#171;abstract&#187;</text>
+        <text x="100" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Creator</text>
+        <text x="20" y="58" font-family="monospace" font-size="10" fill="#374151">+ factoryMethod(): Product</text>
+        <text x="20" y="72" font-family="monospace" font-size="10" fill="#374151">+ someOperation()</text>
+        <rect x="260" y="10" width="170" height="70" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="260" y1="32" x2="430" y2="32" stroke="#7c3aed" stroke-width="1"/>
+        <text x="345" y="24" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#6d28d9">&#171;interface&#187;</text>
+        <text x="345" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Product</text>
+        <text x="270" y="62" font-family="monospace" font-size="10" fill="#374151">+ operate()</text>
+        <line x1="190" y1="45" x2="258" y2="45" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,2"/>
+        <polygon points="258,41 268,45 258,49" fill="#7c3aed"/>
+        <rect x="10" y="140" width="180" height="70" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="10" y1="160" x2="190" y2="160" stroke="#7c3aed" stroke-width="1"/>
+        <text x="100" y="154" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">ConcreteCreator</text>
+        <text x="20" y="175" font-family="monospace" font-size="10" fill="#374151">+ factoryMethod():</text>
+        <text x="20" y="188" font-family="monospace" font-size="10" fill="#374151">&nbsp;&nbsp;ConcreteProduct</text>
+        <rect x="260" y="140" width="170" height="60" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="260" y1="160" x2="430" y2="160" stroke="#7c3aed" stroke-width="1"/>
+        <text x="345" y="154" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">ConcreteProduct</text>
+        <text x="270" y="175" font-family="monospace" font-size="10" fill="#374151">+ operate()</text>
+        <line x1="100" y1="80" x2="100" y2="138" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="96,80 104,80 100,70" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="345" y1="80" x2="345" y2="138" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="341,80 349,80 345,70" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="190" y1="168" x2="258" y2="168" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,2"/>
+        <polygon points="258,164 268,168 258,172" fill="#7c3aed"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">El Creator declara el factory method abstracto que las subclases sobreescriben para crear productos concretos. El cliente trabaja con la interfaz Product.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando no sabes de antemano la clase exacta del objeto a crear, o cuando quieres que las subclases especifiquen el objeto a crear sin alterar el código del cliente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Participantes</div>
+        <div class="tc-body"><strong>Creator</strong>: declara el factory method. <strong>ConcreteCreator</strong>: lo implementa. <strong>Product</strong>: interfaz del producto. <strong>ConcreteProduct</strong>: implementación concreta.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">vs Abstract Factory</div>
+        <div class="tc-body">Factory Method crea <em>un</em> producto via herencia. Abstract Factory crea <em>familias</em> de productos via composición. Factory Method es más simple y más común.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Dialog</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Button</span> createButton(); <span class="a-cm">// factory method</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">default void</span> render() {{ '{' }} createButton().render(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">WindowsDialog</span> <span class="a-kw">implements</span> <span class="a-type">Dialog</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Button</span> createButton() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">WindowsButton</span>(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">WebDialog</span> <span class="a-kw">implements</span> <span class="a-type">Dialog</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Button</span> createButton() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">HtmlButton</span>(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===2">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">3</span><span class="lesson-mod">M1 · Creacionales</span></div>
+      <h2 class="lesson-title">Abstract Factory</h2>
+      <p class="lesson-sub">Proporciona una interfaz para crear familias de objetos relacionados sin especificar sus clases concretas.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 460 200" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="160" y="10" width="140" height="60" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="160" y1="28" x2="300" y2="28" stroke="#7c3aed" stroke-width="1"/>
+        <text x="230" y="22" text-anchor="middle" font-family="monospace" font-size="9" font-style="italic" fill="#6d28d9">&#171;interface&#187;</text>
+        <text x="230" y="41" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">GUIFactory</text>
+        <text x="168" y="53" font-family="monospace" font-size="9" fill="#374151">+ createButton(): Button</text>
+        <text x="168" y="64" font-family="monospace" font-size="9" fill="#374151">+ createCheckbox(): Checkbox</text>
+        <rect x="10" y="130" width="150" height="55" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="10" y1="148" x2="160" y2="148" stroke="#7c3aed" stroke-width="1"/>
+        <text x="85" y="142" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">WinFactory</text>
+        <text x="18" y="160" font-family="monospace" font-size="9" fill="#374151">+ createButton()</text>
+        <text x="18" y="174" font-family="monospace" font-size="9" fill="#374151">+ createCheckbox()</text>
+        <rect x="300" y="130" width="150" height="55" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="300" y1="148" x2="450" y2="148" stroke="#7c3aed" stroke-width="1"/>
+        <text x="375" y="142" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">MacFactory</text>
+        <text x="308" y="160" font-family="monospace" font-size="9" fill="#374151">+ createButton()</text>
+        <text x="308" y="174" font-family="monospace" font-size="9" fill="#374151">+ createCheckbox()</text>
+        <line x1="85" y1="128" x2="200" y2="72" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="196,68 206,72 200,80" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="375" y1="128" x2="262" y2="72" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="258,68 268,72 262,80" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Garantiza que los objetos producidos sean <em>compatibles entre sí</em>. Un cliente que usa WinFactory nunca mezcla botones Windows con checkboxes Mac.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando el sistema debe ser independiente de cómo se crean sus productos, y necesitas garantizar que los productos de una familia se usen juntos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Participantes</div>
+        <div class="tc-body"><strong>AbstractFactory</strong>: interfaz con métodos de creación. <strong>ConcreteFactory</strong>: crea una familia concreta. <strong>AbstractProduct</strong>: interfaz del producto. <strong>ConcreteProduct</strong>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Extensibilidad</div>
+        <div class="tc-body">Añadir un nuevo tipo de producto rompe la interfaz AbstractFactory (OCP violado). Añadir una nueva familia (nueva plataforma) es fácil sin cambiar el cliente.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">GUIFactory</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Button</span> createButton();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Checkbox</span> createCheckbox();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">WinFactory</span> <span class="a-kw">implements</span> <span class="a-type">GUIFactory</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Button</span> createButton() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">WinButton</span>(); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Checkbox</span> createCheckbox() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">WinCheckbox</span>(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Application</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">GUIFactory</span> factory;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Application</span>(<span class="a-type">GUIFactory</span> f) {{ '{' }} <span class="a-kw">this</span>.factory = f; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> buildUI() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Button</span> b = factory.createButton(); <span class="a-cm">// no sabe el tipo concreto</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===3">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">4</span><span class="lesson-mod">M1 · Creacionales</span></div>
+      <h2 class="lesson-title">Builder</h2>
+      <p class="lesson-sub">Separa la construcción de un objeto complejo de su representación, permitiendo el mismo proceso construir distintas representaciones.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 460 200" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="60" width="140" height="75" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="10" y1="78" x2="150" y2="78" stroke="#7c3aed" stroke-width="1"/>
+        <text x="80" y="72" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#6d28d9">&#171;interface&#187;</text>
+        <text x="80" y="92" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Builder</text>
+        <text x="18" y="107" font-family="monospace" font-size="10" fill="#374151">+ buildPartA()</text>
+        <text x="18" y="120" font-family="monospace" font-size="10" fill="#374151">+ buildPartB()</text>
+        <text x="18" y="133" font-family="monospace" font-size="10" fill="#374151">+ getResult(): Product</text>
+        <rect x="10" y="165" width="140" height="30" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="80" y="184" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">ConcreteBuilder</text>
+        <line x1="80" y1="135" x2="80" y2="163" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="76,135 84,135 80,125" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect x="310" y="60" width="140" height="55" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="310" y1="78" x2="450" y2="78" stroke="#7c3aed" stroke-width="1"/>
+        <text x="380" y="72" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Director</text>
+        <text x="318" y="92" font-family="monospace" font-size="10" fill="#374151">- builder: Builder</text>
+        <text x="318" y="107" font-family="monospace" font-size="10" fill="#374151">+ construct()</text>
+        <rect x="310" y="145" width="140" height="45" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="310" y1="163" x2="450" y2="163" stroke="#7c3aed" stroke-width="1"/>
+        <text x="380" y="157" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Product</text>
+        <text x="318" y="178" font-family="monospace" font-size="10" fill="#374151">- partA, partB: String</text>
+        <line x1="150" y1="97" x2="308" y2="87" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,2"/>
+        <polygon points="302,83 312,87 302,91" fill="#7c3aed"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">El Director coordina la construcción usando el Builder. El cliente puede usar el Director para construir variantes, u omitirlo y llamar al Builder directamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Objetos con muchos parámetros opcionales (evita constructores con 10 parámetros), múltiples representaciones del mismo proceso de construcción, construcción paso a paso.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Builder fluente en Java</div>
+        <div class="tc-body">En Java moderno, el Builder fluente (sin Director) es muy común: <code>Pizza.builder().size(L).toppings(List.of(CHEESE)).build()</code>. Lombok <code>@Builder</code> lo genera automáticamente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">vs Constructor/Telescoping</div>
+        <div class="tc-body">El anti-patrón "telescoping constructor" tiene N constructores sobreargados. Builder lo elimina y hace el código legible. Útil cuando hay más de 4 parámetros opcionales.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Pizza</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">Size</span> size; <span class="a-kw">private final</span> <span class="a-type">List</span>&lt;<span class="a-type">Topping</span>&gt; toppings;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">Pizza</span>(<span class="a-type">Builder</span> b) {{ '{' }} <span class="a-kw">this</span>.size=b.size; <span class="a-kw">this</span>.toppings=b.toppings; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public static class</span> <span class="a-type">Builder</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">Size</span> size; <span class="a-kw">private</span> <span class="a-type">List</span>&lt;<span class="a-type">Topping</span>&gt; toppings = <span class="a-kw">new</span> <span class="a-type">ArrayList</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Builder</span> size(<span class="a-type">Size</span> s) {{ '{' }} <span class="a-kw">this</span>.size=s; <span class="a-kw">return this</span>; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Builder</span> topping(<span class="a-type">Topping</span> t) {{ '{' }} toppings.add(t); <span class="a-kw">return this</span>; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Pizza</span> build() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">Pizza</span>(<span class="a-kw">this</span>); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-type">Pizza</span> p = <span class="a-kw">new</span> <span class="a-type">Pizza</span>.<span class="a-type">Builder</span>().size(<span class="a-type">Size</span>.LARGE).topping(<span class="a-type">Topping</span>.CHEESE).build();</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===4">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">5</span><span class="lesson-mod">M1 · Creacionales</span></div>
+      <h2 class="lesson-title">Prototype</h2>
+      <p class="lesson-sub">Especifica los tipos de objetos a crear usando una instancia prototípica, y crea nuevos objetos copiando ese prototipo.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 380 170" style="width:100%;max-width:380px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="120" y="10" width="140" height="50" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="120" y1="28" x2="260" y2="28" stroke="#7c3aed" stroke-width="1"/>
+        <text x="190" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#6d28d9">&#171;interface&#187;</text>
+        <text x="190" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#1e1b4b">Prototype</text>
+        <text x="128" y="54" font-family="monospace" font-size="10" fill="#374151">+ clone(): Prototype</text>
+        <rect x="10" y="110" width="150" height="50" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="10" y1="128" x2="160" y2="128" stroke="#7c3aed" stroke-width="1"/>
+        <text x="85" y="122" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">ConcretePrototype1</text>
+        <text x="18" y="142" font-family="monospace" font-size="10" fill="#374151">- field: Object</text>
+        <text x="18" y="155" font-family="monospace" font-size="10" fill="#374151">+ clone()</text>
+        <rect x="220" y="110" width="150" height="50" rx="3" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="220" y1="128" x2="370" y2="128" stroke="#7c3aed" stroke-width="1"/>
+        <text x="295" y="122" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#1e1b4b">ConcretePrototype2</text>
+        <text x="228" y="142" font-family="monospace" font-size="10" fill="#374151">- field: Object</text>
+        <text x="228" y="155" font-family="monospace" font-size="10" fill="#374151">+ clone()</text>
+        <line x1="85" y1="108" x2="165" y2="62" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="161,58 171,62 165,70" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+        <line x1="295" y1="108" x2="218" y2="62" stroke="#7c3aed" stroke-width="1"/>
+        <polygon points="214,58 224,62 218,70" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Clonar objetos sin acoplarse a sus clases. El cliente solo necesita la interfaz <code>clone()</code>. Útil cuando la creación es costosa (objeto preconfigurado, conexión establecida).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando crear un objeto desde cero es más caro que copiarlo. Cuando quieres un "snapshot" del estado de un objeto. Frameworks de Spring usan prototipos para bean scopes.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Deep vs Shallow Copy</div>
+        <div class="tc-body">La copia superficial (shallow) copia referencias. La copia profunda (deep) copia objetos anidados. Java's <code>Object.clone()</code> hace shallow copy — hay que sobreescribir manualmente.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div>
+        <div class="tc-title">Java: Cloneable</div>
+        <div class="tc-body">Java tiene <code>Cloneable</code> + <code>Object.clone()</code>, pero es un diseño defectuoso (lanza checked exception, shallow por defecto). Prefer copy constructor o factory method.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Shape</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">String</span> color; <span class="a-kw">private int</span> x, y;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Shape</span>(<span class="a-type">Shape</span> source) {{ '{' }} <span class="a-cm">// copy constructor</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.color = source.color; <span class="a-kw">this</span>.x = source.x; <span class="a-kw">this</span>.y = source.y;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Shape</span> clone() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">Shape</span>(<span class="a-kw">this</span>); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">Circle</span> <span class="a-kw">extends</span> <span class="a-type">Shape</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private int</span> radius;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Circle</span>(<span class="a-type">Circle</span> src) {{ '{' }} <span class="a-kw">super</span>(src); <span class="a-kw">this</span>.radius = src.radius; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Circle</span> clone() {{ '{' }} <span class="a-kw">return new</span> <span class="a-type">Circle</span>(<span class="a-kw">this</span>); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 1: Patrones Creacionales</div>
+
+    <div class="quiz-box" id="dp1q01">
+      <div class="quiz-label">dp1q01</div>
+      <div class="quiz-q">¿Cuál es la mejor forma de implementar un Singleton thread-safe en Java moderno?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q01',false)"><span class="quiz-letter">A</span> synchronized en todo el método getInstance()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q01',false)"><span class="quiz-letter">B</span> Double-checked locking con volatile</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q01',true)"><span class="quiz-letter">C</span> Un enum con un único valor INSTANCE</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q01',false)"><span class="quiz-letter">D</span> Una variable static final inicializada directamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q01-ok">Correcto — el Singleton con enum es la forma recomendada por Effective Java (Bloch): thread-safe, serialización segura, y no puede ser roto por reflexión.</div>
+      <div class="quiz-feedback fail" id="dp1q01-fail">Incorrecto — el enum Singleton es la forma más robusta en Java moderno. Es thread-safe, inmune a serialización y reflexión maliciosa.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q02">
+      <div class="quiz-label">dp1q02</div>
+      <div class="quiz-q">¿Cuál es el patrón que "deja a las subclases decidir qué clase instanciar"?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q02',false)"><span class="quiz-letter">A</span> Abstract Factory</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q02',false)"><span class="quiz-letter">B</span> Builder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q02',true)"><span class="quiz-letter">C</span> Factory Method</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q02',false)"><span class="quiz-letter">D</span> Prototype</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q02-ok">Correcto — la definición clásica de Factory Method: "Define an interface for creating an object, but let subclasses decide which class to instantiate."</div>
+      <div class="quiz-feedback fail" id="dp1q02-fail">Incorrecto — Factory Method deja a las subclases decidir qué instanciar. Abstract Factory crea familias de objetos relacionados.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q03">
+      <div class="quiz-label">dp1q03</div>
+      <div class="quiz-q">¿Cuál es la principal diferencia entre Factory Method y Abstract Factory?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q03',true)"><span class="quiz-letter">A</span> Factory Method crea UN producto via herencia; Abstract Factory crea FAMILIAS de productos via composición</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q03',false)"><span class="quiz-letter">B</span> Factory Method usa interfaces; Abstract Factory usa clases abstractas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q03',false)"><span class="quiz-letter">C</span> Abstract Factory solo funciona con patrones Creacionales; Factory Method con cualquier tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q03',false)"><span class="quiz-letter">D</span> No hay diferencia real entre ambos patrones</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q03-ok">Correcto — Factory Method = herencia + 1 producto. Abstract Factory = composición + familia completa de productos relacionados.</div>
+      <div class="quiz-feedback fail" id="dp1q03-fail">Incorrecto — la diferencia clave: Factory Method crea un objeto vía herencia. Abstract Factory crea familias enteras de objetos relacionados vía composición.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q04">
+      <div class="quiz-label">dp1q04</div>
+      <div class="quiz-q">¿Qué problema resuelve el patrón Builder en Java?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q04',false)"><span class="quiz-letter">A</span> Permite crear objetos sin conocer su clase concreta</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q04',true)"><span class="quiz-letter">B</span> Elimina el anti-patrón del constructor telescópico con muchos parámetros opcionales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q04',false)"><span class="quiz-letter">C</span> Garantiza que solo exista una instancia de la clase</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q04',false)"><span class="quiz-letter">D</span> Permite clonar objetos existentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q04-ok">Correcto — Builder resuelve la construcción de objetos con muchos parámetros opcionales, haciendo el código legible y evitando el constructor telescópico.</div>
+      <div class="quiz-feedback fail" id="dp1q04-fail">Incorrecto — Builder elimina el problema del constructor con N parámetros (telescoping), permitiendo construir objetos complejos paso a paso.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q05">
+      <div class="quiz-label">dp1q05</div>
+      <div class="quiz-q">¿Qué hace <code>@Builder</code> de Lombok?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q05',true)"><span class="quiz-letter">A</span> Genera automáticamente la clase Builder interna estática con métodos fluentes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q05',false)"><span class="quiz-letter">B</span> Aplica el patrón Builder al nivel de base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q05',false)"><span class="quiz-letter">C</span> Crea un Director automático para coordinar la construcción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q05',false)"><span class="quiz-letter">D</span> Solo funciona con records de Java 14+</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q05-ok">Correcto — @Builder de Lombok genera en tiempo de compilación la clase Builder interna con métodos fluentes para todos los campos, más el método build().</div>
+      <div class="quiz-feedback fail" id="dp1q05-fail">Incorrecto — @Builder de Lombok genera el boilerplate del patrón Builder (inner class estática, métodos fluentes, build()) en tiempo de compilación.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q06">
+      <div class="quiz-label">dp1q06</div>
+      <div class="quiz-q">¿Cuál es el problema de <code>Object.clone()</code> en Java para implementar Prototype?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q06',false)"><span class="quiz-letter">A</span> clone() solo funciona con clases final</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q06',true)"><span class="quiz-letter">B</span> Hace copia superficial por defecto, requiere Cloneable (diseño defectuoso) y lanza excepción checked</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q06',false)"><span class="quiz-letter">C</span> No es thread-safe</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q06',false)"><span class="quiz-letter">D</span> No existe Object.clone() en Java</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q06-ok">Correcto — Object.clone() tiene varios problemas: shallow copy, Cloneable es un marker interface sin el método, CloneNotSupportedException checked. Se prefiere copy constructor.</div>
+      <div class="quiz-feedback fail" id="dp1q06-fail">Incorrecto — Object.clone() es problemático: shallow copy por defecto, diseño de Cloneable defectuoso, checked exception. Mejor usar constructor copia.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q07">
+      <div class="quiz-label">dp1q07</div>
+      <div class="quiz-q">¿Qué rol cumple el <strong>Director</strong> en el patrón Builder?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q07',true)"><span class="quiz-letter">A</span> Define el orden de los pasos de construcción y puede reutilizarse para distintos builders</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q07',false)"><span class="quiz-letter">B</span> Es el objeto final que se construye</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q07',false)"><span class="quiz-letter">C</span> Es el cliente que inicia la construcción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q07',false)"><span class="quiz-letter">D</span> Valida el resultado antes de retornarlo</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q07-ok">Correcto — el Director encapsula el algoritmo de construcción (el orden de llamadas a buildPartX). Es opcional: el cliente puede llamar al Builder directamente.</div>
+      <div class="quiz-feedback fail" id="dp1q07-fail">Incorrecto — el Director coordina el proceso de construcción definiendo el orden de pasos. Es independiente del Builder concreto que usa.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q08">
+      <div class="quiz-label">dp1q08</div>
+      <div class="quiz-q">¿Cuándo el patrón Singleton viola el principio Single Responsibility?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q08',true)"><span class="quiz-letter">A</span> Siempre: gestiona tanto su propia creación única como su lógica de negocio</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q08',false)"><span class="quiz-letter">B</span> Solo cuando tiene métodos estáticos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q08',false)"><span class="quiz-letter">C</span> Cuando implementa una interfaz</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q08',false)"><span class="quiz-letter">D</span> No viola SRP si el constructor es private</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q08-ok">Correcto — el Singleton viola SRP porque tiene dos responsabilidades: controlar su instanciación única Y ejecutar su lógica de negocio.</div>
+      <div class="quiz-feedback fail" id="dp1q08-fail">Incorrecto — el Singleton siempre tiene dos responsabilidades: gestionar su unicidad y la lógica de negocio. Viola SRP por definición.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q09">
+      <div class="quiz-label">dp1q09</div>
+      <div class="quiz-q">¿Qué garantiza Abstract Factory que Factory Method no garantiza?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q09',false)"><span class="quiz-letter">A</span> Que el producto sea inmutable</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q09',true)"><span class="quiz-letter">B</span> Que los productos de una familia sean compatibles entre sí</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q09',false)"><span class="quiz-letter">C</span> Que solo exista un objeto de cada tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q09',false)"><span class="quiz-letter">D</span> Que la construcción sea thread-safe</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q09-ok">Correcto — Abstract Factory garantiza la consistencia entre productos de la misma familia (ej. botones Windows + checkboxes Windows, nunca mezclados).</div>
+      <div class="quiz-feedback fail" id="dp1q09-fail">Incorrecto — Abstract Factory garantiza que los objetos de una familia sean compatibles entre sí, lo que Factory Method no puede asegurar.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q10">
+      <div class="quiz-label">dp1q10</div>
+      <div class="quiz-q">¿Para qué sirve el "Initialization-on-demand holder" pattern en Singleton?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q10',true)"><span class="quiz-letter">A</span> Lazy initialization thread-safe sin synchronized — la clase interna Holder solo se carga cuando se accede</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q10',false)"><span class="quiz-letter">B</span> Inicializa el Singleton con datos de una base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q10',false)"><span class="quiz-letter">C</span> Permite múltiples instancias en diferentes ClassLoaders</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q10',false)"><span class="quiz-letter">D</span> Destruye el Singleton cuando ya no se necesita</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q10-ok">Correcto — el class loader de Java garantiza que la clase interna Holder se inicialice una sola vez, de forma lazy y thread-safe, sin overhead de sincronización.</div>
+      <div class="quiz-feedback fail" id="dp1q10-fail">Incorrecto — el Initialization-on-demand holder usa la garantía del class loader de Java para obtener lazy initialization thread-safe sin synchronized.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q11">
+      <div class="quiz-label">dp1q11</div>
+      <div class="quiz-q">¿En qué se diferencian deep copy y shallow copy en el patrón Prototype?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q11',true)"><span class="quiz-letter">A</span> Shallow: copia referencias de objetos anidados. Deep: copia recursivamente todos los objetos anidados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q11',false)"><span class="quiz-letter">B</span> Son equivalentes para objetos sin colecciones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q11',false)"><span class="quiz-letter">C</span> Deep copy es más rápida que shallow copy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q11',false)"><span class="quiz-letter">D</span> Shallow copy solo funciona con primitivos</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q11-ok">Correcto — shallow copy: dos objetos comparten las mismas referencias internas (modificar uno afecta al otro). Deep copy: objetos completamente independientes.</div>
+      <div class="quiz-feedback fail" id="dp1q11-fail">Incorrecto — shallow: copia el objeto pero comparte referencias internas. Deep: copia todo recursivamente creando objetos completamente independientes.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q12">
+      <div class="quiz-label">dp1q12</div>
+      <div class="quiz-q">¿Cuál de estos es un ejemplo real de Factory Method en Java SE?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q12',false)"><span class="quiz-letter">A</span> new ArrayList&lt;&gt;()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q12',true)"><span class="quiz-letter">B</span> Calendar.getInstance()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q12',false)"><span class="quiz-letter">C</span> String.format()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q12',false)"><span class="quiz-letter">D</span> System.currentTimeMillis()</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q12-ok">Correcto — Calendar.getInstance() retorna una subclase concreta de Calendar según la configuración regional — el cliente no sabe qué implementación recibe.</div>
+      <div class="quiz-feedback fail" id="dp1q12-fail">Incorrecto — Calendar.getInstance() es un factory method que retorna una subclase concreta de Calendar (GregorianCalendar, etc.) según el locale.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q13">
+      <div class="quiz-label">dp1q13</div>
+      <div class="quiz-q">¿Qué hace el scope <code>prototype</code> de Spring en relación con este patrón?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q13',true)"><span class="quiz-letter">A</span> Spring crea una nueva instancia del bean cada vez que se inyecta o solicita (no hay instancia compartida)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q13',false)"><span class="quiz-letter">B</span> Spring clona el bean registrado usando clone()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q13',false)"><span class="quiz-letter">C</span> Solo aplica a beans con la anotación @Cloneable</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q13',false)"><span class="quiz-letter">D</span> Es equivalente al scope singleton</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q13-ok">Correcto — @Scope("prototype") en Spring significa que cada inyección o getBean() crea una nueva instancia, inspirado en el concepto del patrón Prototype (nueva copia por petición).</div>
+      <div class="quiz-feedback fail" id="dp1q13-fail">Incorrecto — el scope prototype de Spring crea una nueva instancia por cada petición/inyección, en contraste con singleton que comparte la misma instancia.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q14">
+      <div class="quiz-label">dp1q14</div>
+      <div class="quiz-q">¿Por qué es difícil testear código que usa Singleton directamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q14',true)"><span class="quiz-letter">A</span> No se puede mockear — la dependencia está hardcodeada dentro del método, no puede inyectarse</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q14',false)"><span class="quiz-letter">B</span> JUnit no soporta clases con constructores privados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q14',false)"><span class="quiz-letter">C</span> El Singleton tiene un ciclo de vida que JUnit no gestiona</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q14',false)"><span class="quiz-letter">D</span> Los métodos estáticos no se pueden llamar desde tests</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q14-ok">Correcto — el código que hace ClassX.INSTANCE.method() tiene la dependencia hardcodeada: no se puede sustituir por un mock. La solución es inyectar la dependencia via interfaz.</div>
+      <div class="quiz-feedback fail" id="dp1q14-fail">Incorrecto — el problema es el acoplamiento: Singleton.getInstance() hardcodea la dependencia, imposibilitando la sustitución por mocks en tests.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q15">
+      <div class="quiz-label">dp1q15</div>
+      <div class="quiz-q">¿Qué patrón creacional usarías para generar consultas SQL complejas con múltiples cláusulas opcionales?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q15',false)"><span class="quiz-letter">A</span> Singleton</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q15',false)"><span class="quiz-letter">C</span> Factory Method</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q15',true)"><span class="quiz-letter">B</span> Builder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q15',false)"><span class="quiz-letter">D</span> Prototype</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q15-ok">Correcto — Builder es ideal para construir objetos paso a paso con partes opcionales. JPA Criteria API, QueryDSL y StringBuilder son ejemplos reales.</div>
+      <div class="quiz-feedback fail" id="dp1q15-fail">Incorrecto — Builder es el patrón ideal para objetos complejos con muchas partes opcionales, como consultas SQL. QueryDSL y JPA Criteria API lo usan.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q16">
+      <div class="quiz-label">dp1q16</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre un static factory method y el patrón Factory Method GoF?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q16',true)"><span class="quiz-letter">A</span> Static factory method es un método estático de conveniencia; Factory Method GoF es un patrón con herencia y polimorfismo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q16',false)"><span class="quiz-letter">B</span> Son lo mismo — el GoF usa métodos estáticos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q16',false)"><span class="quiz-letter">C</span> Static factory method solo existe en Effective Java, no en GoF</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q16',false)"><span class="quiz-letter">D</span> Factory Method GoF siempre retorna un Singleton</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q16-ok">Correcto — static factory method (Bloch) = método estático que crea objetos (List.of()). Factory Method GoF = patrón de herencia donde subclases deciden qué instanciar.</div>
+      <div class="quiz-feedback fail" id="dp1q16-fail">Incorrecto — son conceptos distintos: static factory method es un idioma de implementación; Factory Method GoF es un patrón de diseño basado en herencia.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q17">
+      <div class="quiz-label">dp1q17</div>
+      <div class="quiz-q">¿Qué ventaja tiene el patrón Abstract Factory para cambiar de "familia" en producción?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q17',true)"><span class="quiz-letter">A</span> Basta con cambiar la implementación concreta de la factory — el código cliente no cambia</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q17',false)"><span class="quiz-letter">B</span> Requiere cambiar solo los productos, no la factory</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q17',false)"><span class="quiz-letter">C</span> No es posible cambiar de familia en producción</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q17',false)"><span class="quiz-letter">D</span> Hay que modificar todos los clientes que usan los productos</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q17-ok">Correcto — el cliente trabaja con GUIFactory abstracta. Pasar WinFactory o MacFactory es la única diferencia. El OCP se cumple perfectamente.</div>
+      <div class="quiz-feedback fail" id="dp1q17-fail">Incorrecto — con Abstract Factory basta con cambiar la implementación concreta de la factory para cambiar toda la familia de objetos. El cliente no toca.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q18">
+      <div class="quiz-label">dp1q18</div>
+      <div class="quiz-q">¿Para qué se usa el Prototype en el contexto de Spring Framework?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q18',false)"><span class="quiz-letter">A</span> Para clonar beans singleton</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q18',true)"><span class="quiz-letter">B</span> Como scope de beans: cada inyección/getBean() crea una nueva instancia independiente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q18',false)"><span class="quiz-letter">C</span> Para crear prototipos de API antes de implementarlos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q18',false)"><span class="quiz-letter">D</span> Solo en Spring Batch para procesar registros</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q18-ok">Correcto — @Scope("prototype") significa que Spring crea una nueva instancia cada vez que el bean se solicita, similar al concepto de clonar un prototipo.</div>
+      <div class="quiz-feedback fail" id="dp1q18-fail">Incorrecto — el scope prototype en Spring crea una nueva instancia por cada petición, implementando el concepto del patrón Prototype.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q19">
+      <div class="quiz-label">dp1q19</div>
+      <div class="quiz-q">¿Cuándo NO usar el patrón Builder?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q19',true)"><span class="quiz-letter">A</span> Cuando el objeto tiene pocos parámetros (2-3) todos requeridos — añade complejidad innecesaria</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q19',false)"><span class="quiz-letter">B</span> Cuando el objeto es immutable</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q19',false)"><span class="quiz-letter">C</span> Cuando el objeto necesita validación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q19',false)"><span class="quiz-letter">D</span> Cuando se trabaja con Java 8+</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q19-ok">Correcto — Builder añade una clase adicional (el Builder). Con pocos parámetros obligatorios, un constructor normal es más simple y claro.</div>
+      <div class="quiz-feedback fail" id="dp1q19-fail">Incorrecto — Builder agrega complejidad. Si el objeto tiene 2-3 parámetros todos requeridos, un simple constructor es más claro y preferible.</div>
+    </div>
+
+    <div class="quiz-box" id="dp1q20">
+      <div class="quiz-label">dp1q20</div>
+      <div class="quiz-q">¿Qué patrón creacional se identifica por el uso de un método <code>clone()</code> en la interfaz?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q20',false)"><span class="quiz-letter">A</span> Factory Method</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q20',false)"><span class="quiz-letter">B</span> Builder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp1q20',false)"><span class="quiz-letter">C</span> Abstract Factory</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp1q20',true)"><span class="quiz-letter">D</span> Prototype</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp1q20-ok">Correcto — Prototype define una interfaz con el método clone() para que los objetos puedan copiarse a sí mismos independientemente de su tipo concreto.</div>
+      <div class="quiz-feedback fail" id="dp1q20-fail">Incorrecto — el método clone() en la interfaz es la firma del patrón Prototype. Permite copiar objetos sin acoplarse a su clase concreta.</div>
+    </div>
+
+  </div>
+
+</ng-container>

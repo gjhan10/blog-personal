@@ -1,0 +1,403 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===37">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">38</span><span class="lesson-mod">Módulo 7 · Testing</span></div>
+      <h2 class="lesson-title">StepVerifier Avanzado</h2>
+      <p class="lesson-sub">Pruebas precisas de pipelines reactivos con tiempo virtual, secuencias y grabación.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">withVirtualTime()</div>
+        <div class="tc-body">Permite simular el paso del tiempo sin esperar realmente. <code>StepVerifier.withVirtualTime(() -&gt; Flux.interval(Duration.ofSeconds(1)))</code>. <strong>El supplier es obligatorio</strong> para capturar la suscripción con VirtualTimeScheduler.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-timer" aria-hidden="true"></i></div>
+        <div class="tc-title">thenAwait(Duration)</div>
+        <div class="tc-body">Avanza el reloj virtual: <code>.thenAwait(Duration.ofSeconds(10))</code>. Después de avanzar el reloj, se pueden verificar los elementos emitidos. No hay espera real.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">recordWith</div>
+        <div class="tc-body"><code>.recordWith(ArrayList::new).thenConsumeWhile(x -&gt; true).consumeRecordedWith(list -&gt; assertThat(list).containsExactly(...))</code>. Acumula elementos para assertions complejas.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-hash" aria-hidden="true"></i></div>
+        <div class="tc-title">expectNextCount</div>
+        <div class="tc-body"><code>.expectNextCount(100)</code> verifica que se emiten exactamente N elementos sin inspeccionarlos. Combina con <code>.expectNextMatches(predicate)</code> para elementos específicos.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Test con tiempo virtual</span></div>
+      <div class="anatomy-line"><span class="a-type">StepVerifier</span>.withVirtualTime(() -&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">Flux</span>.interval(<span class="a-type">Duration</span>.ofSeconds(1)).take(3))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expectSubscription()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.thenAwait(<span class="a-type">Duration</span>.ofSeconds(3))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.expectNextCount(3)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.verifyComplete();</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// recordWith para assertions sobre la colección</span></div>
+      <div class="anatomy-line"><span class="a-type">StepVerifier</span>.create(service.getAll())</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.recordWith(<span class="a-type">ArrayList</span>::<span class="a-kw">new</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.thenConsumeWhile(p -&gt; <span class="a-kw">true</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.consumeRecordedWith(list -&gt;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;assertThat(list).hasSize(5))</div>
+      <div class="anatomy-line">&nbsp;&nbsp;.verifyComplete();</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===38">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">39</span><span class="lesson-mod">Módulo 7 · Testing</span></div>
+      <h2 class="lesson-title">WebTestClient</h2>
+      <p class="lesson-sub">Cliente HTTP de pruebas para endpoints WebFlux: integración y unitaria.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-link" aria-hidden="true"></i></div>
+        <div class="tc-title">bindToApplicationContext</div>
+        <div class="tc-body">Test de integración completo: <code>WebTestClient.bindToApplicationContext(ctx).build()</code>. Inicia el contexto de Spring completo sin servidor real. Opción: <code>bindToServer("http://localhost:8080")</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">bindToRouterFunction</div>
+        <div class="tc-body"><code>WebTestClient.bindToRouterFunction(routerFn).build()</code>. Para testear Router Functions de forma aislada. Sin contexto de Spring completo — test unitario puro.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-search" aria-hidden="true"></i></div>
+        <div class="tc-title">expectBody + jsonPath</div>
+        <div class="tc-body"><code>.expectBody().jsonPath("$.name").isEqualTo("Alice")</code>. Para objetos tipados: <code>.expectBody(Product.class).value(p -&gt; assertThat(p.name()).isEqualTo("X"))</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">expectBodyList</div>
+      <div class="tc-body"><code>.expectBodyList(Product.class).hasSize(3).contains(product1)</code>. Para Flux: <code>.returnResult(Product.class).getResponseBody()</code> retorna un Flux para procesar con StepVerifier.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Test</span></div>
+      <div class="anatomy-line"><span class="a-kw">void</span> testGetProduct() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;webTestClient.get()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.uri(<span class="a-str">"/products/1"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.accept(<span class="a-type">MediaType</span>.APPLICATION_JSON)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.exchange()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.expectStatus().isOk()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.expectBody(<span class="a-type">Product</span>.class)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;.value(p -&gt; assertThat(p.getId()).isEqualTo(1L));</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===39">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">40</span><span class="lesson-mod">Módulo 7 · Testing</span></div>
+      <h2 class="lesson-title">@WebFluxTest y Mocking</h2>
+      <p class="lesson-sub">Tests unitarios de controladores WebFlux con contexto reducido y mocks reactivos.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-flask" aria-hidden="true"></i></div>
+        <div class="tc-title">@WebFluxTest</div>
+        <div class="tc-body">Carga solo los beans de la capa web: controllers, HandlerFunctions, WebFilter. No carga services ni repositories. Auto-configura WebTestClient. Más rápido que @SpringBootTest.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-users" aria-hidden="true"></i></div>
+        <div class="tc-title">@MockBean</div>
+        <div class="tc-body">Crea un mock de Mockito y lo registra en el contexto de Spring. Los mocks de servicios deben devolver Mono/Flux: <code>when(service.find(1L)).thenReturn(Mono.just(product))</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-ban" aria-hidden="true"></i></div>
+        <div class="tc-title">Mono.empty() en mocks</div>
+        <div class="tc-body">Para simular 404: <code>when(repo.findById(99L)).thenReturn(Mono.empty())</code>. El controlador debería hacer <code>.switchIfEmpty(Mono.error(new NotFoundException()))</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">mutateWith para seguridad</div>
+        <div class="tc-body"><code>webTestClient.mutateWith(mockJwt().jwt(j -&gt; j.subject("user1"))).get()...</code>. O <code>mutateWith(csrf())</code> para endpoints con CSRF. Evita configurar tokens reales en tests.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@WebFluxTest</span>(<span class="a-type">ProductController</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ProductControllerTest</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Autowired</span> <span class="a-type">WebTestClient</span> client;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@MockBean</span> <span class="a-type">ProductService</span> service;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Test</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> returns404WhenNotFound() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;when(service.findById(99L)).thenReturn(<span class="a-type">Mono</span>.empty());</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;client.get().uri(<span class="a-str">"/products/99"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.exchange()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.expectStatus().isNotFound();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 7</div>
+
+    <div class="quiz-box" id="wf7q01">
+      <div class="quiz-label">wf7q01</div>
+      <div class="quiz-q">¿Por qué <code>withVirtualTime()</code> recibe un Supplier y no directamente el Publisher?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q01',true)"><span class="quiz-letter">A</span> Para que la suscripción ocurra después de instalar el VirtualTimeScheduler, interceptando Flux.interval</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q01',false)"><span class="quiz-letter">B</span> Por convención de API, no tiene impacto técnico</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q01',false)"><span class="quiz-letter">C</span> Para permitir múltiples suscripciones al mismo publisher</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q01',false)"><span class="quiz-letter">D</span> El Supplier permite lazy evaluation del test</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q01-ok">Correcto — el Supplier permite que withVirtualTime instale el VirtualTimeScheduler ANTES de crear el Flux, por eso intercepta Flux.interval.</div>
+      <div class="quiz-feedback fail" id="wf7q01-fail">Incorrecto — el Supplier asegura que el VirtualTimeScheduler esté instalado antes de crear el publisher, capturando Flux.interval correctamente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q02">
+      <div class="quiz-label">wf7q02</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>WebTestClient</code> y <code>MockMvc</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q02',true)"><span class="quiz-letter">A</span> WebTestClient es reactivo y soporta Flux streaming; MockMvc es para Spring MVC bloqueante</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q02',false)"><span class="quiz-letter">B</span> MockMvc es más moderno y reemplaza a WebTestClient</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q02',false)"><span class="quiz-letter">C</span> WebTestClient solo funciona con servidor real; MockMvc sin servidor</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q02',false)"><span class="quiz-letter">D</span> Son equivalentes con diferente API</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q02-ok">Correcto — WebTestClient está diseñado para WebFlux con soporte reactivo completo (SSE, streaming). MockMvc es para Spring MVC Servlet.</div>
+      <div class="quiz-feedback fail" id="wf7q02-fail">Incorrecto — WebTestClient es para WebFlux (reactivo); MockMvc es para Spring MVC (bloqueante, Servlet).</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q03">
+      <div class="quiz-label">wf7q03</div>
+      <div class="quiz-q">¿Qué carga @WebFluxTest comparado con @SpringBootTest?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q03',false)"><span class="quiz-letter">A</span> Lo mismo — @WebFluxTest es un alias de @SpringBootTest</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q03',true)"><span class="quiz-letter">B</span> Solo la capa web (controllers, filters, HandlerFunctions) — sin services ni repositories</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q03',false)"><span class="quiz-letter">C</span> Solo repositories y la base de datos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q03',false)"><span class="quiz-letter">D</span> El contexto completo pero sin servidor HTTP real</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q03-ok">Correcto — @WebFluxTest hace slice testing: solo la capa web. Los services y repositories deben mockearse con @MockBean.</div>
+      <div class="quiz-feedback fail" id="wf7q03-fail">Incorrecto — @WebFluxTest es un test slice que carga solo la capa web. @SpringBootTest carga el contexto completo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q04">
+      <div class="quiz-label">wf7q04</div>
+      <div class="quiz-q">¿Cómo simular un Mono que lanza error en un mock de Mockito?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q04',false)"><span class="quiz-letter">A</span> when(service.find(1L)).thenThrow(new RuntimeException())</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q04',true)"><span class="quiz-letter">B</span> when(service.find(1L)).thenReturn(Mono.error(new RuntimeException()))</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q04',false)"><span class="quiz-letter">C</span> when(service.find(1L)).thenReturn(Mono.empty())</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q04',false)"><span class="quiz-letter">D</span> doThrow(new RuntimeException()).when(service).find(1L)</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q04-ok">Correcto — para simular error reactivo, el mock debe retornar Mono.error(). thenThrow() lanzaría la excepción al llamar al método, no al suscribirse.</div>
+      <div class="quiz-feedback fail" id="wf7q04-fail">Incorrecto — en código reactivo, el mock debe retornar Mono.error(ex) para simular un error en el pipeline reactivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q05">
+      <div class="quiz-label">wf7q05</div>
+      <div class="quiz-q">¿Qué hace <code>.consumeWith()</code> en WebTestClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q05',true)"><span class="quiz-letter">A</span> Permite assertions personalizadas sobre el EntityExchangeResult (body, status, headers)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q05',false)"><span class="quiz-letter">B</span> Consume el Flux de respuesta completo en una lista</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q05',false)"><span class="quiz-letter">C</span> Solo verifica que el body no sea null</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q05',false)"><span class="quiz-letter">D</span> Deserializa el body como String</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q05-ok">Correcto — consumeWith acepta un Consumer&lt;EntityExchangeResult&gt; para assertions complejas sobre la respuesta completa.</div>
+      <div class="quiz-feedback fail" id="wf7q05-fail">Incorrecto — consumeWith permite un Consumer&lt;EntityExchangeResult&lt;T&gt;&gt; para assertions complejas personalizadas.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q06">
+      <div class="quiz-label">wf7q06</div>
+      <div class="quiz-q">¿Cómo testear un endpoint SSE (Server-Sent Events) con WebTestClient?</div>
+      <div class="quiz-options">
+        <div class="quiz.opt" (click)="answer($event.currentTarget,'wf7q06',false)"><span class="quiz-letter">A</span> No es posible — WebTestClient no soporta SSE</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q06',true)"><span class="quiz-letter">B</span> Con .accept(TEXT_EVENT_STREAM) y .returnResult(Type.class).getResponseBody() retornando un Flux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q06',false)"><span class="quiz-letter">C</span> Solo con bindToServer() apuntando a un servidor real</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q06',false)"><span class="quiz-letter">D</span> Con .expectBodyList() limitado a 100 eventos</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q06-ok">Correcto — accept(TEXT_EVENT_STREAM) + returnResult().getResponseBody() devuelve un Flux que puedes verificar con StepVerifier.</div>
+      <div class="quiz-feedback fail" id="wf7q06-fail">Incorrecto — WebTestClient soporta SSE. Usa accept(TEXT_EVENT_STREAM) y returnResult(T.class).getResponseBody() para obtener el Flux de eventos.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q07">
+      <div class="quiz-label">wf7q07</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>verifyComplete()</code> y <code>verify()</code> en StepVerifier?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q07',false)"><span class="quiz-letter">A</span> verifyComplete() es para Mono; verify() es para Flux</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q07',true)"><span class="quiz-letter">B</span> verifyComplete() verifica que el stream terminó con onComplete; verify() verifica sin verificar el tipo de terminación</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q07',false)"><span class="quiz-letter">C</span> verify() bloquea el thread; verifyComplete() no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q07',false)"><span class="quiz-letter">D</span> Son equivalentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q07-ok">Correcto — verifyComplete() espera señal onComplete; verifyError() espera onError; verify() solo verifica que hay alguna señal de terminación.</div>
+      <div class="quiz-feedback fail" id="wf7q07-fail">Incorrecto — verifyComplete() verifica señal onComplete; verifyError() verifica onError; verify() acepta cualquier señal terminal.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q08">
+      <div class="quiz-label">wf7q08</div>
+      <div class="quiz-q">¿Qué hace <code>StepVerifier.setDefaultTimeout(Duration.ofSeconds(5))</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q08',true)"><span class="quiz-letter">A</span> Establece el timeout máximo para todas las verificaciones en la clase de test si el publisher no termina</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q08',false)"><span class="quiz-letter">B</span> Configura thenAwait(5s) automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q08',false)"><span class="quiz-letter">C</span> Solo aplica a withVirtualTime</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q08',false)"><span class="quiz-letter">D</span> Equivale a .verify(Duration.ofSeconds(5))</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q08-ok">Correcto — setDefaultTimeout establece un timeout global para evitar que los tests cuelguen indefinidamente si el publisher no termina.</div>
+      <div class="quiz-feedback fail" id="wf7q08-fail">Incorrecto — setDefaultTimeout establece un timeout global para todos los StepVerifier de la JVM, evitando tests que cuelgan.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q09">
+      <div class="quiz-label">wf7q09</div>
+      <div class="quiz-q">¿Qué es <code>.expectNextMatches(predicate)</code> en StepVerifier?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q09',true)"><span class="quiz-letter">A</span> Verifica que el siguiente elemento cumple un predicado personalizado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q09',false)"><span class="quiz-letter">B</span> Filtra elementos que no cumplen el predicado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q09',false)"><span class="quiz-letter">C</span> Espera hasta que el predicado sea true</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q09',false)"><span class="quiz-letter">D</span> Registra los elementos que cumplen el predicado</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q09-ok">Correcto — expectNextMatches(p) verifica que el próximo elemento emitido cumple el predicado. Falla si el predicado retorna false.</div>
+      <div class="quiz-feedback fail" id="wf7q09-fail">Incorrecto — expectNextMatches(predicate) verifica que el siguiente elemento del stream cumple el predicado dado.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q10">
+      <div class="quiz-label">wf7q10</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre <code>@Mock</code> y <code>@MockBean</code> en tests de Spring?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q10',true)"><span class="quiz-letter">A</span> @Mock crea un mock de Mockito puro; @MockBean crea un mock y lo registra en el contexto de Spring</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q10',false)"><span class="quiz-letter">B</span> Son equivalentes con diferente import</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q10',false)"><span class="quiz-letter">C</span> @MockBean es para tests unitarios; @Mock es para integración</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q10',false)"><span class="quiz-letter">D</span> @Mock solo funciona con reactive; @MockBean con bloqueante</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q10-ok">Correcto — @Mock es solo Mockito. @MockBean es Spring: crea el mock Y lo añade al ApplicationContext, reemplazando el bean existente.</div>
+      <div class="quiz-feedback fail" id="wf7q10-fail">Incorrecto — @Mock es puro Mockito (no Spring). @MockBean es Spring Boot: crea el mock y lo registra en el contexto de Spring.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q11">
+      <div class="quiz-label">wf7q11</div>
+      <div class="quiz-q">¿Cómo verificar que un Flux lanza un error del tipo específico con StepVerifier?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q11',false)"><span class="quiz-letter">A</span> .expectError() sin argumento</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q11',true)"><span class="quiz-letter">B</span> .verifyError(NotFoundException.class) o .expectError(NotFoundException.class).verify()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q11',false)"><span class="quiz-letter">C</span> .verifyComplete(NotFoundException.class)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q11',false)"><span class="quiz-letter">D</span> try {{ '{' }} verifyComplete(); {{ '}' }} catch(NotFoundException e) {{ '{' }} {{ '}' }}</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q11-ok">Correcto — verifyError(ExceptionType.class) es el shorthand. La forma expandida es expectError(ExceptionType.class).verify().</div>
+      <div class="quiz-feedback fail" id="wf7q11-fail">Incorrecto — para verificar el tipo de error usa verifyError(ExceptionClass.class) o expectError(ExceptionClass.class).verify().</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q12">
+      <div class="quiz-label">wf7q12</div>
+      <div class="quiz-q">¿Qué hace <code>.expectNoEvent(Duration.ofSeconds(1))</code> en StepVerifier?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q12',true)"><span class="quiz-letter">A</span> Verifica que no se emite ningún elemento en ese período (usando tiempo virtual)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q12',false)"><span class="quiz-letter">B</span> Espera 1 segundo real sin verificar nada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q12',false)"><span class="quiz-letter">C</span> Equivale a thenAwait(1s)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q12',false)"><span class="quiz-letter">D</span> Verifica que el stream está vacío</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q12-ok">Correcto — expectNoEvent(duration) verifica que ningún evento (onNext, onError, onComplete) ocurre durante esa duración con tiempo virtual.</div>
+      <div class="quiz-feedback fail" id="wf7q12-fail">Incorrecto — expectNoEvent(duration) asegura que no hay ningún evento en ese intervalo. Requiere tiempo virtual para ser efectivo.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q13">
+      <div class="quiz-label">wf7q13</div>
+      <div class="quiz-q">¿Qué es <code>bindToWebHandler()</code> en WebTestClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q13',false)"><span class="quiz-letter">A</span> Lo mismo que bindToController()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q13',true)"><span class="quiz-letter">B</span> Bind directo a un WebHandler para tests de componentes de bajo nivel</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q13',false)"><span class="quiz-letter">C</span> Para tests con Undertow como servidor embebido</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q13',false)"><span class="quiz-letter">D</span> Para testear WebSockets en WebFlux</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q13-ok">Correcto — bindToWebHandler permite tests de WebHandler directamente, útil para filtros y handlers de bajo nivel fuera del contexto de Spring.</div>
+      <div class="quiz-feedback fail" id="wf7q13-fail">Incorrecto — bindToWebHandler es para testear WebHandler de bajo nivel directamente, sin el overhead del contexto de Spring.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q14">
+      <div class="quiz-label">wf7q14</div>
+      <div class="quiz-q">¿Por qué NO se debe hacer <code>flux.subscribe(list::add)</code> en lugar de StepVerifier en tests?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q14',true)"><span class="quiz-letter">A</span> subscribe() es asíncrono — el test puede terminar antes de que el Flux emita, dando falsos positivos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q14',false)"><span class="quiz-letter">B</span> subscribe() no existe en pruebas con JUnit 5</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q14',false)"><span class="quiz-letter">C</span> subscribe() no funciona con mocks de Mockito</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q14',false)"><span class="quiz-letter">D</span> No hay razón — ambas formas son equivalentes en tests</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q14-ok">Correcto — subscribe() es asíncrono. El test completa antes de que el Flux emita, causando falsos positivos. StepVerifier bloquea hasta que el stream termina.</div>
+      <div class="quiz-feedback fail" id="wf7q14-fail">Incorrecto — subscribe() en tests es problemático porque es asíncrono: el test puede completar sin esperar los elementos. StepVerifier bloquea correctamente.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q15">
+      <div class="quiz-label">wf7q15</div>
+      <div class="quiz-q">¿Cuál es la alternativa a <code>@WebFluxTest</code> para un test de integración completo?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q15',true)"><span class="quiz-letter">A</span> @SpringBootTest con webEnvironment = RANDOM_PORT o MOCK</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q15',false)"><span class="quiz-letter">B</span> @ReactiveIntegrationTest</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q15',false)"><span class="quiz-letter">C</span> @WebFluxTest(integration = true)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q15',false)"><span class="quiz-letter">D</span> @SpringWebFluxTest</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q15-ok">Correcto — @SpringBootTest(webEnvironment = RANDOM_PORT) levanta el servidor completo. Con MOCK levanta un servidor mock con WebTestClient.</div>
+      <div class="quiz-feedback fail" id="wf7q15-fail">Incorrecto — la alternativa de integración completa es @SpringBootTest. @WebFluxTest es solo slice testing de la capa web.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q16">
+      <div class="quiz-label">wf7q16</div>
+      <div class="quiz-q">¿Para qué sirve <code>.expectNextSequence(Iterable)</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q16',true)"><span class="quiz-letter">A</span> Verifica los próximos N elementos del stream comparándolos con los elementos del Iterable en orden</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q16',false)"><span class="quiz-letter">B</span> Verifica que el stream contiene esos elementos en cualquier orden</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q16',false)"><span class="quiz-letter">C</span> Alimenta el stream con los elementos del Iterable</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q16',false)"><span class="quiz-letter">D</span> Solo funciona con List, no con otros Iterables</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q16-ok">Correcto — expectNextSequence(collection) verifica los próximos elementos del stream en orden estricto contra la colección dada.</div>
+      <div class="quiz-feedback fail" id="wf7q16-fail">Incorrecto — expectNextSequence verifica los próximos N elementos en orden exacto contra el Iterable proporcionado.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q17">
+      <div class="quiz-label">wf7q17</div>
+      <div class="quiz-q">¿Qué retorna <code>WebTestClient.returnResult(Product.class).getResponseBody()</code>?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q17',true)"><span class="quiz-letter">A</span> FluxExchangeResult&lt;Product&gt; — útil para verificar streams con StepVerifier</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q17',false)"><span class="quiz-letter">B</span> List&lt;Product&gt; con todos los elementos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q17',false)"><span class="quiz-letter">C</span> Mono&lt;Product&gt;</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q17',false)"><span class="quiz-letter">D</span> ResponseEntity&lt;Product&gt;</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q17-ok">Correcto — returnResult() da FluxExchangeResult. getResponseBody() retorna un Flux&lt;T&gt; que puedes pasarle a StepVerifier.create().</div>
+      <div class="quiz-feedback fail" id="wf7q17-fail">Incorrecto — returnResult(T.class).getResponseBody() retorna un Flux&lt;T&gt; para verificar streams completos con StepVerifier.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q18">
+      <div class="quiz-label">wf7q18</div>
+      <div class="quiz-q">¿Qué hace <code>.mutateWith(mockJwt())</code> en WebTestClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q18',true)"><span class="quiz-letter">A</span> Simula un JWT válido en la petición para tests con seguridad habilitada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q18',false)"><span class="quiz-letter">B</span> Deshabilita la seguridad para ese test</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q18',false)"><span class="quiz-letter">C</span> Genera un JWT real firmado con la clave privada de tests</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q18',false)"><span class="quiz-letter">D</span> Solo funciona con @WebFluxTest, no con @SpringBootTest</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q18-ok">Correcto — mutateWith(mockJwt()) configura el SecurityContext con un JWT simulado. No se necesita token real ni servidor de autorización.</div>
+      <div class="quiz-feedback fail" id="wf7q18-fail">Incorrecto — mockJwt() simula un JWT válido en el SecurityContext para tests, sin necesidad de token real ni servidor de autorización.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q19">
+      <div class="quiz-label">wf7q19</div>
+      <div class="quiz-q">¿Qué ocurre si no llamas a <code>.verify()</code> o <code>.verifyComplete()</code> al final de un StepVerifier?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q19',false)"><span class="quiz-letter">A</span> El test falla automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q19',true)"><span class="quiz-letter">B</span> La verificación no se ejecuta — el test pasa aunque haya errores en el stream</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q19',false)"><span class="quiz-letter">C</span> Spring lanza IllegalStateException</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q19',false)"><span class="quiz-letter">D</span> El test se bloquea indefinidamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q19-ok">Correcto — sin verify() el StepVerifier solo declara las expectativas pero nunca las evalúa. El test parece pasar con éxito aunque el stream tenga errores.</div>
+      <div class="quiz-feedback fail" id="wf7q19-fail">Incorrecto — olvidar verify() es un bug silencioso: el test pasa siempre porque las expectativas nunca se evalúan.</div>
+    </div>
+
+    <div class="quiz-box" id="wf7q20">
+      <div class="quiz-label">wf7q20</div>
+      <div class="quiz-q">¿Qué diferencia hay entre <code>expectBody()</code> y <code>expectBody(String.class)</code> en WebTestClient?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'wf7q20',true)"><span class="quiz-letter">A</span> expectBody() sin tipo opera sobre bytes (byte[]) y JSON raw; expectBody(Class) deserializa al tipo dado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q20',false)"><span class="quiz-letter">B</span> Son equivalentes para respuestas JSON</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q20',false)"><span class="quiz-letter">C</span> expectBody(String.class) verifica Content-Type text/plain</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'wf7q20',false)"><span class="quiz-letter">D</span> expectBody() solo funciona para respuestas vacías</div>
+      </div>
+      <div class="quiz-feedback ok" id="wf7q20-ok">Correcto — expectBody() retorna BodySpec&lt;byte[]&gt; para assertions raw y jsonPath. expectBody(T.class) deserializa y retorna BodySpec&lt;T&gt;.</div>
+      <div class="quiz-feedback fail" id="wf7q20-fail">Incorrecto — expectBody() sin clase trabaja con bytes/JSON raw y soporta jsonPath. expectBody(T.class) deserializa al objeto typed.</div>
+    </div>
+
+  </div>
+
+</ng-container>

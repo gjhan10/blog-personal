@@ -1,0 +1,612 @@
+﻿<ng-container>
+  <div class="lesson-card" *ngIf="globalLesson===6">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">07</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">Contenedor IoC</h2>
+      <p class="lesson-sub">El contenedor IoC (Inversion of Control) de Spring gestiona la creación, configuración y ciclo de vida de los objetos (beans). <strong>BeanFactory</strong> es la interfaz base; <strong>ApplicationContext</strong> la extiende con soporte de eventos, i18n y más.</p>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">BeanFactory</div>
+        <div class="compare-code">Interfaz raíz del contenedor<br>Instanciación lazy por defecto<br>No soporta eventos de contexto<br>No soporta i18n<br>No registra BeanPostProcessors automáticamente<br>Uso: entornos con restricciones de memoria</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">ApplicationContext</div>
+        <div class="compare-code">Extiende BeanFactory<br>Instanciación eager por defecto<br>Publica y consume ApplicationEvents<br>Soporte i18n con MessageSource<br>Registra BeanPostProcessors automáticamente<br>Uso: aplicaciones Spring Boot (siempre)</div>
+      </div>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-leaf" aria-hidden="true"></i></div>
+        <div class="tc-title">Fase Init</div>
+        <div class="tc-body">El contenedor instancia el bean, inyecta dependencias y ejecuta callbacks de inicialización: <code>@PostConstruct</code>, <code>InitializingBean.afterPropertiesSet()</code>, <code>initMethod</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Fase Use</div>
+        <div class="tc-body">El bean está listo para ser usado. En scope singleton vive mientras dura el contexto. En prototype, Spring entrega la instancia y pierde el control.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Fase Destroy</div>
+        <div class="tc-body">Al cerrar el contexto se ejecutan: <code>@PreDestroy</code>, <code>DisposableBean.destroy()</code>, <code>destroyMethod</code>. Solo aplica a beans singleton.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-building" aria-hidden="true"></i></div>
+        <div class="tc-title">@Bean</div>
+        <div class="tc-body">Declara un método en una clase <code>@Configuration</code> como proveedor de un bean. Spring intercepta la llamada al método para garantizar el singleton.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">AppConfig</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Bean</span>(initMethod = <span class="a-str">"init"</span>, destroyMethod = <span class="a-str">"cleanup"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">DataService</span> dataService() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return new</span> <span class="a-type">DataService</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Spring lee la metadata de definición de beans (anotaciones o XML).</div></div>
+      <div class="step"><span class="step-n">2</span><div>Los <code>BeanFactoryPostProcessor</code> modifican la metadata antes de instanciar beans.</div></div>
+      <div class="step"><span class="step-n">3</span><div>El contenedor instancia los beans en orden de dependencia.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Los <code>BeanPostProcessor</code> envuelven los beans (AOP, validación, etc.).</div></div>
+      <div class="step"><span class="step-n">5</span><div>Se ejecutan los callbacks <code>@PostConstruct</code> e <code>InitializingBean</code>.</div></div>
+      <div class="step"><span class="step-n">6</span><div>La aplicación usa los beans normalmente.</div></div>
+      <div class="step"><span class="step-n">7</span><div>Al cerrar: <code>@PreDestroy</code> y <code>DisposableBean.destroy()</code>.</div></div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <code>AnnotationConfigApplicationContext</code> es el ApplicationContext estándar para aplicaciones basadas en anotaciones. Spring Boot lo gestiona internamente con <code>SpringApplication.run()</code>.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===7">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">08</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">Beans &amp; Estereotipos</h2>
+      <p class="lesson-sub">Spring define cuatro estereotipos de componentes. Todos son especializaciones de <code>@Component</code> y activan el escaneo automático, pero transmiten semántica adicional y habilitan funcionalidades específicas.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-puzzle" aria-hidden="true"></i></div>
+        <div class="tc-title">@Component</div>
+        <div class="tc-body">Estereotipo genérico. Úsalo cuando ninguna otra anotación semántica es apropiada: utilidades, helpers, adaptadores. Es la base de los demás estereotipos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-briefcase" aria-hidden="true"></i></div>
+        <div class="tc-title">@Service</div>
+        <div class="tc-body">Marca la lógica de negocio. Semánticamente indica que la clase contiene operaciones de servicio. Habilita el manejo declarativo de transacciones con <code>@Transactional</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-database" aria-hidden="true"></i></div>
+        <div class="tc-title">@Repository</div>
+        <div class="tc-body">Capa de persistencia. Spring activa la traducción automática de excepciones de infraestructura a <code>DataAccessException</code>. Úsalo en DAOs y repositorios JPA.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">@Controller</div>
+        <div class="tc-body">Capa web. Indica que la clase maneja peticiones HTTP vía Spring MVC. <code>@RestController</code> = <code>@Controller</code> + <code>@ResponseBody</code> para APIs JSON/XML.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Component</span>(<span class="a-str">"miUtilidad"</span>)  <span class="a-cm">// nombre explícito del bean</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">FechaUtility</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Service</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">PedidoService</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Transactional</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> crearPedido(<span class="a-type">Pedido</span> p) {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Repository</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">PedidoRepository</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@RestController</span></div>
+      <div class="anatomy-line"><span class="a-kw">@RequestMapping</span>(<span class="a-str">"/pedidos"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">PedidoController</span> {{ '{' }} ... {{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Sin estereotipos (manual)</div>
+        <div class="compare-code">&#64;Bean en &#64;Configuration para cada clase<br>Configuración verbose y propensa a errores<br>Sin traducción de excepciones<br>Sin soporte AOP por capa</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Con estereotipos (@ComponentScan)</div>
+        <div class="compare-code">Detección automática en el classpath<br>Semántica clara por capa<br>Traducción automática en @Repository<br>AOP por capa (transacciones, seguridad)</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> El nombre por defecto del bean es el nombre de la clase con la primera letra en minúscula. <code>PedidoService</code> → <code>pedidoService</code>. Puedes especificar un nombre con <code>@Service("nombre")</code>.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===8">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">09</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">@Autowired &amp; Dependency Injection</h2>
+      <p class="lesson-sub"><code>@Autowired</code> instruye a Spring para que resuelva e inyecte la dependencia por tipo. Existen tres modalidades de inyección: campo, setter y constructor.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-key" aria-hidden="true"></i></div>
+        <div class="tc-title">Inyección por Campo</div>
+        <div class="tc-body">La más concisa pero la más problemática: no permite inmutabilidad, dificulta las pruebas unitarias sin contenedor Spring y oculta dependencias. <strong>Evitar en código de producción.</strong></div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-gear" aria-hidden="true"></i></div>
+        <div class="tc-title">Inyección por Setter</div>
+        <div class="tc-body">Permite dependencias opcionales (<code>required=false</code>) y reasignación. Útil para dependencias circulares en casos excepcionales. El bean puede existir sin la dependencia.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></div>
+        <div class="tc-title">Inyección por Constructor</div>
+        <div class="tc-body">La forma recomendada. Garantiza inmutabilidad, facilita tests unitarios (sin Spring), hace explícitas las dependencias obligatorias y evita dependencias circulares en arranque.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">@Qualifier &amp; @Primary</div>
+        <div class="tc-body"><code>@Primary</code> marca el bean preferido cuando hay varios del mismo tipo. <code>@Qualifier("nombre")</code> selecciona un bean específico por nombre. <code>@Qualifier</code> tiene mayor precedencia.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// <i class="ico ico-x" aria-hidden="true"></i> Campo (evitar)</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Autowired</span></div>
+      <div class="anatomy-line"><span class="a-kw">private</span> <span class="a-type">PedidoService</span> pedidoService;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// <i class="ico ico-alert" aria-hidden="true"></i> Setter (dependencias opcionales)</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Autowired</span>(required = <span class="a-kw">false</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public void</span> setCache(<span class="a-type">CacheService</span> cache) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">this</span>.cache = cache;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// <i class="ico ico-check" aria-hidden="true"></i> Constructor (recomendado)</span></div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">OrderController</span>(<span class="a-type">PedidoService</span> pedidoService,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">@Qualifier</span>(<span class="a-str">"emailNotifier"</span>) <span class="a-type">Notifier</span> notifier) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">this</span>.pedidoService = pedidoService;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">this</span>.notifier = notifier;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-label bad">Dependencia Circular (problema)</div>
+        <div class="compare-code">ClassA → ClassB → ClassA<br>Con constructor injection:<br>BeanCurrentlyInCreationException<br>al arrancar la app</div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label good">Soluciones</div>
+        <div class="compare-code">1. Refactorizar (solución ideal)<br>2. @Lazy en uno de los constructores<br>3. Setter injection en uno de los beans<br>4. Extraer la dependencia común a un tercero</div>
+      </div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Si solo hay un constructor, <code>@Autowired</code> es opcional desde Spring 4.3. Spring lo detecta automáticamente. Con Lombok <code>@RequiredArgsConstructor</code> no necesitas escribirlo.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===9">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">10</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">Constructor Injection</h2>
+      <p class="lesson-sub">La inyección por constructor es la práctica recomendada por el equipo de Spring. Garantiza que el bean esté en un estado válido e inmutable desde el momento de su creación.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-lock" aria-hidden="true"></i></div>
+        <div class="tc-title">Inmutabilidad</div>
+        <div class="tc-body">Las dependencias pueden declararse <code>final</code>. Una vez construido el bean, sus dependencias no pueden cambiar. Esto elimina toda una clase de bugs en aplicaciones concurrentes.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-flask" aria-hidden="true"></i></div>
+        <div class="tc-title">Testabilidad</div>
+        <div class="tc-body">Para un test unitario, simplemente creas la instancia con <code>new MiServicio(mockDep)</code>. No necesitas Spring, Mockito con <code>@InjectMocks</code>, ni reflexión para inyectar los mocks.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-clipboard" aria-hidden="true"></i></div>
+        <div class="tc-title">Dependencias Explícitas</div>
+        <div class="tc-body">La firma del constructor documenta exactamente qué necesita el bean. Si el constructor tiene demasiados parámetros, es una señal de que la clase viola el principio de responsabilidad única.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-bolt" aria-hidden="true"></i></div>
+        <div class="tc-title">Lombok @RequiredArgsConstructor</div>
+        <div class="tc-body">Genera automáticamente un constructor con todos los campos <code>final</code> o <code>@NonNull</code>. Elimina el boilerplate manteniendo todos los beneficios de la inyección por constructor.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Sin Lombok (verboso)</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Service</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">FacturaService</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">ClienteRepository</span> clienteRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">ProductoRepository</span> productoRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">NotificationService</span> notifier;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">FacturaService</span>(<span class="a-type">ClienteRepository</span> clienteRepo,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">ProductoRepository</span> productoRepo,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">NotificationService</span> notifier) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.clienteRepo = clienteRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.productoRepo = productoRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">this</span>.notifier = notifier;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Con Lombok (equivalente)</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Service</span></div>
+      <div class="anatomy-line"><span class="a-kw">@RequiredArgsConstructor</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">FacturaService</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">ClienteRepository</span> clienteRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">ProductoRepository</span> productoRepo;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">NotificationService</span> notifier;</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Un test unitario limpio: <code>new FacturaService(new FakeClienteRepo(), new FakeProductoRepo(), new FakeNotifier())</code>. Sin Spring, sin reflexión, sin magic.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===10">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">11</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">Bean Scopes</h2>
+      <p class="lesson-sub">El scope de un bean determina cuántas instancias crea Spring y cuánto tiempo viven. Spring Boot ofrece cinco scopes: dos genéricos y tres específicos para aplicaciones web.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon">1️⃣</div>
+        <div class="tc-title">Singleton (por defecto)</div>
+        <div class="tc-body">Una sola instancia por contexto de aplicación. Creada al arrancar, compartida por todos los consumidores, destruida al cerrar el contexto. <strong>Cuidado con el estado mutable.</strong></div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-refresh" aria-hidden="true"></i></div>
+        <div class="tc-title">Prototype</div>
+        <div class="tc-body">Nueva instancia en cada solicitud de bean al contenedor. Spring no gestiona el ciclo de vida completo: no llama a <code>@PreDestroy</code>. Úsalo para objetos con estado.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-antenna" aria-hidden="true"></i></div>
+        <div class="tc-title">Request</div>
+        <div class="tc-body">Una instancia por petición HTTP. Creada al recibir la request, destruida al enviar la response. Disponible solo en contextos web (<code>WebApplicationContext</code>).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-box" aria-hidden="true"></i></div>
+        <div class="tc-title">Session</div>
+        <div class="tc-body">Una instancia por sesión HTTP. Vive mientras dura la sesión del usuario. Ideal para mantener estado de usuario entre peticiones (carrito de compras, preferencias).</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">Application</div>
+        <div class="tc-body">Una instancia por <code>ServletContext</code>. Similar a singleton pero scoped al ciclo de vida del servlet. Compartido entre todos los usuarios de la aplicación web.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Scoped Proxy</div>
+        <div class="tc-body">Inyectar un bean de scope corto (request) en uno de scope largo (singleton) requiere un proxy: <code>@Scope(value="request", proxyMode=ScopedProxyMode.TARGET_CLASS)</code>.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Singleton (defecto)</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Service</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ConfigService</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Prototype</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Component</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Scope</span>(<span class="a-str">"prototype"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">ReportBuilder</span> {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// Request con proxy</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Component</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Scope</span>(value = <span class="a-str">"request"</span>,</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;proxyMode = <span class="a-type">ScopedProxyMode</span>.TARGET_CLASS)</div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">RequestContext</span> {{ '{' }} ... {{ '}' }}</div>
+    </div>
+    <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Un bean singleton con estado mutable compartido entre hilos es un problema de concurrencia. Usa <code>ThreadLocal</code>, <code>@Scope("prototype")</code> o <code>@Scope("request")</code> según el caso.</div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===11">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">12</span><span class="lesson-mod">Módulo 2</span></div>
+      <h2 class="lesson-title">@Profile &amp; @Configuration</h2>
+      <p class="lesson-sub"><code>@Configuration</code> define clases de configuración Java para declarar beans. <code>@Profile</code> y <code>@Conditional</code> permiten activar beans según el entorno o condiciones programáticas.</p>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-layers" aria-hidden="true"></i></div>
+        <div class="tc-title">@Configuration</div>
+        <div class="tc-body">Clase que actúa como fuente de definiciones de beans. Spring genera un proxy CGLIB de la clase para interceptar llamadas <code>@Bean</code> y garantizar la semántica singleton.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-globe" aria-hidden="true"></i></div>
+        <div class="tc-title">@Profile</div>
+        <div class="tc-body">Activa un bean o clase de configuración solo cuando el perfil indicado está activo. Se activa con <code>spring.profiles.active=prod</code> en <code>application.properties</code> o como argumento JVM.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-help" aria-hidden="true"></i></div>
+        <div class="tc-title">@Conditional</div>
+        <div class="tc-body">Condición programática genérica. Implementa la interfaz <code>Condition</code> con el método <code>matches()</code>. Base de todas las anotaciones <code>@ConditionalOn*</code> de Spring Boot.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pencil" aria-hidden="true"></i></div>
+        <div class="tc-title">SpEL en @Value</div>
+        <div class="tc-body">Spring Expression Language permite expresiones dinámicas: <code>@Value("#{{ '{' }}systemProperties['user.home']{{ '}' }}")</code>, operaciones matemáticas, acceso a otros beans y condicionales ternarios.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">@Configuration</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">DataSourceConfig</span> {{ '{' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Profile</span>(<span class="a-str">"dev"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">DataSource</span> h2DataSource() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return new</span> <span class="a-type">EmbeddedDatabaseBuilder</span>()</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.setType(<span class="a-type">EmbeddedDatabaseType</span>.H2).build();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">@Profile</span>(<span class="a-str">"prod"</span>)</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">DataSource</span> pgDataSource(<span class="a-kw">@Value</span>(<span class="a-str">"${{ '{' }}db.url{{ '}' }}"</span>) <span class="a-type">String</span> url) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">DataSourceBuilder</span>.create().url(url).build();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// @Conditional personalizado</span></div>
+      <div class="anatomy-line"><span class="a-kw">public class</span> <span class="a-type">OnLinuxCondition</span> <span class="a-kw">implements</span> <span class="a-type">Condition</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public boolean</span> matches(<span class="a-type">ConditionContext</span> ctx, <span class="a-type">AnnotatedTypeMetadata</span> m) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> <span class="a-type">System</span>.getProperty(<span class="a-str">"os.name"</span>).contains(<span class="a-str">"Linux"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Bean</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Conditional</span>(<span class="a-type">OnLinuxCondition</span>.class)</div>
+      <div class="anatomy-line"><span class="a-kw">public</span> <span class="a-type">LinuxFileWatcher</span> fileWatcher() {{ '{' }} ... {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-cm">// SpEL en @Value</span></div>
+      <div class="anatomy-line"><span class="a-kw">@Value</span>(<span class="a-str">"#{{ '{' }}T(java.lang.Math).random() * 100{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">private double</span> randomValue;</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">@Value</span>(<span class="a-str">"#{{ '{' }}configBean.timeout > 30 ? 'alto' : 'bajo'{{ '}' }}"</span>)</div>
+      <div class="anatomy-line"><span class="a-kw">private</span> <span class="a-type">String</span> nivelTimeout;</div>
+    </div>
+    <div class="steps-list">
+      <div class="step"><span class="step-n">1</span><div>Activa el perfil en <code>application.properties</code>: <code>spring.profiles.active=prod</code>.</div></div>
+      <div class="step"><span class="step-n">2</span><div>O como argumento JVM: <code>-Dspring.profiles.active=prod</code>.</div></div>
+      <div class="step"><span class="step-n">3</span><div>O con variable de entorno: <code>SPRING_PROFILES_ACTIVE=prod</code>.</div></div>
+      <div class="step"><span class="step-n">4</span><div>Usa <code>@Profile("!prod")</code> para activar en cualquier perfil <strong>excepto</strong> producción.</div></div>
+      <div class="step"><span class="step-n">5</span><div>Combina perfiles: <code>@Profile("{{ '{' }}"prod", "staging"{{ '}' }}")</code> o <code>@Profile("prod &amp; cloud")</code>.</div></div>
+    </div>
+    <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> <code>@Import(OtraConfigClass.class)</code> importa definiciones de beans de otra clase <code>@Configuration</code> sin necesidad de estar en el package base del <code>@ComponentScan</code>.</div>
+  </div>
+
+  <div class="quiz-section" id="eval-m2" *ngIf="isEval">
+    <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 2 — IoC &amp; Dependency Injection</div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 1 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia clave entre BeanFactory y ApplicationContext en Spring?</div>
+      <div class="quiz-options" id="em2q01">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">A</div> BeanFactory soporta eventos de contexto; ApplicationContext no</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">B</div> Son exactamente equivalentes, ApplicationContext es solo un alias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q01',true)"><div class="quiz-letter">C</div> ApplicationContext extiende BeanFactory añadiendo eventos, i18n y registro automático de BeanPostProcessors</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q01',false)"><div class="quiz-letter">D</div> BeanFactory soporta inyección por constructor; ApplicationContext solo por campo</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q01-ok">✓ ApplicationContext es una extensión rica de BeanFactory. Añade publicación de eventos, soporte i18n, carga de recursos y registro automático de BeanPostProcessors y BeanFactoryPostProcessors.</div>
+      <div class="quiz-feedback fail" id="em2q01-fail">✗ ApplicationContext extiende BeanFactory con: publicación de eventos (ApplicationEvent), i18n (MessageSource), carga de recursos y registro automático de BeanPostProcessors.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 2 de 20</div>
+      <div class="quiz-q">¿Qué hace @Lazy cuando se aplica a una definición de bean?</div>
+      <div class="quiz-options" id="em2q02">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">A</div> Destruye el bean después de su primer uso</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q02',true)"><div class="quiz-letter">B</div> Retrasa la creación del bean hasta su primera solicitud en lugar de crearlo al arrancar el contexto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">C</div> Hace que el bean se cree en un hilo separado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q02',false)"><div class="quiz-letter">D</div> Desactiva la inyección de dependencias en el bean</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q02-ok">✓ @Lazy retrasa la instanciación del bean hasta que se necesita por primera vez. Reduce el tiempo de arranque pero puede ocultar errores de configuración hasta el primer uso.</div>
+      <div class="quiz-feedback fail" id="em2q02-fail">✗ @Lazy indica al contenedor que cree el bean en su primera solicitud, no al arrancar. También sirve para resolver dependencias circulares entre constructores.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 3 de 20</div>
+      <div class="quiz-q">¿Por qué los beans singleton de Spring NO son automáticamente thread-safe?</div>
+      <div class="quiz-options" id="em2q03">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">A</div> Porque Spring usa una sola instancia por hilo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q03',true)"><div class="quiz-letter">B</div> Porque múltiples hilos acceden concurrentemente a la misma instancia y Spring no sincroniza el estado mutable del bean</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">C</div> Porque singleton implica que el bean está bloqueado para un solo hilo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q03',false)"><div class="quiz-letter">D</div> Porque los beans singleton no pueden tener estado</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q03-ok">✓ Singleton significa una instancia compartida. Si el bean tiene campos mutables y múltiples hilos los modifican concurrentemente sin sincronización, hay condiciones de carrera.</div>
+      <div class="quiz-feedback fail" id="em2q03-fail">✗ Un singleton Spring es compartido por todos los hilos. Si tiene estado mutable (campos de instancia que cambian), múltiples hilos pueden corromperse mutuamente. Solución: beans sin estado o sincronización.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 4 de 20</div>
+      <div class="quiz-q">¿Para qué sirve @DependsOn en una definición de bean?</div>
+      <div class="quiz-options" id="em2q04">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">A</div> Declara las dependencias que se inyectan por @Autowired</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q04',true)"><div class="quiz-letter">B</div> Fuerza que los beans especificados sean inicializados antes que el bean anotado, incluso sin dependencia directa</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">C</div> Indica que el bean no puede existir si el otro bean no está registrado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q04',false)"><div class="quiz-letter">D</div> Establece el orden de destrucción de los beans al cerrar el contexto</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q04-ok">✓ @DependsOn garantiza el orden de inicialización cuando hay dependencias implícitas (ej. un bean que configura una base de datos antes que otro que la usa). No implica inyección de dependencias.</div>
+      <div class="quiz-feedback fail" id="em2q04-fail">✗ @DependsOn("otroBean") fuerza que "otroBean" se inicialice primero. Útil cuando hay efectos secundarios en la inicialización que deben ocurrir en orden.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 5 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre InitializingBean y @PostConstruct para ejecutar código de inicialización?</div>
+      <div class="quiz-options" id="em2q05">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">A</div> InitializingBean se ejecuta antes de que se inyecten las dependencias; @PostConstruct después</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q05',true)"><div class="quiz-letter">B</div> @PostConstruct es un estándar Jakarta EE que no acopla al código con Spring; InitializingBean acopla la clase a la API de Spring</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">C</div> Son idénticos en comportamiento y no hay ninguna diferencia práctica</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q05',false)"><div class="quiz-letter">D</div> InitializingBean permite recibir parámetros; @PostConstruct no</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q05-ok">✓ @PostConstruct es de la especificación Jakarta EE, por lo que tu clase no depende de imports de Spring. InitializingBean acopla la clase al framework. Ambos se ejecutan tras la inyección de dependencias.</div>
+      <div class="quiz-feedback fail" id="em2q05-fail">✗ @PostConstruct (jakarta.annotation) es preferible porque no introduce dependencia en la API de Spring. Ambos se llaman tras la inyección, siendo @PostConstruct el enfoque recomendado.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 6 de 20</div>
+      <div class="quiz-q">¿Qué hace un BeanPostProcessor en el ciclo de vida de Spring?</div>
+      <div class="quiz-options" id="em2q06">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">A</div> Modifica la definición de beans antes de que sean instanciados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q06',true)"><div class="quiz-letter">B</div> Intercepta cada bean ya instanciado para aplicar lógica antes y después de su inicialización (AOP, validación, proxies)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">C</div> Solo actúa en beans anotados con @Component</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q06',false)"><div class="quiz-letter">D</div> Destruye beans que no cumplen validaciones</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q06-ok">✓ BeanPostProcessor tiene dos métodos: postProcessBeforeInitialization (antes de @PostConstruct) y postProcessAfterInitialization (después). Spring AOP, @Autowired y @Async se implementan como BeanPostProcessors.</div>
+      <div class="quiz-feedback fail" id="em2q06-fail">✗ BeanPostProcessor actúa sobre instancias ya creadas, antes y después de su inicialización. Es la base de AOP proxies, @Autowired processing, @Async, y muchas otras funcionalidades de Spring.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 7 de 20</div>
+      <div class="quiz-q">¿En qué se diferencia BeanFactoryPostProcessor de BeanPostProcessor?</div>
+      <div class="quiz-options" id="em2q07">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q07',true)"><div class="quiz-letter">A</div> BeanFactoryPostProcessor modifica la metadata de definición de beans antes de instanciarlos; BeanPostProcessor actúa sobre instancias ya creadas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">B</div> BeanFactoryPostProcessor actúa después de la inicialización; BeanPostProcessor antes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">C</div> Son equivalentes y se pueden usar indistintamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q07',false)"><div class="quiz-letter">D</div> BeanFactoryPostProcessor solo funciona con beans de scope prototype</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q07-ok">✓ BeanFactoryPostProcessor se ejecuta antes de instanciar beans, permitiendo modificar BeanDefinitions (ej. PropertySourcesPlaceholderConfigurer resuelve ${{ '{' }}{{ '}' }} antes de crear beans).</div>
+      <div class="quiz-feedback fail" id="em2q07-fail">✗ BeanFactoryPostProcessor actúa sobre BeanDefinitions (metadata) antes de instanciar. BeanPostProcessor actúa sobre instancias después de crearlas. Fases completamente distintas.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 8 de 20</div>
+      <div class="quiz-q">¿Para qué se usa @Import en una clase @Configuration?</div>
+      <div class="quiz-options" id="em2q08">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">A</div> Para importar archivos XML de configuración de Spring clásico</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q08',true)"><div class="quiz-letter">B</div> Para incluir otras clases @Configuration, @Component o ImportSelector en el contexto sin necesitar @ComponentScan</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">C</div> Para importar dependencias Maven en tiempo de ejecución</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q08',false)"><div class="quiz-letter">D</div> Para inyectar un bean desde otro ApplicationContext</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q08-ok">✓ @Import permite componer configuraciones modulares. También acepta ImportSelector e ImportBeanDefinitionRegistrar para registro dinámico de beans. Es la base de muchas anotaciones @Enable*.</div>
+      <div class="quiz-feedback fail" id="em2q08-fail">✗ @Import(OtraConfig.class) incluye esa clase en el contexto como si hubiera sido encontrada por @ComponentScan. Útil para librerías y módulos que no están en el package base.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 9 de 20</div>
+      <div class="quiz-q">¿Qué ocurre cuando @Bean(destroyMethod="close") se aplica a un bean con scope prototype?</div>
+      <div class="quiz-options" id="em2q09">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">A</div> Spring llama a close() cuando el bean ya no tiene referencias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q09',true)"><div class="quiz-letter">B</div> Spring NO llama al destroyMethod en beans prototype; el cliente es responsable de liberar los recursos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">C</div> Spring llama a close() al finalizar cada request HTTP</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q09',false)"><div class="quiz-letter">D</div> destroyMethod en prototype lanza IllegalStateException al arrancar</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q09-ok">✓ Spring gestiona el ciclo de vida completo solo para beans singleton. Con prototype, entrega la instancia y pierde el control. El cliente debe llamar al método de destrucción manualmente o usar DisposableBeanAdapter.</div>
+      <div class="quiz-feedback fail" id="em2q09-fail">✗ Para beans prototype, Spring no gestiona la destrucción. No se llama a @PreDestroy ni destroyMethod. El consumidor del bean es responsable de liberar los recursos.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 10 de 20</div>
+      <div class="quiz-q">¿Cuál es el problema de inyectar un bean prototype en un bean singleton mediante @Autowired?</div>
+      <div class="quiz-options" id="em2q10">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q10',true)"><div class="quiz-letter">A</div> El singleton siempre recibe la misma instancia del prototype, perdiendo el efecto de múltiples instancias</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">B</div> Spring lanza una excepción porque no se pueden mezclar scopes</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">C</div> El prototype se convierte automáticamente en singleton</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q10',false)"><div class="quiz-letter">D</div> La inyección funciona correctamente sin ningún problema</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q10-ok">✓ El singleton se construye una sola vez, por lo que recibe una sola instancia del prototype. Soluciones: inyectar ApplicationContext y llamar getBean(), usar ObjectProvider, o ApplicationContext.getBean() en cada uso.</div>
+      <div class="quiz-feedback fail" id="em2q10-fail">✗ Al inyectar un prototype en un singleton via @Autowired, el singleton retiene esa instancia durante toda su vida. Para obtener una nueva instancia en cada uso, inyecta ObjectProvider&lt;T&gt; o usa lookup method injection.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 11 de 20</div>
+      <div class="quiz-q">Cuando hay dos beans del mismo tipo y uno tiene @Primary, ¿qué ocurre si también se usa @Qualifier en el punto de inyección?</div>
+      <div class="quiz-options" id="em2q11">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">A</div> @Primary siempre tiene mayor precedencia que @Qualifier</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q11',true)"><div class="quiz-letter">B</div> @Qualifier tiene mayor precedencia: selecciona el bean por nombre ignorando @Primary</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">C</div> Spring lanza una excepción de ambigüedad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q11',false)"><div class="quiz-letter">D</div> Se usa el bean declarado primero en el contexto</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q11-ok">✓ @Qualifier es más específico que @Primary. Cuando se especifica un qualifier, Spring ignora @Primary y selecciona el bean cuyo nombre o qualifier coincide exactamente.</div>
+      <div class="quiz-feedback fail" id="em2q11-fail">✗ @Qualifier tiene mayor precedencia. @Primary solo actúa como desempate cuando no hay qualifiers. Si usas @Qualifier("nombre"), ese bean se inyecta independientemente de @Primary.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 12 de 20</div>
+      <div class="quiz-q">¿Cómo publica y consume eventos de ApplicationContext en Spring?</div>
+      <div class="quiz-options" id="em2q12">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">A</div> Solo se pueden consumir eventos predefinidos de Spring, no crear eventos personalizados</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q12',true)"><div class="quiz-letter">B</div> Publica con ApplicationEventPublisher.publishEvent() y escucha con @EventListener en cualquier bean</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">C</div> Los eventos solo pueden publicarse desde clases @Configuration</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q12',false)"><div class="quiz-letter">D</div> Se requiere implementar la interfaz ApplicationListener para cada evento</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q12-ok">✓ Inyecta ApplicationEventPublisher y llama publishEvent(new MiEvento(this, datos)). Escucha con @EventListener en cualquier método de cualquier bean. @TransactionalEventListener sincroniza con transacciones.</div>
+      <div class="quiz-feedback fail" id="em2q12-fail">✗ Publica: inyectar ApplicationEventPublisher y llamar publishEvent(). Escuchar: anotar cualquier método con @EventListener(MiEvento.class). No necesitas implementar ApplicationListener (aunque también funciona).</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 13 de 20</div>
+      <div class="quiz-q">¿Para qué sirve FactoryBean&lt;T&gt; en Spring?</div>
+      <div class="quiz-options" id="em2q13">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">A</div> Es equivalente a @Configuration y se usa para organizar @Bean methods</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q13',true)"><div class="quiz-letter">B</div> Encapsula lógica de creación compleja de objetos; getObject() retorna el bean gestionado por Spring, no el FactoryBean mismo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">C</div> Solo sirve para crear beans de librerías de terceros</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q13',false)"><div class="quiz-letter">D</div> Es una alternativa a @Autowired para inyectar colecciones de beans</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q13-ok">✓ FactoryBean&lt;T&gt; permite crear beans con lógica de inicialización compleja. Inyectar por tipo obtiene el resultado de getObject(); inyectar con "&amp;nombreBean" obtiene el FactoryBean mismo.</div>
+      <div class="quiz-feedback fail" id="em2q13-fail">✗ FactoryBean encapsula la construcción compleja de un objeto. Spring registra el tipo T (resultado de getObject()), no el FactoryBean. Para obtener el FactoryBean: contexto.getBean("&amp;miFactory").</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 14 de 20</div>
+      <div class="quiz-q">¿Cuál de estas afirmaciones sobre @Conditional es correcta?</div>
+      <div class="quiz-options" id="em2q14">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">A</div> @Conditional solo puede aplicarse a clases @Configuration, no a métodos @Bean individuales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">B</div> @Conditional evalúa la condición en cada solicitud del bean, no solo al arrancar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q14',true)"><div class="quiz-letter">C</div> @Conditional acepta clases que implementan Condition y se evalúa durante la carga del contexto; el bean se registra o no según el resultado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q14',false)"><div class="quiz-letter">D</div> @Conditional reemplaza a @Profile y son mutuamente excluyentes</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q14-ok">✓ @Conditional(MiCondicion.class) evalúa Condition.matches() durante la carga del contexto (fase de BeanDefinition). Si retorna false, el bean no se registra. Aplica a clases y a métodos @Bean.</div>
+      <div class="quiz-feedback fail" id="em2q14-fail">✗ @Conditional evalúa la condición una sola vez al cargar el contexto. Si matches() retorna false, la BeanDefinition no se registra. Aplica tanto a clases @Configuration como a métodos @Bean individuales.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 15 de 20</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre @Value("${{ '{' }}prop{{ '}' }}") y @Value("#{{ '{' }}expresion{{ '}' }}") en Spring?</div>
+      <div class="quiz-options" id="em2q15">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q15',true)"><div class="quiz-letter">A</div> ${{ '{' }}{{ '}' }} resuelve propiedades del environment; #{{ '{' }}{{ '}' }} evalúa expresiones SpEL que pueden acceder a beans, métodos y operaciones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">B</div> Son sintaxis equivalentes para el mismo mecanismo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">C</div> #{{ '{' }}{{ '}' }} solo funciona en archivos application.properties; ${{ '{' }}{{ '}' }} en código Java</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q15',false)"><div class="quiz-letter">D</div> ${{ '{' }}{{ '}' }} es SpEL; #{{ '{' }}{{ '}' }} es property placeholder</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q15-ok">✓ ${{ '{' }}prop{{ '}' }} es property placeholder: busca en Environment (properties, env vars, args). #{{ '{' }}expresion{{ '}' }} es SpEL: puede llamar métodos, acceder a otros beans, hacer operaciones matemáticas y condicionales.</div>
+      <div class="quiz-feedback fail" id="em2q15-fail">✗ ${{ '{' }}{{ '}' }} = property placeholder (busca en Environment). #{{ '{' }}{{ '}' }} = Spring Expression Language. Con SpEL puedes: acceder beans (#{{ '{' }}otroBean.propiedad{{ '}' }}), llamar métodos estáticos (#{{ '{' }}T(Math).PI{{ '}' }}), operadores ternarios.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 16 de 20</div>
+      <div class="quiz-q">¿En qué orden se ejecutan @Autowired y @PostConstruct durante la inicialización de un bean?</div>
+      <div class="quiz-options" id="em2q16">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">A</div> @PostConstruct se ejecuta antes de que se inyecten las dependencias via @Autowired</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q16',true)"><div class="quiz-letter">B</div> Primero se inyectan todas las dependencias (@Autowired), luego se ejecuta @PostConstruct</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">C</div> Se ejecutan en paralelo sin orden garantizado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q16',false)"><div class="quiz-letter">D</div> Depende del tipo de inyección: campo vs constructor</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q16-ok">✓ El orden garantizado es: constructor → inyección de campos/setter (@Autowired) → @PostConstruct. Puedes usar con seguridad las dependencias inyectadas dentro de @PostConstruct.</div>
+      <div class="quiz-feedback fail" id="em2q16-fail">✗ Orden: instanciación → inyección de dependencias (@Autowired campos/setter) → @PostConstruct → bean listo. Puedes usar todas las dependencias inyectadas dentro de @PostConstruct sin problema.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 17 de 20</div>
+      <div class="quiz-q">¿Cuándo es preferible @ConfigurationProperties sobre @Value para leer configuración?</div>
+      <div class="quiz-options" id="em2q17">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">A</div> @Value es siempre preferible porque es más simple</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q17',true)"><div class="quiz-letter">B</div> @ConfigurationProperties es preferible para grupos de propiedades relacionadas: soporta binding jerárquico, validación con @Validated y relaxed binding</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">C</div> @ConfigurationProperties solo funciona con archivos YAML</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q17',false)"><div class="quiz-letter">D</div> Son equivalentes; la elección es puramente estética</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q17-ok">✓ @ConfigurationProperties es preferible para grupos relacionados: soporta objetos anidados, listas, validación javax/jakarta, relaxed binding (kebab-case, snake_case, camelCase), y facilita el testing.</div>
+      <div class="quiz-feedback fail" id="em2q17-fail">✗ Usa @ConfigurationProperties para grupos de propiedades. Ventajas: binding jerárquico, @Validated para validar, relaxed binding, IDE autocompletado con spring-boot-configuration-processor. @Value para propiedades sueltas o SpEL.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 18 de 20</div>
+      <div class="quiz-q">¿Cómo resuelve Spring el perfil activo cuando se define en múltiples lugares a la vez?</div>
+      <div class="quiz-options" id="em2q18">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">A</div> Solo se respeta el valor en application.properties; las demás fuentes son ignoradas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q18',true)"><div class="quiz-letter">B</div> Sigue el orden de prioridad del Environment: argumentos JVM (-D) y variables de entorno tienen mayor prioridad que application.properties</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">C</div> Se activan todos los perfiles de todas las fuentes simultáneamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q18',false)"><div class="quiz-letter">D</div> application.properties siempre tiene mayor prioridad que las variables de entorno</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q18-ok">✓ Spring sigue la prioridad del Environment: args de línea de comandos → SPRING_PROFILES_ACTIVE (env var) → -Dspring.profiles.active (JVM arg) → spring.profiles.active en application.properties.</div>
+      <div class="quiz-feedback fail" id="em2q18-fail">✗ Prioridad para spring.profiles.active: argumentos CLI > variable de entorno SPRING_PROFILES_ACTIVE > argumento JVM -Dspring.profiles.active > application.properties. Mayor prioridad sobreescribe a menor.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 19 de 20</div>
+      <div class="quiz-q">¿Para qué sirve ObjectProvider&lt;T&gt; en la inyección de dependencias?</div>
+      <div class="quiz-options" id="em2q19">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">A</div> Es equivalente a Optional&lt;T&gt; de Java y solo gestiona nullability</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q19',true)"><div class="quiz-letter">B</div> Permite inyección lazy, dependencias opcionales, y obtener múltiples instancias de beans prototype de forma segura sin acoplar al ApplicationContext</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">C</div> Solo sirve para inyectar beans de scope request en beans singleton</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q19',false)"><div class="quiz-letter">D</div> Es una forma de crear beans sin registrarlos en el contexto Spring</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q19-ok">✓ ObjectProvider&lt;T&gt; ofrece: getIfAvailable() (null si no existe), getIfUnique() (null si hay varios), stream() para todos los beans, e ifAvailable(consumer) para lógica condicional. Ideal para dependencias opcionales.</div>
+      <div class="quiz-feedback fail" id="em2q19-fail">✗ ObjectProvider&lt;T&gt; es una alternativa elegante a inyectar ApplicationContext. Ofrece getObject() (lanza si no existe), getIfAvailable() (null-safe), stream() para múltiples instancias, y resolución lazy.</div>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-label">Pregunta 20 de 20</div>
+      <div class="quiz-q">¿Qué son las interfaces Aware en Spring y para qué sirven?</div>
+      <div class="quiz-options" id="em2q20">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">A</div> Son interfaces para marcar beans que requieren inyección obligatoria</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em2q20',true)"><div class="quiz-letter">B</div> Permiten que un bean reciba referencias a infraestructura del contenedor (ApplicationContext, BeanFactory, Environment) a través de callbacks de inyección</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">C</div> Son interfaces para implementar validaciones automáticas al crear beans</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em2q20',false)"><div class="quiz-letter">D</div> Solo las usa Spring internamente; los desarrolladores no pueden implementarlas</div>
+      </div>
+      <div class="quiz-feedback ok" id="em2q20-ok">✓ Ejemplos: ApplicationContextAware (recibe el contexto), BeanNameAware (recibe el nombre del bean), EnvironmentAware (recibe el Environment). Mejor alternativa: inyectar directamente vía constructor para evitar acoplamiento a Spring.</div>
+      <div class="quiz-feedback fail" id="em2q20-fail">✗ Implementando ApplicationContextAware, Spring llama a setApplicationContext() después de crear el bean. Útil pero acopla al framework. Prefiere inyección directa por constructor cuando sea posible.</div>
+    </div>
+  </div>
+</ng-container>

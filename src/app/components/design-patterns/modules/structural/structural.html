@@ -1,0 +1,760 @@
+﻿<ng-container>
+
+  <div class="lesson-card" *ngIf="globalLesson===5">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">1</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Adapter</h2>
+      <p class="lesson-sub">Convierte la interfaz de una clase en otra que el cliente espera. Permite que clases con interfaces incompatibles trabajen juntas.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 460 160" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="40" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="58" x2="120" y2="58" stroke="#0891b2" stroke-width="1"/>
+        <text x="65" y="52" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Client</text>
+        <text x="18" y="72" font-family="monospace" font-size="10" fill="#374151">uses Target</text>
+        <rect x="170" y="10" width="120" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="170" y1="28" x2="290" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="230" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="230" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Target</text>
+        <text x="178" y="55" font-family="monospace" font-size="10" fill="#374151">+ request()</text>
+        <rect x="170" y="100" width="120" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="170" y1="118" x2="290" y2="118" stroke="#0891b2" stroke-width="1"/>
+        <text x="230" y="112" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Adapter</text>
+        <text x="178" y="132" font-family="monospace" font-size="10" fill="#374151">+ request()</text>
+        <text x="178" y="145" font-family="monospace" font-size="10" fill="#374151">wraps Adaptee</text>
+        <rect x="340" y="100" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="340" y1="118" x2="450" y2="118" stroke="#0891b2" stroke-width="1"/>
+        <text x="395" y="112" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Adaptee</text>
+        <text x="348" y="132" font-family="monospace" font-size="10" fill="#374151">+ specificReq()</text>
+        <line x1="120" y1="60" x2="168" y2="35" stroke="#0891b2" stroke-width="1" stroke-dasharray="3,2"/>
+        <polygon points="165,31 175,35 165,39" fill="#0891b2"/>
+        <line x1="230" y1="60" x2="230" y2="98" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="226,60 234,60 230,50" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="290" y1="125" x2="338" y2="125" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="333,121 343,125 333,129" fill="#0891b2"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">El Adapter "envuelve" al Adaptee y traduce las llamadas del cliente. Es el "enchufe adaptador" del software: permite conectar interfaces incompatibles.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando quieres usar una clase existente con una interfaz incompatible. Integración con librerías de terceros. Legacy code que no puedes modificar.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Object vs Class Adapter</div>
+        <div class="tc-body"><strong>Object Adapter</strong> (composición): delega al Adaptee — más flexible. <strong>Class Adapter</strong> (herencia múltiple): Java no lo soporta directamente, pero puede usar herencia de Adaptee.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div>
+        <div class="tc-title">Ejemplos en Java</div>
+        <div class="tc-body"><code>Arrays.asList()</code>, <code>Collections.list()</code>, <code>InputStreamReader</code> (adapta InputStream a Reader), <code>BufferedReader</code>. Spring usa Adapters en HandlerAdapter (MVC).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-cm">// Adaptee (legacy, no podemos modificar)</span></div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">XmlParser</span> {{ '{' }} <span class="a-kw">public</span> <span class="a-type">Document</span> parseXml(<span class="a-type">String</span> xml) {{ '{' }} ... {{ '}' }} {{ '}' }}</div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Parser</span> {{ '{' }} <span class="a-type">Map</span> parse(<span class="a-type">String</span> data); {{ '}' }} <span class="a-cm">// Target</span></div>
+      <div class="anatomy-line"></div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">XmlParserAdapter</span> <span class="a-kw">implements</span> <span class="a-type">Parser</span> {{ '{' }} <span class="a-cm">// Adapter</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">XmlParser</span> adaptee = <span class="a-kw">new</span> <span class="a-type">XmlParser</span>();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">Map</span> parse(<span class="a-type">String</span> data) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-type">Document</span> doc = adaptee.parseXml(data); <span class="a-cm">// traduce la llamada</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> convertToMap(doc);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===6">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">2</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Bridge</h2>
+      <p class="lesson-sub">Desacopla una abstracción de su implementación para que ambas puedan variar independientemente.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 460 200" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="160" height="70" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="30" x2="170" y2="30" stroke="#0891b2" stroke-width="1"/>
+        <text x="90" y="23" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;abstract&#187;</text>
+        <text x="90" y="46" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Shape</text>
+        <text x="18" y="60" font-family="monospace" font-size="10" fill="#374151">- impl: Renderer</text>
+        <text x="18" y="74" font-family="monospace" font-size="10" fill="#374151">+ draw()</text>
+        <rect x="10" y="130" width="140" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="148" x2="150" y2="148" stroke="#0891b2" stroke-width="1"/>
+        <text x="80" y="142" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Circle</text>
+        <text x="18" y="162" font-family="monospace" font-size="10" fill="#374151">- radius: int</text>
+        <text x="18" y="175" font-family="monospace" font-size="10" fill="#374151">+ draw()</text>
+        <line x1="80" y1="128" x2="80" y2="82" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="76,82 84,82 80,72" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <rect x="290" y="10" width="160" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="290" y1="28" x2="450" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="370" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="370" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Renderer</text>
+        <text x="298" y="58" font-family="monospace" font-size="10" fill="#374151">+ renderCircle(x,y,r)</text>
+        <rect x="290" y="120" width="150" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="290" y1="138" x2="440" y2="138" stroke="#0891b2" stroke-width="1"/>
+        <text x="365" y="132" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">VectorRenderer</text>
+        <text x="298" y="152" font-family="monospace" font-size="10" fill="#374151">+ renderCircle(x,y,r)</text>
+        <line x1="365" y1="118" x2="365" y2="72" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="361,72 369,72 365,62" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="170" y1="45" x2="288" y2="35" stroke="#0891b2" stroke-width="1" stroke-dasharray="3,2"/>
+        <polygon points="282,31 292,35 282,39" fill="#0891b2"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Separa la jerarquía de abstracción (Shape) de la jerarquía de implementación (Renderer). Ambas pueden crecer independientemente sin explosión combinatoria de subclases.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando tienes N tipos × M implementaciones y evitar N×M subclases. Cuando quieres cambiar la implementación en tiempo de ejecución. Cuando ambas jerarquías deben ser extensibles.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Abstracción vs Implementación</div>
+        <div class="tc-body"><strong>Abstracción</strong>: la interfaz de alto nivel (Shape — qué se hace). <strong>Implementación</strong>: cómo se hace (Renderer — VectorRenderer/RasterRenderer). La Abstracción delega en la Implementación.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">vs Adapter</div>
+        <div class="tc-body">Adapter: hace que cosas incompatibles trabajen juntas (corrección). Bridge: diseña desde el inicio para que abstracción e implementación varíen libremente (previsión).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Renderer</span> {{ '{' }} <span class="a-kw">void</span> renderCircle(<span class="a-kw">float</span> x, <span class="a-kw">float</span> y, <span class="a-kw">float</span> r); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">abstract class</span> <span class="a-type">Shape</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected final</span> <span class="a-type">Renderer</span> renderer; <span class="a-cm">// el "bridge"</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected</span> <span class="a-type">Shape</span>(<span class="a-type">Renderer</span> r) {{ '{' }} <span class="a-kw">this</span>.renderer = r; {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">abstract void</span> draw();</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Circle</span> <span class="a-kw">extends</span> <span class="a-type">Shape</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private float</span> x, y, radius;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> draw() {{ '{' }} renderer.renderCircle(x, y, radius); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Uso: Circle con VectorRenderer o RasterRenderer sin más subclases</span></div>
+      <div class="anatomy-line"><span class="a-kw">var</span> c = <span class="a-kw">new</span> <span class="a-type">Circle</span>(<span class="a-kw">new</span> <span class="a-type">VectorRenderer</span>());</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===7">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">3</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Composite</h2>
+      <p class="lesson-sub">Compone objetos en estructuras de árbol para representar jerarquías parte-todo. Permite tratar objetos individuales y composiciones uniformemente.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 400 190" style="width:100%;max-width:400px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="140" y="10" width="120" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="140" y1="28" x2="260" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="200" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="200" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Component</text>
+        <text x="148" y="54" font-family="monospace" font-size="10" fill="#374151">+ execute()</text>
+        <rect x="10" y="120" width="120" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="138" x2="130" y2="138" stroke="#0891b2" stroke-width="1"/>
+        <text x="70" y="132" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Leaf</text>
+        <text x="18" y="150" font-family="monospace" font-size="10" fill="#374151">+ execute()</text>
+        <rect x="260" y="120" width="130" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="260" y1="138" x2="390" y2="138" stroke="#0891b2" stroke-width="1"/>
+        <text x="325" y="132" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Composite</text>
+        <text x="268" y="150" font-family="monospace" font-size="10" fill="#374151">- children: List</text>
+        <text x="268" y="163" font-family="monospace" font-size="10" fill="#374151">+ execute()</text>
+        <text x="268" y="175" font-family="monospace" font-size="10" fill="#374151">+ add/remove()</text>
+        <line x1="70" y1="118" x2="165" y2="62" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="161,58 171,62 165,70" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="325" y1="118" x2="238" y2="62" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="234,58 244,62 238,70" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="325" y1="118" x2="260" y2="60" stroke="#0891b2" stroke-width="0.5" stroke-dasharray="3,2" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">El cliente trata Leaf y Composite de la misma forma. Composite contiene una colección de Component (que puede ser Leaf o Composite). Estructura recursiva en árbol.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Sistemas de archivos (File y Folder), UI components, árboles de menú, estructuras de datos jerárquicas, parsers de expresiones. Siempre que tengas jerarquías parte-todo.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Leaf vs Composite</div>
+        <div class="tc-body"><strong>Leaf</strong>: nodo hoja sin hijos, hace el trabajo real. <strong>Composite</strong>: nodo rama con hijos, delega en sus hijos con <code>for (Component c : children) c.execute()</code>.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Dilema de diseño</div>
+        <div class="tc-body">Si add/remove están en Component, Leaf tiene métodos que no usa (viola ISP). Si están solo en Composite, el cliente debe hacer cast. Se prefiere tenerlos en Component con implementación vacía en Leaf.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">FileSystemItem</span> {{ '{' }} <span class="a-kw">void</span> display(<span class="a-type">String</span> indent); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">FileItem</span>(<span class="a-type">String</span> name) <span class="a-kw">implements</span> <span class="a-type">FileSystemItem</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> display(<span class="a-type">String</span> indent) {{ '{' }} System.out.println(indent + name); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">Directory</span> <span class="a-kw">implements</span> <span class="a-type">FileSystemItem</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">List</span>&lt;<span class="a-type">FileSystemItem</span>&gt; children = <span class="a-kw">new</span> <span class="a-type">ArrayList</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">void</span> add(<span class="a-type">FileSystemItem</span> item) {{ '{' }} children.add(item); {{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> display(<span class="a-type">String</span> indent) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(indent + name + <span class="a-str">"/"</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;children.forEach(c -> c.display(indent + <span class="a-str">"  "</span>));</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===8">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">4</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Decorator</h2>
+      <p class="lesson-sub">Añade responsabilidades adicionales a un objeto dinámicamente. Los decoradores son una alternativa flexible a la herencia para extender funcionalidad.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 460 200" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="160" y="10" width="140" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="160" y1="28" x2="300" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="230" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="230" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Component</text>
+        <text x="168" y="54" font-family="monospace" font-size="10" fill="#374151">+ operation()</text>
+        <rect x="10" y="130" width="120" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="148" x2="130" y2="148" stroke="#0891b2" stroke-width="1"/>
+        <text x="70" y="142" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Concrete</text>
+        <text x="70" y="154" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Component</text>
+        <text x="18" y="172" font-family="monospace" font-size="10" fill="#374151">+ operation()</text>
+        <rect x="170" y="130" width="120" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="170" y1="148" x2="290" y2="148" stroke="#0891b2" stroke-width="1"/>
+        <text x="230" y="142" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Decorator</text>
+        <text x="178" y="160" font-family="monospace" font-size="10" fill="#374151">- wrappee: Component</text>
+        <text x="178" y="174" font-family="monospace" font-size="10" fill="#374151">+ operation()</text>
+        <rect x="340" y="130" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="340" y1="148" x2="450" y2="148" stroke="#0891b2" stroke-width="1"/>
+        <text x="395" y="142" text-anchor="middle" font-family="monospace" font-size="10" font-weight="bold" fill="#0c4a6e">Concrete</text>
+        <text x="395" y="154" text-anchor="middle" font-family="monospace" font-size="10" font-weight="bold" fill="#0c4a6e">Decorator</text>
+        <text x="348" y="172" font-family="monospace" font-size="10" fill="#374151">+ operation()</text>
+        <line x1="70" y1="128" x2="195" y2="62" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="191,58 201,62 195,70" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="230" y1="128" x2="230" y2="62" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="226,62 234,62 230,52" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="340" y1="155" x2="292" y2="155" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="296,151 286,155 296,159" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="230" y1="128" x2="230" y2="62" stroke="#0891b2" stroke-width="0.5" opacity="0.3" stroke-dasharray="2,2"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Envuelve un objeto en otro que añade comportamiento. Puede apilarse: <code>new TLS(new Compression(new DataSource()))</code>. Cada capa añade algo antes/después de delegar.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando extender con herencia es impráctcio (clases final, explosión de subclases). Añadir/quitar comportamiento dinámicamente. Java I/O streams son el ejemplo canónico.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div>
+        <div class="tc-title">Java I/O Streams</div>
+        <div class="tc-body"><code>new BufferedReader(new InputStreamReader(new FileInputStream("f.txt")))</code> es Decorator en acción: cada nivel añade buffering, charset conversion, file reading.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">vs Herencia</div>
+        <div class="tc-body">Herencia: comportamiento extra en tiempo de compilación. Decorator: en tiempo de ejecución, más flexible. Pero Decorator puede complicar debugging (múltiples capas de wrapping).</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">TextTransformer</span> {{ '{' }} <span class="a-type">String</span> transform(<span class="a-type">String</span> text); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">PlainText</span> <span class="a-kw">implements</span> <span class="a-type">TextTransformer</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">String</span> transform(<span class="a-type">String</span> t) {{ '{' }} <span class="a-kw">return</span> t; {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">abstract class</span> <span class="a-type">TextDecorator</span> <span class="a-kw">implements</span> <span class="a-type">TextTransformer</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected final</span> <span class="a-type">TextTransformer</span> wrapped;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">protected</span> <span class="a-type">TextDecorator</span>(<span class="a-type">TextTransformer</span> w) {{ '{' }} <span class="a-kw">this</span>.wrapped = w; {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">UpperCaseDecorator</span> <span class="a-kw">extends</span> <span class="a-type">TextDecorator</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public</span> <span class="a-type">String</span> transform(<span class="a-type">String</span> t) {{ '{' }} <span class="a-kw">return</span> wrapped.transform(t).toUpperCase(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===9">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">5</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Facade</h2>
+      <p class="lesson-sub">Proporciona una interfaz simplificada a un subsistema complejo. El cliente solo necesita conocer la fachada.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 420 160" style="width:100%;max-width:420px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="55" width="90" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="73" x2="100" y2="73" stroke="#0891b2" stroke-width="1"/>
+        <text x="55" y="67" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Client</text>
+        <rect x="155" y="55" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="2"/>
+        <line x1="155" y1="73" x2="265" y2="73" stroke="#0891b2" stroke-width="1"/>
+        <text x="210" y="67" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Facade</text>
+        <text x="163" y="85" font-family="monospace" font-size="10" fill="#374151">+ simplifiedOp()</text>
+        <rect x="320" y="10" width="90" height="35" rx="3" fill="#e0f2fe" stroke="#0891b2" stroke-width="1"/>
+        <text x="365" y="30" text-anchor="middle" font-family="monospace" font-size="10" fill="#0c4a6e">SubsystemA</text>
+        <rect x="320" y="60" width="90" height="35" rx="3" fill="#e0f2fe" stroke="#0891b2" stroke-width="1"/>
+        <text x="365" y="80" text-anchor="middle" font-family="monospace" font-size="10" fill="#0c4a6e">SubsystemB</text>
+        <rect x="320" y="110" width="90" height="35" rx="3" fill="#e0f2fe" stroke="#0891b2" stroke-width="1"/>
+        <text x="365" y="130" text-anchor="middle" font-family="monospace" font-size="10" fill="#0c4a6e">SubsystemC</text>
+        <line x1="100" y1="80" x2="153" y2="80" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="148,76 158,80 148,84" fill="#0891b2"/>
+        <line x1="265" y1="68" x2="318" y2="27" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="313,23 323,27 313,31" fill="#0891b2"/>
+        <line x1="265" y1="78" x2="318" y2="78" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="313,74 323,78 313,82" fill="#0891b2"/>
+        <line x1="265" y1="88" x2="318" y2="127" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="313,123 323,127 313,131" fill="#0891b2"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Oculta la complejidad interna del subsistema detrás de una interfaz simple. El cliente no necesita conocer los detalles del subsistema — solo la Facade.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando tienes un subsistema complejo con muchas clases. Para organizar código en capas. Para crear un punto de entrada a una librería o API. Para reducir dependencias externas.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-pin" aria-hidden="true"></i></div>
+        <div class="tc-title">Ejemplos en Spring</div>
+        <div class="tc-body"><code>JdbcTemplate</code> es una Facade sobre JDBC (DataSource, Connection, PreparedStatement, ResultSet). <code>RestTemplate</code> oculta la complejidad de HTTP. SLF4J oculta la librería de logging.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Anti-patrón: God Facade</div>
+        <div class="tc-body">Cuidado con Facades que crecen demasiado y se convierten en una clase "God" que sabe demasiado. Una Facade debe simplificar, no acumular toda la lógica de negocio.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">HomeTheaterFacade</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">Projector</span> proj; <span class="a-kw">private final</span> <span class="a-type">SoundSystem</span> sound; <span class="a-kw">private final</span> <span class="a-type">Lights</span> lights;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> watchMovie(<span class="a-type">String</span> movie) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;lights.dim(<span class="a-num">10</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;proj.on(); proj.setInput(<span class="a-type">Input</span>.HDMI);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;sound.setSurroundSound(); sound.setVolume(<span class="a-num">5</span>);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;proj.play(movie);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> endMovie() {{ '{' }} proj.off(); sound.off(); lights.on(); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Cliente: solo necesita saber watchMovie/endMovie</span></div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===10">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">6</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Flyweight</h2>
+      <p class="lesson-sub">Usa el compartir para soportar eficientemente un gran número de objetos de grano fino, reduciendo el consumo de memoria.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 440 170" style="width:100%;max-width:440px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="150" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="28" x2="160" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="85" y="22" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">FlyweightFactory</text>
+        <text x="18" y="42" font-family="monospace" font-size="10" fill="#374151">- pool: Map&lt;K,Flyweight&gt;</text>
+        <text x="18" y="58" font-family="monospace" font-size="10" fill="#374151">+ getFlyweight(key)</text>
+        <rect x="220" y="10" width="140" height="60" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="220" y1="28" x2="360" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="290" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="290" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Flyweight</text>
+        <text x="228" y="58" font-family="monospace" font-size="10" fill="#374151">+ operation(extrinsic)</text>
+        <rect x="220" y="110" width="140" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="220" y1="128" x2="360" y2="128" stroke="#0891b2" stroke-width="1"/>
+        <text x="290" y="122" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">ConcreteFlyweight</text>
+        <text x="228" y="140" font-family="monospace" font-size="10" fill="#374151">- intrinsic: State (shared)</text>
+        <text x="228" y="154" font-family="monospace" font-size="10" fill="#374151">+ operation(extrinsic)</text>
+        <line x1="160" y1="40" x2="218" y2="40" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="213,36 223,40 213,44" fill="#0891b2"/>
+        <line x1="290" y1="70" x2="290" y2="108" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="286,70 294,70 290,60" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Intención</div>
+        <div class="tc-body">Divide el estado del objeto en <strong>intrínseco</strong> (compartido, inmutable) y <strong>extrínseco</strong> (único por uso, pasado como parámetro). La Factory cachea los objetos intrínsecos.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Cuando necesitas millones de objetos similares (partículas en juegos, caracteres en editor de texto, píxeles en gráficos). Cuando el coste de memoria es crítico.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div>
+        <div class="tc-title">Java: String Pool e Integer Cache</div>
+        <div class="tc-body">Java implementa Flyweight en <code>String.intern()</code> (String pool) y en el caché de Integer/Long para valores entre -128 y 127. <code>Integer.valueOf(127) == Integer.valueOf(127)</code> es true.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-alert" aria-hidden="true"></i></div>
+        <div class="tc-title">Complejidad vs Beneficio</div>
+        <div class="tc-body">El patrón añade complejidad (factory, split de estado). Solo vale la pena cuando el ahorro de memoria es medible. RAM es barata hoy — solo aplicar con millones de objetos.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">CharStyle</span>(<span class="a-type">String</span> font, <span class="a-kw">int</span> size, <span class="a-type">Color</span> color) {{ '{' }}{{ '}' }} <span class="a-cm">// intrínseco, compartido</span></div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">StyleFactory</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private static final</span> <span class="a-type">Map</span>&lt;<span class="a-type">CharStyle</span>, <span class="a-type">CharStyle</span>&gt; cache = <span class="a-kw">new</span> <span class="a-type">HashMap</span>&lt;&gt;();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public static</span> <span class="a-type">CharStyle</span> get(<span class="a-type">String</span> f, <span class="a-kw">int</span> s, <span class="a-type">Color</span> c) {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">return</span> cache.computeIfAbsent(<span class="a-kw">new</span> <span class="a-type">CharStyle</span>(f,s,c), k -> k);</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-cm">// Cada Character tiene posición (extrínseco) y comparte CharStyle (intrínseco)</span></div>
+      <div class="anatomy-line"><span class="a-kw">record</span> <span class="a-type">Character</span>(<span class="a-kw">char</span> ch, <span class="a-kw">int</span> x, <span class="a-kw">int</span> y, <span class="a-type">CharStyle</span> style) {{ '{' }}{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="lesson-card" *ngIf="globalLesson===11">
+    <div class="lesson-header">
+      <div class="lesson-meta"><span class="lesson-num">7</span><span class="lesson-mod">M2 · Estructurales</span></div>
+      <h2 class="lesson-title">Proxy</h2>
+      <p class="lesson-sub">Proporciona un sustituto o placeholder de otro objeto para controlar el acceso al mismo.</p>
+    </div>
+    <div class="uml-wrap" style="text-align:center;margin:1.2rem 0">
+      <svg viewBox="0 0 420 160" style="width:100%;max-width:420px" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="55" width="90" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="10" y1="73" x2="100" y2="73" stroke="#0891b2" stroke-width="1"/>
+        <text x="55" y="67" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">Client</text>
+        <rect x="155" y="10" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="155" y1="28" x2="265" y2="28" stroke="#0891b2" stroke-width="1"/>
+        <text x="210" y="22" text-anchor="middle" font-family="monospace" font-size="10" font-style="italic" fill="#0369a1">&#171;interface&#187;</text>
+        <text x="210" y="42" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Subject</text>
+        <text x="163" y="54" font-family="monospace" font-size="10" fill="#374151">+ request()</text>
+        <rect x="155" y="100" width="110" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="155" y1="118" x2="265" y2="118" stroke="#0891b2" stroke-width="1"/>
+        <text x="210" y="112" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="#0c4a6e">Proxy</text>
+        <text x="163" y="130" font-family="monospace" font-size="10" fill="#374151">- realSubject</text>
+        <text x="163" y="143" font-family="monospace" font-size="10" fill="#374151">+ request()</text>
+        <rect x="310" y="100" width="100" height="50" rx="3" fill="#f0f9ff" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="310" y1="118" x2="410" y2="118" stroke="#0891b2" stroke-width="1"/>
+        <text x="360" y="112" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#0c4a6e">RealSubject</text>
+        <text x="318" y="130" font-family="monospace" font-size="10" fill="#374151">+ request()</text>
+        <line x1="100" y1="80" x2="153" y2="35" stroke="#0891b2" stroke-width="1" stroke-dasharray="3,2"/>
+        <polygon points="149,31 159,35 149,39" fill="#0891b2"/>
+        <line x1="210" y1="98" x2="210" y2="62" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="206,62 214,62 210,52" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+        <line x1="310" y1="125" x2="267" y2="125" stroke="#0891b2" stroke-width="1"/>
+        <polygon points="271,121 261,125 271,129" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="theory-grid">
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-target" aria-hidden="true"></i></div>
+        <div class="tc-title">Tipos de Proxy</div>
+        <div class="tc-body"><strong>Virtual</strong>: lazy loading (crea el objeto caro solo cuando se necesita). <strong>Protection</strong>: control de acceso. <strong>Remote</strong>: objeto en otro proceso/servidor. <strong>Caching</strong>: cachea resultados.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-check" aria-hidden="true"></i></div>
+        <div class="tc-title">Cuándo usarlo</div>
+        <div class="tc-body">Lazy initialization de objetos costosos. Logging o auditoría transparente. Cache de resultados de operaciones caras. Control de acceso basado en permisos. Spring AOP usa proxies.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-cup" aria-hidden="true"></i></div>
+        <div class="tc-title">Dynamic Proxy en Java</div>
+        <div class="tc-body"><code>java.lang.reflect.Proxy</code> crea proxies dinámicos en tiempo de ejecución. Spring AOP, JPA Lazy Loading (Hibernate) y CDI usan dynamic proxies o CGLIB para intercepción.</div>
+      </div>
+      <div class="theory-card">
+        <div class="tc-icon"><i class="ico ico-repeat" aria-hidden="true"></i></div>
+        <div class="tc-title">vs Decorator</div>
+        <div class="tc-body">Proxy y Decorator tienen estructura similar, pero propósito distinto. Proxy controla el <em>acceso</em> al objeto real. Decorator <em>añade comportamiento</em> sin restricciones de acceso.</div>
+      </div>
+    </div>
+    <div class="code-anatomy">
+      <div class="anatomy-line"><span class="a-kw">interface</span> <span class="a-type">Image</span> {{ '{' }} <span class="a-kw">void</span> display(); {{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">RealImage</span> <span class="a-kw">implements</span> <span class="a-type">Image</span> {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private final</span> <span class="a-type">String</span> file;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-type">RealImage</span>(<span class="a-type">String</span> f) {{ '{' }} <span class="a-kw">this</span>.file = f; loadFromDisk(); {{ '}' }} <span class="a-cm">// costoso</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> display() {{ '{' }} System.out.println(<span class="a-str">"Displaying "</span> + file); {{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+      <div class="anatomy-line"><span class="a-kw">class</span> <span class="a-type">ProxyImage</span> <span class="a-kw">implements</span> <span class="a-type">Image</span> {{ '{' }} <span class="a-cm">// Virtual Proxy</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">private</span> <span class="a-type">RealImage</span> real; <span class="a-kw">private final</span> <span class="a-type">String</span> file;</div>
+      <div class="anatomy-line">&nbsp;&nbsp;<span class="a-kw">public void</span> display() {{ '{' }}</div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="a-kw">if</span> (real == <span class="a-kw">null</span>) real = <span class="a-kw">new</span> <span class="a-type">RealImage</span>(file); <span class="a-cm">// lazy init</span></div>
+      <div class="anatomy-line">&nbsp;&nbsp;&nbsp;&nbsp;real.display();</div>
+      <div class="anatomy-line">&nbsp;&nbsp;{{ '}' }}</div>
+      <div class="anatomy-line">{{ '}' }}</div>
+    </div>
+  </div>
+
+  <div class="quiz-section" *ngIf="isEval">
+    <div class="quiz-title">Evaluación — Módulo 2: Patrones Estructurales</div>
+
+    <div class="quiz-box" id="dp2q01">
+      <div class="quiz-label">dp2q01</div>
+      <div class="quiz-q">¿Qué componente del patrón Adapter "envuelve" al Adaptee?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q01',false)"><span class="quiz-letter">A</span> El Target</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q01',false)"><span class="quiz-letter">B</span> El Client</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q01',true)"><span class="quiz-letter">C</span> El Adapter</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q01',false)"><span class="quiz-letter">D</span> El Facade</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q01-ok">Correcto — el Adapter contiene (o hereda de) el Adaptee y traduce las llamadas de la interfaz Target a las operaciones del Adaptee.</div>
+      <div class="quiz-feedback fail" id="dp2q01-fail">Incorrecto — el Adapter es quien envuelve al Adaptee y traduce las llamadas del cliente (Target interface) a la API incompatible del Adaptee.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q02">
+      <div class="quiz-label">dp2q02</div>
+      <div class="quiz-q">¿Cuál es el ejemplo canónico del patrón Decorator en Java SE?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q02',false)"><span class="quiz-letter">A</span> Collections.unmodifiableList()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q02',true)"><span class="quiz-letter">B</span> new BufferedReader(new InputStreamReader(new FileInputStream(...)))</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q02',false)"><span class="quiz-letter">C</span> String.format()</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q02',false)"><span class="quiz-letter">D</span> Calendar.getInstance()</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q02-ok">Correcto — Java I/O usa Decorator extensamente: FileInputStream (datos crudos) → InputStreamReader (convierte bytes a chars) → BufferedReader (añade buffer). Cada capa agrega comportamiento.</div>
+      <div class="quiz-feedback fail" id="dp2q02-fail">Incorrecto — las Java I/O Streams son el ejemplo canónico de Decorator: cada wrapper añade un comportamiento sobre el anterior (buffering, charset, etc.).</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q03">
+      <div class="quiz-label">dp2q03</div>
+      <div class="quiz-q">¿Qué problema resuelve el Bridge que no resuelve la herencia simple?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q03',true)"><span class="quiz-letter">A</span> Evita la explosión combinatoria de subclases cuando hay N abstracciones × M implementaciones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q03',false)"><span class="quiz-letter">B</span> Permite usar interfaces en lugar de clases abstractas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q03',false)"><span class="quiz-letter">C</span> Permite crear objetos sin constructores públicos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q03',false)"><span class="quiz-letter">D</span> Hace el código thread-safe automáticamente</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q03-ok">Correcto — con herencia: 3 formas × 3 renderizados = 9 clases. Con Bridge: 3 + 3 = 6 clases. La composición escala mejor que la herencia múltiple.</div>
+      <div class="quiz-feedback fail" id="dp2q03-fail">Incorrecto — Bridge evita la explosión combinatoria N×M de subclases separando abstracción e implementación en jerarquías independientes.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q04">
+      <div class="quiz-label">dp2q04</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Composite y una simple lista de objetos?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q04',true)"><span class="quiz-letter">A</span> Composite trata Leaf y Composite con la misma interfaz — el cliente no necesita saber si es un nodo hoja o rama</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q04',false)"><span class="quiz-letter">B</span> Composite solo permite objetos del mismo tipo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q04',false)"><span class="quiz-letter">C</span> Una lista es más eficiente que Composite en todos los casos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q04',false)"><span class="quiz-letter">D</span> Composite no puede contener más de un nivel de profundidad</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q04-ok">Correcto — la uniformidad es la clave: con Composite, el cliente hace myComponent.execute() sin saber si es una hoja o un árbol entero. La recursión queda oculta.</div>
+      <div class="quiz-feedback fail" id="dp2q04-fail">Incorrecto — Composite usa una interfaz uniforme para Leaf y Composite. El cliente puede llamar execute() en cualquier nodo sin importar si tiene hijos o no.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q05">
+      <div class="quiz-label">dp2q05</div>
+      <div class="quiz-q">¿Qué es el estado intrínseco en el patrón Flyweight?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q05',true)"><span class="quiz-letter">A</span> El estado inmutable y compartido entre múltiples objetos (ej. la fuente y el color de un carácter)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q05',false)"><span class="quiz-letter">B</span> El estado que cambia con cada uso del objeto (ej. la posición del carácter)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q05',false)"><span class="quiz-letter">C</span> El estado almacenado en la Flyweight Factory</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q05',false)"><span class="quiz-letter">D</span> El estado de la JVM en tiempo de ejecución</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q05-ok">Correcto — intrínseco = compartido, inmutable (fuente, tamaño, color). Extrínseco = único por instancia, pasado como parámetro (posición x,y del carácter).</div>
+      <div class="quiz-feedback fail" id="dp2q05-fail">Incorrecto — el estado intrínseco es el compartido/inmutable. El extrínseco es el que varía por cada uso y se pasa como parámetro al método de operación.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q06">
+      <div class="quiz-label">dp2q06</div>
+      <div class="quiz-q">¿Por qué Spring AOP usa Proxy internamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q06',true)"><span class="quiz-letter">A</span> Para interceptar llamadas a métodos y añadir comportamiento cross-cutting (logging, transacciones) de forma transparente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q06',false)"><span class="quiz-letter">B</span> Para crear múltiples instancias del bean original</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q06',false)"><span class="quiz-letter">C</span> Para serializar beans a JSON automáticamente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q06',false)"><span class="quiz-letter">D</span> Para encriptar los datos del bean</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q06-ok">Correcto — Spring envuelve los beans en proxies JDK o CGLIB. Al llamar un método @Transactional, el proxy intercepta, abre la transacción, ejecuta, y la confirma/rollback.</div>
+      <div class="quiz-feedback fail" id="dp2q06-fail">Incorrecto — Spring AOP usa Proxy para interceptar métodos y añadir comportamiento transversal (@Transactional, @Cacheable, @Secured) sin modificar el código del bean.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q07">
+      <div class="quiz-label">dp2q07</div>
+      <div class="quiz-q">¿Cuál es la diferencia entre Facade y Adapter?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q07',true)"><span class="quiz-letter">A</span> Facade simplifica un subsistema complejo; Adapter hace compatibles dos interfaces incompatibles</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q07',false)"><span class="quiz-letter">B</span> Son el mismo patrón con nombres distintos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q07',false)"><span class="quiz-letter">C</span> Adapter trabaja con subsistemas; Facade con objetos individuales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q07',false)"><span class="quiz-letter">D</span> Facade siempre usa herencia; Adapter siempre usa composición</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q07-ok">Correcto — Facade: simplifica (ocultando complejidad de N clases). Adapter: traduce (convierte interfaz incompatible en compatible). Objetivo diferente.</div>
+      <div class="quiz-feedback fail" id="dp2q07-fail">Incorrecto — Facade = simplificación de subsistema complejo. Adapter = traducción entre interfaces incompatibles. Propósitos distintos aunque estructuralmente similares.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q08">
+      <div class="quiz-label">dp2q08</div>
+      <div class="quiz-q">¿Cómo implementa Java el patrón Flyweight en sus tipos primitivos envueltos?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q08',true)"><span class="quiz-letter">A</span> Integer.valueOf() cachea instancias para valores entre -128 y 127 — reutiliza el mismo objeto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q08',false)"><span class="quiz-letter">B</span> Todos los Integer son singletons</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q08',false)"><span class="quiz-letter">C</span> Java usa autoboxing con deep copy para Integer</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q08',false)"><span class="quiz-letter">D</span> Integer.valueOf() siempre crea una nueva instancia</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q08-ok">Correcto — Integer, Byte, Short, Long cachean valores [-128, 127]. Integer.valueOf(100) == Integer.valueOf(100) es true. Fuera del rango, new Integer() crea instancias nuevas.</div>
+      <div class="quiz-feedback fail" id="dp2q08-fail">Incorrecto — Integer.valueOf() usa un caché interno para [-128, 127], reutilizando instancias (Flyweight). Por eso == funciona en ese rango pero no fuera de él.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q09">
+      <div class="quiz-label">dp2q09</div>
+      <div class="quiz-q">¿En qué se parecen Proxy y Decorator estructuralmente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q09',true)"><span class="quiz-letter">A</span> Ambos implementan la misma interfaz que el objeto envuelto y añaden comportamiento pre/post llamada</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q09',false)"><span class="quiz-letter">B</span> Ambos requieren herencia múltiple</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q09',false)"><span class="quiz-letter">C</span> Ambos crean objetos sin constructores</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q09',false)"><span class="quiz-letter">D</span> Solo se diferencian en el nombre</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q09-ok">Correcto — ambos patrones envuelven un objeto e implementan su interfaz. La diferencia es el <em>propósito</em>: Proxy controla acceso, Decorator agrega funcionalidad.</div>
+      <div class="quiz-feedback fail" id="dp2q09-fail">Incorrecto — estructuralmente son casi idénticos (ambos envuelven e implementan la misma interfaz), pero su intención difiere: Proxy = control de acceso, Decorator = extensión.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q10">
+      <div class="quiz-label">dp2q10</div>
+      <div class="quiz-q">¿Cuándo usarías Adapter en vez de modificar el código legacy directamente?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q10',true)"><span class="quiz-letter">A</span> Cuando el código legacy es de una librería de terceros que no puedes modificar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q10',false)"><span class="quiz-letter">B</span> Cuando el código legacy es tuyo y tienes tiempo</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q10',false)"><span class="quiz-letter">C</span> Cuando el código legacy no tiene tests</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q10',false)"><span class="quiz-letter">D</span> Nunca — siempre es mejor modificar el código fuente</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q10-ok">Correcto — Adapter es esencial para integración con librerías externas (JAR sin fuente), APIs legacy de terceros, o código que no debes romper porque otros lo usan.</div>
+      <div class="quiz-feedback fail" id="dp2q10-fail">Incorrecto — Adapter es la solución cuando no puedes modificar el código fuente (librería externa, API de terceros, código legacy crítico sin tests).</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q11">
+      <div class="quiz-label">dp2q11</div>
+      <div class="quiz-q">¿Qué patrón estructural usa JdbcTemplate de Spring?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q11',false)"><span class="quiz-letter">A</span> Adapter</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q11',true)"><span class="quiz-letter">B</span> Facade</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q11',false)"><span class="quiz-letter">C</span> Proxy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q11',false)"><span class="quiz-letter">D</span> Bridge</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q11-ok">Correcto — JdbcTemplate es una Facade sobre el complejo API de JDBC: oculta Connection, PreparedStatement, ResultSet, manejo de excepciones checked, etc.</div>
+      <div class="quiz-feedback fail" id="dp2q11-fail">Incorrecto — JdbcTemplate es una Facade que simplifica JDBC: el cliente solo llama query() o update() sin gestionar Connection, PreparedStatement, ni excepciones JDBC directamente.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q12">
+      <div class="quiz-label">dp2q12</div>
+      <div class="quiz-q">¿Cuál es la estructura de árbol que representa el patrón Composite?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q12',false)"><span class="quiz-letter">A</span> Árbol binario balanceado</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q12',true)"><span class="quiz-letter">B</span> Árbol N-ario donde Leaf no tiene hijos y Composite tiene una lista de Component</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q12',false)"><span class="quiz-letter">C</span> Árbol donde todos los nodos son del mismo tipo concreto</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q12',false)"><span class="quiz-letter">D</span> Grafo dirigido acíclico</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q12-ok">Correcto — Composite forma un árbol N-ario recursivo: Composite tiene List&lt;Component&gt; (cada Component puede ser Leaf o Composite), y Leaf es el nodo terminal.</div>
+      <div class="quiz-feedback fail" id="dp2q12-fail">Incorrecto — Composite crea un árbol N-ario donde Composite contiene List&lt;Component&gt;. Cada Component puede ser Leaf (nodo final) o Composite (nodo rama con hijos).</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q13">
+      <div class="quiz-label">dp2q13</div>
+      <div class="quiz-q">¿Cuál es el tipo de Proxy que evita crear un objeto costoso hasta que realmente se necesita?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q13',true)"><span class="quiz-letter">A</span> Virtual Proxy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q13',false)"><span class="quiz-letter">B</span> Protection Proxy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q13',false)"><span class="quiz-letter">C</span> Remote Proxy</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q13',false)"><span class="quiz-letter">D</span> Caching Proxy</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q13-ok">Correcto — Virtual Proxy implementa lazy initialization: el objeto costoso (base de datos, imagen grande) solo se crea cuando se llama al método por primera vez.</div>
+      <div class="quiz-feedback fail" id="dp2q13-fail">Incorrecto — Virtual Proxy hace lazy initialization del objeto real: lo crea solo cuando se accede por primera vez. Hibernate usa este patrón para relaciones lazy.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q14">
+      <div class="quiz-label">dp2q14</div>
+      <div class="quiz-q">¿Cuántos objetos concretos se crearían con 4 formas × 3 renderizadores usando Bridge?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q14',false)"><span class="quiz-letter">A</span> 12 (4 × 3)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q14',true)"><span class="quiz-letter">B</span> 7 (4 + 3)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q14',false)"><span class="quiz-letter">C</span> 1 (solo se necesita un objeto)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q14',false)"><span class="quiz-letter">D</span> 24 (4 × 3 × 2)</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q14-ok">Correcto — con Bridge: 4 subclases de Shape + 3 implementaciones de Renderer = 7 clases. Sin Bridge: 12 subclases (Circle_Vector, Circle_Raster, etc.).</div>
+      <div class="quiz-feedback fail" id="dp2q14-fail">Incorrecto — Bridge reduce N×M a N+M: 4 formas + 3 renderizadores = 7 clases en lugar de 12. La composición escala linealmente en vez de cuadráticamente.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q15">
+      <div class="quiz-label">dp2q15</div>
+      <div class="quiz-q">¿Qué hace <code>InputStreamReader</code> en relación con los patrones GoF?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q15',true)"><span class="quiz-letter">A</span> Es un Adapter que adapta InputStream (bytes) a Reader (chars)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q15',false)"><span class="quiz-letter">B</span> Es un Decorator que añade funcionalidad a InputStream</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q15',false)"><span class="quiz-letter">C</span> Es una Facade sobre el sistema de archivos</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q15',false)"><span class="quiz-letter">D</span> Es un Proxy de seguridad para streams</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q15-ok">Correcto — InputStreamReader es un Adapter: convierte la interfaz InputStream (bytes) en Reader (chars), adaptando la API incompatible sin modificarla.</div>
+      <div class="quiz-feedback fail" id="dp2q15-fail">Incorrecto — InputStreamReader es un Adapter que convierte InputStream (bytes) a Reader (chars). Las clases Java I/O usan tanto Adapter como Decorator.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q16">
+      <div class="quiz-label">dp2q16</div>
+      <div class="quiz-q">¿Por qué el patrón Flyweight requiere que el estado intrínseco sea inmutable?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q16',true)"><span class="quiz-letter">A</span> Porque el objeto se comparte entre múltiples contextos — modificarlo afectaría a todos los usuarios</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q16',false)"><span class="quiz-letter">B</span> Porque Java no permite modificar variables estáticas</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q16',false)"><span class="quiz-letter">C</span> Para facilitar la serialización</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q16',false)"><span class="quiz-letter">D</span> Por requisito del compilador de Java</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q16-ok">Correcto — si el estado compartido fuera mutable, cambiar el color de UN carácter cambiaría el color de TODOS los caracteres que usan ese mismo estilo. La inmutabilidad es fundamental.</div>
+      <div class="quiz-feedback fail" id="dp2q16-fail">Incorrecto — el estado intrínseco debe ser inmutable porque es compartido. Si fuera mutable, cambiar el estado en un contexto afectaría a todos los otros contextos que comparten el mismo flyweight.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q17">
+      <div class="quiz-label">dp2q17</div>
+      <div class="quiz-q">¿Cómo difiere el propósito de Adapter del propósito de Bridge?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q17',true)"><span class="quiz-letter">A</span> Adapter arregla incompatibilidades existentes; Bridge se diseña desde el principio para variación independiente</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q17',false)"><span class="quiz-letter">B</span> Bridge es solo para APIs de red; Adapter para APIs locales</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q17',false)"><span class="quiz-letter">C</span> Son equivalentes y se pueden intercambiar</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q17',false)"><span class="quiz-letter">D</span> Adapter usa herencia; Bridge solo usa composición</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q17-ok">Correcto — Adapter es reactivo (arregla incompatibilidad ya existente). Bridge es proactivo (diseño para extensibilidad futura de ambas jerarquías).</div>
+      <div class="quiz-feedback fail" id="dp2q17-fail">Incorrecto — Adapter soluciona incompatibilidades después del hecho. Bridge se diseña a priori para que abstracción e implementación evolucionen de forma independiente.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q18">
+      <div class="quiz-label">dp2q18</div>
+      <div class="quiz-q">¿Qué es Hibernate Lazy Loading en términos de patrones GoF?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q18',true)"><span class="quiz-letter">A</span> Virtual Proxy — Hibernate crea un proxy de la entidad que carga los datos de la BD solo al acceder</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q18',false)"><span class="quiz-letter">B</span> Decorator — añade comportamiento de carga lazy a la entidad</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q18',false)"><span class="quiz-letter">C</span> Flyweight — comparte entidades entre sesiones</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q18',false)"><span class="quiz-letter">D</span> Facade — simplifica la carga de relaciones</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q18-ok">Correcto — Hibernate genera subclases proxy (CGLIB/ByteBuddy) de las entidades. Al acceder a una relación lazy, el proxy intercepta y ejecuta la query SQL.</div>
+      <div class="quiz-feedback fail" id="dp2q18-fail">Incorrecto — Hibernate lazy loading usa Virtual Proxy: genera un proxy de la entidad que solo ejecuta la SELECT de la BD cuando se accede a la propiedad por primera vez.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q19">
+      <div class="quiz-label">dp2q19</div>
+      <div class="quiz-q">¿Cuántas capas de Decorator se pueden apilar en teoría?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q19',false)"><span class="quiz-letter">A</span> Máximo 3, es el límite recomendado por GoF</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q19',true)"><span class="quiz-letter">B</span> Ilimitadas — cualquier número, ya que todos implementan la misma interfaz</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q19',false)"><span class="quiz-letter">C</span> Solo 2 — el objeto real y un decorator</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q19',false)"><span class="quiz-letter">D</span> Depende del compilador de Java</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q19-ok">Correcto — la recursividad del patrón permite N capas. Cada Decorator tiene la misma interfaz, por lo que puede envolverse infinitamente. La práctica limita a las capas necesarias.</div>
+      <div class="quiz-feedback fail" id="dp2q19-fail">Incorrecto — se pueden apilar tantos Decorators como se necesite, ya que todos implementan la misma interfaz Component. No hay límite técnico.</div>
+    </div>
+
+    <div class="quiz-box" id="dp2q20">
+      <div class="quiz-label">dp2q20</div>
+      <div class="quiz-q">¿Qué patrón estructural usarías para implementar control de acceso a métodos según roles de usuario?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q20',false)"><span class="quiz-letter">A</span> Facade</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q20',false)"><span class="quiz-letter">B</span> Composite</div>
+        <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'dp2q20',true)"><span class="quiz-letter">C</span> Proxy (Protection Proxy)</div>
+        <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'dp2q20',false)"><span class="quiz-letter">D</span> Flyweight</div>
+      </div>
+      <div class="quiz-feedback ok" id="dp2q20-ok">Correcto — Protection Proxy controla el acceso verificando permisos antes de delegar. Spring Security con @PreAuthorize usa este patrón a través de AOP proxies.</div>
+      <div class="quiz-feedback fail" id="dp2q20-fail">Incorrecto — Protection Proxy es el patrón para control de acceso: verifica permisos/roles antes de permitir la llamada al objeto real. Spring Security lo implementa via AOP.</div>
+    </div>
+
+  </div>
+
+</ng-container>

@@ -1,0 +1,911 @@
+﻿<ng-container>
+    <div class="lesson-card" *ngIf="globalLesson===21">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">22</span><span class="lesson-mod">Arrays</span></div>
+        <h2 class="lesson-title">Arrays Unidimensionales</h2>
+        <p class="lesson-sub">Un <strong>array</strong> es una estructura de datos de <strong>tamaño fijo</strong> que almacena elementos del mismo tipo en posiciones contiguas de memoria. Los índices van de <code>0</code> a <code>length - 1</code>.</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+        <li>Se declaran con <code>tipo[] nombre</code> o <code>tipo nombre[]</code>.</li>
+        <li>El tamaño se define en la creación y <strong>no puede cambiar</strong>.</li>
+        <li>El acceso es <strong>O(1)</strong> — directo por índice.</li>
+        <li>Los elementos se inicializan con valores por defecto (<code>0</code>, <code>false</code>, <code>null</code>) si no se asignan.</li>
+        <li>Acceder fuera del rango lanza <code>ArrayIndexOutOfBoundsException</code>.</li>
+        <li>Los Arryas son objetos.</li>
+      </ul>
+
+      <h3 class="var-h3">Declaración e inicialización</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Sintaxis básica</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span>[] notas = <span class="a-kw">new int</span>[<span class="a-body">5</span>];<br>
+            notas[<span class="a-body">0</span>] = <span class="a-body">85</span>;<br>
+            notas[<span class="a-body">1</span>] = <span class="a-body">72</span>;<br>
+            <span class="a-comment">// acceso</span><br>
+            System.out.println(notas[<span class="a-body">0</span>]); <span class="a-comment">// 85</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Inicialización con literales</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span>[] notas = {{ '{' }}<span class="a-body">85</span>, <span class="a-body">72</span>, <span class="a-body">91</span>, <span class="a-body">60</span>{{ '}' }};<br>
+            <span class="a-type">String</span>[] nombres = {{ '{' }}<span class="a-str">"Ana"</span>, <span class="a-str">"Luis"</span>, <span class="a-str">"Eva"</span>{{ '}' }};<br>
+            System.out.println(notas.<span class="a-fn">length</span>); <span class="a-comment">// 4</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Clase <code>java.util.Arrays</code></h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:14px">
+        <li><code>Arrays.sort(arr)</code> — ordena el array <strong>in-place</strong>, O(n log n).</li>
+        <li><code>Arrays.binarySearch(arr, key)</code> — búsqueda binaria; el array debe estar ordenado.</li>
+        <li><code>Arrays.copyOf(arr, newLen)</code> — copia (truncando o rellenando con cero).</li>
+        <li><code>Arrays.copyOfRange(arr, from, to)</code> — copia un rango.</li>
+        <li><code>Arrays.fill(arr, val)</code> — rellena todo el array con <code>val</code>.</li>
+        <li><code>Arrays.toString(arr)</code> — representación textual <code>"[1, 2, 3]"</code>.</li>
+        <li><code>Arrays.equals(a, b)</code> — compara elemento a elemento.</li>
+        <li><code>Arrays.stream(arr)</code> — crea un <code>IntStream</code> / <code>Stream</code> desde el array.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Ejemplo completo con Arrays</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">import</span> java.util.Arrays;<br>
+            <span class="a-kw">int</span>[] notas = {{ '{' }}<span class="a-body">85</span>, <span class="a-body">72</span>, <span class="a-body">91</span>, <span class="a-body">60</span>, <span class="a-body">78</span>{{ '}' }};<br>
+            Arrays.<span class="a-fn">sort</span>(notas);<br>
+            System.out.println(Arrays.<span class="a-fn">toString</span>(notas)); <span class="a-comment">// [60, 72, 78, 85, 91]</span><br>
+            <span class="a-kw">int</span> idx = Arrays.<span class="a-fn">binarySearch</span>(notas, <span class="a-body">78</span>);<br>
+            System.out.println(<span class="a-str">"Índice de 78: "</span> + idx); <span class="a-comment">// 2</span><br>
+            <span class="a-kw">int</span>[] copia = Arrays.<span class="a-fn">copyOf</span>(notas, <span class="a-body">3</span>);<br>
+            System.out.println(Arrays.<span class="a-fn">toString</span>(copia)); <span class="a-comment">// [60, 72, 78]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> <code>binarySearch()</code> requiere que el array esté previamente <strong>ordenado</strong>. Si no lo está, el resultado es indeterminado.</div>
+
+      <h3 class="var-h3" style="margin-top:18px">for clásico vs for-each</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">for con índice — permite modificar</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">for</span> (<span class="a-kw">int</span> i = <span class="a-body">0</span>; i &lt; notas.<span class="a-fn">length</span>; i++) {{ '{' }}<br>
+            &nbsp;&nbsp;notas[i] += <span class="a-body">5</span>; <span class="a-comment">// bonificación</span><br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">for-each — lectura limpia</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">for</span> (<span class="a-kw">int</span> n : notas) {{ '{' }}<br>
+            &nbsp;&nbsp;System.out.println(n);<br>
+            {{ '}' }}
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:21, file:'ArraysDemo.java', hint:'Usa Arrays.copyOfRange para obtener las 3 notas más altas'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===22">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">23</span><span class="lesson-mod">Arrays</span></div>
+        <h2 class="lesson-title">Arrays Multidimensionales</h2>
+        <p class="lesson-sub">Un array 2D es un <strong>array de arrays</strong>. Útil para matrices, tableros de juego y estructuras tabulares. Java permite arrays <em>jagged</em> (filas de distinto tamaño).</p>
+      </div>
+
+      <ul class="lesson-intro-list">
+        <li>Se declara como <code>tipo[][] nombre = new tipo[filas][columnas]</code>.</li>
+        <li>El acceso es <code>nombre[fila][col]</code>.</li>
+        <li><code>nombre.length</code> da el número de filas; <code>nombre[i].length</code> el número de columnas de la fila <code>i</code>.</li>
+        <li>Un array <em>jagged</em> tiene filas con distinto número de columnas.</li>
+        <li>Para imprimir: <code>Arrays.deepToString()</code>; para comparar: <code>Arrays.deepEquals()</code>.</li>
+      </ul>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Declaración y recorrido</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span>[][] m = {{ '{' }} {{ '{' }}<span class="a-body">1</span>,<span class="a-body">2</span>,<span class="a-body">3</span>{{ '}' }}, {{ '{' }}<span class="a-body">4</span>,<span class="a-body">5</span>,<span class="a-body">6</span>{{ '}' }}, {{ '{' }}<span class="a-body">7</span>,<span class="a-body">8</span>,<span class="a-body">9</span>{{ '}' }} {{ '}' }};<br>
+            <span class="a-kw">for</span> (<span class="a-kw">int</span>[] fila : m) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-kw">for</span> (<span class="a-kw">int</span> v : fila) System.out.print(v + <span class="a-str">" "</span>);<br>
+            &nbsp;&nbsp;System.out.println();<br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Array jagged</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span>[][] tri = <span class="a-kw">new int</span>[<span class="a-body">3</span>][];<br>
+            tri[<span class="a-body">0</span>] = <span class="a-kw">new int</span>[<span class="a-body">1</span>]; <span class="a-comment">// 1 col</span><br>
+            tri[<span class="a-body">1</span>] = <span class="a-kw">new int</span>[<span class="a-body">2</span>]; <span class="a-comment">// 2 cols</span><br>
+            tri[<span class="a-body">2</span>] = <span class="a-kw">new int</span>[<span class="a-body">3</span>]; <span class="a-comment">// 3 cols</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Operaciones de matrices</h3>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Diagonal principal y suma total</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span>[][] m = {{ '{' }} {{ '{' }}<span class="a-body">1</span>,<span class="a-body">2</span>,<span class="a-body">3</span>{{ '}' }}, {{ '{' }}<span class="a-body">4</span>,<span class="a-body">5</span>,<span class="a-body">6</span>{{ '}' }}, {{ '{' }}<span class="a-body">7</span>,<span class="a-body">8</span>,<span class="a-body">9</span>{{ '}' }} {{ '}' }};<br>
+            <span class="a-kw">int</span> diag = <span class="a-body">0</span>, suma = <span class="a-body">0</span>;<br>
+            <span class="a-kw">for</span> (<span class="a-kw">int</span> i = <span class="a-body">0</span>; i &lt; m.<span class="a-fn">length</span>; i++) {{ '{' }}<br>
+            &nbsp;&nbsp;diag += m[i][i];<br>
+            &nbsp;&nbsp;<span class="a-kw">for</span> (<span class="a-kw">int</span> j = <span class="a-body">0</span>; j &lt; m[i].<span class="a-fn">length</span>; j++) suma += m[i][j];<br>
+            {{ '}' }}<br>
+            System.out.println(<span class="a-str">"Diagonal: "</span> + diag); <span class="a-comment">// 15</span><br>
+            System.out.println(<span class="a-str">"Suma total: "</span> + suma); <span class="a-comment">// 45</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> Para operaciones matriciales avanzadas (multiplicación, transposición) en producción se usan librerías como <strong>Apache Commons Math</strong> o <strong>ND4J</strong>.</div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:22, file:'MatrizDemo.java', hint:'Calcula la diagonal secundaria (i + j == n-1)'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===24">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">25</span><span class="lesson-mod">Arrays</span></div>
+        <h2 class="lesson-title">ArrayList &amp; LinkedList</h2>
+        <p class="lesson-sub">Las colecciones de la <strong>Java Collections Framework (JCF)</strong> son dinámicas y genéricas. <code>ArrayList</code> y <code>LinkedList</code> implementan la interfaz <code>List&lt;E&gt;</code>.</p>
+      </div>
+
+      <h3 class="var-h3">Listas</h3>
+      <ul class="lesson-intro-list">
+        <li>Cada elemento tiene una <strong>posición asociada a partir del orden de llegada</strong>, siendo <code>0</code> la posición del primero.</li>
+        <li>Las listas implementan la interfaz <code>List</code>, que a su vez implementa <code>Collection</code>.</li>
+        <li>Son colecciones de <strong>tipo genérico</strong> (preparadas para admitir cualquier objeto Java).</li>
+        <li>La principal clase de colección es <strong>ArrayList</strong>.</li>
+      </ul>
+
+      <h3 class="var-h3" style="margin-top:18px">Clases e interfaces de Listas</h3>
+      <div class="uml-diagram">
+
+        <div class="uml-iface-box">
+          <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+          <div class="uml-iface-name"><em>Iterable</em></div>
+          <div class="uml-empty-body"></div>
+        </div>
+
+        <div class="uml-arrow-up"></div>
+
+        <div class="uml-iface-box">
+          <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+          <div class="uml-iface-name"><em>Collection</em></div>
+          <div class="uml-empty-body"></div>
+        </div>
+
+        <div class="uml-arrow-up"></div>
+
+        <div class="uml-iface-box">
+          <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+          <div class="uml-iface-name"><em>List</em></div>
+          <div class="uml-empty-body"></div>
+        </div>
+
+        <svg class="uml-fan-svg" viewBox="0 0 408 54" width="408" height="54" xmlns="http://www.w3.org/2000/svg">
+          <line x1="204" y1="0" x2="204" y2="18" stroke="#4a8cff" stroke-width="2"/>
+          <line x1="60" y1="18" x2="348" y2="18" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="60" y1="18" x2="60" y2="54" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="204" y1="18" x2="204" y2="54" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="348" y1="18" x2="348" y2="54" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+        </svg>
+
+        <div class="uml-impl-row">
+          <div class="uml-class-box">
+            <div class="uml-class-name">ArrayList</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">Vector</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">LinkedList</div>
+            <div class="uml-empty-body"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">ArrayList</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Respaldado por un array interno que <strong>crece automáticamente</strong> (factor ×1.5).</li>
+        <li>Acceso por índice <strong>O(1)</strong>.</li>
+        <li>Inserción/eliminación al medio <strong>O(n)</strong> (desplaza elementos).</li>
+        <li>Permite elementos <code>null</code>.</li>
+        <li>No es <em>thread-safe</em>; usa <code>Collections.synchronizedList()</code> o <code>CopyOnWriteArrayList</code> en entornos concurrentes.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Operaciones principales de ArrayList</div>
+          <div class="compare-code compare-code--light">
+            ArrayList&lt;<span class="a-type">String</span>&gt; lista = <span class="a-kw">new</span> ArrayList&lt;&gt;();<br>
+            lista.<span class="a-fn">add</span>(<span class="a-str">"Ana"</span>);            <span class="a-comment">// add al final</span><br>
+            lista.<span class="a-fn">add</span>(<span class="a-body">0</span>, <span class="a-str">"Eva"</span>);       <span class="a-comment">// add en índice</span><br>
+            lista.<span class="a-fn">set</span>(<span class="a-body">1</span>, <span class="a-str">"Luis"</span>);      <span class="a-comment">// reemplazar</span><br>
+            lista.<span class="a-fn">remove</span>(<span class="a-str">"Luis"</span>);      <span class="a-comment">// eliminar por valor</span><br>
+            lista.<span class="a-fn">remove</span>(<span class="a-body">0</span>);          <span class="a-comment">// eliminar por índice</span><br>
+            <span class="a-kw">boolean</span> tiene = lista.<span class="a-fn">contains</span>(<span class="a-str">"Ana"</span>);<br>
+            System.out.println(lista.<span class="a-fn">size</span>()); <span class="a-comment">// número de elementos</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">LinkedList</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Implementada como lista <strong>doblemente enlazada</strong>.</li>
+        <li>Inserción/eliminación al inicio y final <strong>O(1)</strong>.</li>
+        <li>Acceso por índice <strong>O(n)</strong> (recorre los nodos).</li>
+        <li>Implementa también <code>Deque</code>: puede usarse como <strong>pila</strong> o <strong>cola</strong>.</li>
+        <li>Mayor overhead de memoria por almacenar punteros prev/next.</li>
+      </ul>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label">LinkedList como pila (LIFO)</div>
+          <div class="compare-code compare-code--light">
+            LinkedList&lt;<span class="a-type">String</span>&gt; pila = <span class="a-kw">new</span> LinkedList&lt;&gt;();<br>
+            pila.<span class="a-fn">push</span>(<span class="a-str">"A"</span>);<br>
+            pila.<span class="a-fn">push</span>(<span class="a-str">"B"</span>);<br>
+            System.out.println(pila.<span class="a-fn">pop</span>()); <span class="a-comment">// B</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">LinkedList como cola (FIFO)</div>
+          <div class="compare-code compare-code--light">
+            LinkedList&lt;<span class="a-type">String</span>&gt; cola = <span class="a-kw">new</span> LinkedList&lt;&gt;();<br>
+            cola.<span class="a-fn">offer</span>(<span class="a-str">"A"</span>);<br>
+            cola.<span class="a-fn">offer</span>(<span class="a-str">"B"</span>);<br>
+            System.out.println(cola.<span class="a-fn">poll</span>()); <span class="a-comment">// A</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Cuándo usar cada una</h3>
+      <table class="ref-table">
+        <tr><th>Operación</th><th>ArrayList</th><th>LinkedList</th></tr>
+        <tr><td>Acceso por índice</td><td><i class="ico ico-check" aria-hidden="true"></i> O(1)</td><td><i class="ico ico-x" aria-hidden="true"></i> O(n)</td></tr>
+        <tr><td>Insertar al final</td><td><i class="ico ico-check" aria-hidden="true"></i> O(1) amort.</td><td><i class="ico ico-check" aria-hidden="true"></i> O(1)</td></tr>
+        <tr><td>Insertar al inicio</td><td><i class="ico ico-x" aria-hidden="true"></i> O(n)</td><td><i class="ico ico-check" aria-hidden="true"></i> O(1)</td></tr>
+        <tr><td>Insertar al medio</td><td><i class="ico ico-x" aria-hidden="true"></i> O(n)</td><td><i class="ico ico-x" aria-hidden="true"></i> O(n)</td></tr>
+        <tr><td>Memoria por elemento</td><td><i class="ico ico-check" aria-hidden="true"></i> Compacta</td><td><i class="ico ico-x" aria-hidden="true"></i> Extra prev/next</td></tr>
+        <tr><td>Uso como Deque/Cola</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td><i class="ico ico-check" aria-hidden="true"></i></td></tr>
+      </table>
+
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> En la práctica, <strong>ArrayList es preferida en la mayoría de casos</strong>. LinkedList solo vale la pena cuando se insertan/eliminan frecuentemente al inicio o se usa como cola/pila.</div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:24, file:'ListasDemo.java', hint:'Compara ArrayList vs LinkedList para inserciones al inicio'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===25">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">26</span><span class="lesson-mod">Arrays</span></div>
+        <h2 class="lesson-title">HashMap &amp; HashSet</h2>
+        <p class="lesson-sub"><code>HashMap&lt;K,V&gt;</code> es la implementación estándar de <code>Map&lt;K,V&gt;</code>: almacena pares clave→valor con acceso <strong>O(1) amortizado</strong> gracias a una tabla hash interna.</p>
+      </div>
+
+      <h3 class="var-h3">Tablas</h3>
+      <ul class="lesson-intro-list">
+        <li>Cada elemento tiene asociada una <strong>clave única</strong>.</li>
+        <li>No hay un <strong>orden o posición</strong>.</li>
+        <li>Las tablas implementan la interfaz <code>Map</code>.</li>
+        <li>Tanto el tipo de la <strong>clave</strong> como del <strong>valor</strong> son genéricos.</li>
+        <li>La principal clase de colección es <strong>HashMap</strong>.</li>
+      </ul>
+
+      <h3 class="var-h3" style="margin-top:18px">Clases e interfaces de tablas</h3>
+      <div class="uml-diagram">
+
+        <div class="uml-iface-box" style="min-width:200px">
+          <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+          <div class="uml-iface-name"><em>Map</em></div>
+          <div class="uml-empty-body"></div>
+        </div>
+
+        <svg class="uml-fan-svg" viewBox="0 0 498 70" width="498" height="70" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="249,0 243,12 255,12" fill="#4a8cff"/>
+          <line x1="249" y1="12" x2="249" y2="28" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="75" y1="28" x2="423" y2="28" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="75" y1="28" x2="75" y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="249" y1="28" x2="249" y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="423" y1="28" x2="423" y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+        </svg>
+
+        <div class="uml-impl-row">
+          <div class="uml-class-box">
+            <div class="uml-class-name">HashMap</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">Hashtable</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">TreeMap</div>
+            <div class="uml-empty-body"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">HashMap — Cómo funciona internamente</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Calcula el <strong>hashCode()</strong> de la clave para determinar el bucket.</li>
+        <li>Resuelve colisiones con <strong>encadenamiento</strong> (árbol rojo-negro desde Java 8 cuando el bucket supera 8 elementos).</li>
+        <li><em>load factor</em> por defecto: <code>0.75</code> — hace <em>resize</em> (×2 buckets) al superar el 75% de ocupación.</li>
+        <li>Permite <strong>una</strong> clave <code>null</code> y múltiples valores <code>null</code>.</li>
+        <li>No garantiza orden de iteración. Para orden de inserción usa <code>LinkedHashMap</code>; para orden natural de claves, <code>TreeMap</code>.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Operaciones principales de HashMap</div>
+          <div class="compare-code compare-code--light">
+            HashMap&lt;<span class="a-type">String</span>, <span class="a-type">Integer</span>&gt; stock = <span class="a-kw">new</span> HashMap&lt;&gt;();<br>
+            stock.<span class="a-fn">put</span>(<span class="a-str">"Manzana"</span>, <span class="a-body">30</span>);          <span class="a-comment">// insertar</span><br>
+            stock.<span class="a-fn">put</span>(<span class="a-str">"Pera"</span>, <span class="a-body">12</span>);<br>
+            stock.<span class="a-fn">putIfAbsent</span>(<span class="a-str">"Uva"</span>, <span class="a-body">55</span>);    <span class="a-comment">// solo si no existe</span><br>
+            stock.<span class="a-fn">getOrDefault</span>(<span class="a-str">"Lima"</span>, <span class="a-body">0</span>);  <span class="a-comment">// valor por defecto</span><br>
+            stock.<span class="a-fn">replace</span>(<span class="a-str">"Manzana"</span>, <span class="a-body">40</span>);     <span class="a-comment">// reemplazar</span><br>
+            stock.<span class="a-fn">remove</span>(<span class="a-str">"Pera"</span>);<br>
+            System.out.println(stock.<span class="a-fn">containsKey</span>(<span class="a-str">"Uva"</span>)); <span class="a-comment">// true</span><br>
+            stock.<span class="a-fn">forEach</span>((k, v) -&gt; System.out.println(k + <span class="a-str">": "</span> + v));
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Comparativa de implementaciones de Map</h3>
+      <table class="ref-table">
+        <tr><th>Clase</th><th>Orden</th><th>null key</th><th>Thread-safe</th><th>Complejidad</th></tr>
+        <tr><td><code>HashMap</code></td><td>Sin orden</td><td><i class="ico ico-check" aria-hidden="true"></i> 1</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td>O(1) amort.</td></tr>
+        <tr><td><code>LinkedHashMap</code></td><td>Inserción</td><td><i class="ico ico-check" aria-hidden="true"></i> 1</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td>O(1) amort.</td></tr>
+        <tr><td><code>TreeMap</code></td><td>Natural/Comparator</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td><i class="ico ico-x" aria-hidden="true"></i></td><td>O(log n)</td></tr>
+        <tr><td><code>Hashtable</code></td><td>Sin orden</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td><i class="ico ico-check" aria-hidden="true"></i></td><td>O(1) amort.</td></tr>
+        <tr><td><code>ConcurrentHashMap</code></td><td>Sin orden</td><td><i class="ico ico-x" aria-hidden="true"></i></td><td><i class="ico ico-check" aria-hidden="true"></i></td><td>O(1) amort.</td></tr>
+      </table>
+
+      <h3 class="var-h3" style="margin-top:18px">Set — Conjuntos</h3>
+      <ul class="lesson-intro-list">
+        <li>Un <strong>Set</strong> es una colección que <strong>no admite elementos duplicados</strong>.</li>
+        <li>No hay un orden o posición garantizada (depende de la implementación).</li>
+        <li>Los conjuntos implementan la interfaz <code>Set</code>, que a su vez extiende <code>Collection</code>.</li>
+        <li>Tanto el tipo del elemento es <strong>genérico</strong> (admite cualquier objeto Java).</li>
+        <li>La principal clase de colección es <strong>HashSet</strong>.</li>
+      </ul>
+
+      <h3 class="var-h3" style="margin-top:18px">Clases e interfaces de conjuntos</h3>
+      <div class="uml-diagram">
+
+        <div class="uml-iface-box" style="min-width:200px">
+          <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+          <div class="uml-iface-name"><em>Set</em></div>
+          <div class="uml-empty-body"></div>
+        </div>
+
+        <svg class="uml-fan-svg" viewBox="0 0 498 70" width="498" height="70" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="249,0 243,12 255,12" fill="#4a8cff"/>
+          <line x1="249" y1="12" x2="249" y2="28" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="75"  y1="28" x2="423" y2="28" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="75"  y1="28" x2="75"  y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="249" y1="28" x2="249" y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="423" y1="28" x2="423" y2="70" stroke="#4a8cff" stroke-width="2" stroke-dasharray="6,4"/>
+        </svg>
+
+        <div class="uml-impl-row">
+          <div class="uml-class-box">
+            <div class="uml-class-name">HashSet</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">LinkedHashSet</div>
+            <div class="uml-empty-body"></div>
+          </div>
+          <div class="uml-class-box">
+            <div class="uml-class-name">TreeSet</div>
+            <div class="uml-empty-body"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">HashSet</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li>Implementado sobre <code>HashMap</code> — la clave es el elemento, el valor es un objeto ficticio constante.</li>
+        <li>No almacena <strong>duplicados</strong> (usa <code>hashCode()</code> + <code>equals()</code>).</li>
+        <li>No garantiza orden. Para orden de inserción: <code>LinkedHashSet</code>; para orden natural: <code>TreeSet</code>.</li>
+        <li><code>add()</code> retorna <code>false</code> si el elemento ya existe.</li>
+      </ul>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">HashSet — uso básico</div>
+          <div class="compare-code compare-code--light">
+            HashSet&lt;<span class="a-type">String</span>&gt; set = <span class="a-kw">new</span> HashSet&lt;&gt;();<br>
+            set.<span class="a-fn">add</span>(<span class="a-str">"rojo"</span>);<br>
+            set.<span class="a-fn">add</span>(<span class="a-str">"azul"</span>);<br>
+            set.<span class="a-fn">add</span>(<span class="a-str">"rojo"</span>); <span class="a-comment">// ignorado, retorna false</span><br>
+            System.out.println(set.<span class="a-fn">size</span>()); <span class="a-comment">// 2</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label">Operaciones de conjuntos</div>
+          <div class="compare-code compare-code--light">
+            Set&lt;<span class="a-type">Integer</span>&gt; a = <span class="a-kw">new</span> HashSet&lt;&gt;(Arrays.<span class="a-fn">asList</span>(<span class="a-body">1</span>,<span class="a-body">2</span>,<span class="a-body">3</span>));<br>
+            Set&lt;<span class="a-type">Integer</span>&gt; b = <span class="a-kw">new</span> HashSet&lt;&gt;(Arrays.<span class="a-fn">asList</span>(<span class="a-body">2</span>,<span class="a-body">3</span>,<span class="a-body">4</span>));<br>
+            a.<span class="a-fn">retainAll</span>(b); <span class="a-comment">// intersección → {{ '{' }}2,3{{ '}' }}</span><br>
+            a.<span class="a-fn">addAll</span>(b);    <span class="a-comment">// unión</span><br>
+            a.<span class="a-fn">removeAll</span>(b); <span class="a-comment">// diferencia</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> Para que <code>HashSet</code> y <code>HashMap</code> funcionen correctamente con objetos propios, debes sobreescribir tanto <strong><code>hashCode()</code></strong> como <strong><code>equals()</code></strong>.</div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:25, file:'MapSetDemo.java', hint:'Usa getOrDefault y forEach para mostrar el inventario'}"></ng-container>
+    </div>
+
+    <div class="lesson-card" *ngIf="globalLesson===23">
+      <div class="lesson-header">
+        <div class="lesson-meta"><span class="lesson-num">24</span><span class="lesson-mod">Arrays</span></div>
+        <h2 class="lesson-title">Iteración de Colecciones</h2>
+        <p class="lesson-sub">Java proporciona múltiples formas de recorrer colecciones. Desde Java 8, el <strong>Stream API</strong> y los métodos funcionales como <code>forEach</code>, <code>filter</code>, <code>map</code> y <code>reduce</code> transforman la forma de procesar datos.</p>
+      </div>
+
+      <h3 class="var-h3">Interfaz Iterable&lt;T&gt;</h3>
+      <ul class="lesson-intro-list">
+        <li>Definida en <code>java.lang.Iterable</code>, es la <strong>raíz de toda la jerarquía</strong> de objetos recorribles.</li>
+        <li>Un objeto que implementa <code>Iterable</code> puede usarse en un <em>enhanced for</em>.</li>
+        <li>Su único método abstracto es:
+          <ul style="padding-left:1.2rem; margin-top:6px">
+            <li><code>Iterator&lt;T&gt; iterator()</code> — devuelve un <code>Iterator</code> para recorrer los elementos.</li>
+          </ul>
+        </li>
+        <li>Las listas, conjuntos y colas son ejemplos de objetos <code>Iterable</code>.</li>
+      </ul>
+      <div class="compare-code compare-code--light" style="margin-bottom:14px">
+        <span class="a-comment">// Cualquier Iterable se puede recorrer con enhanced for:</span><br>
+        <span class="a-type">List</span>&lt;<span class="a-type">String</span>&gt; ciudades = <span class="a-type">List</span>.<span class="a-fn">of</span>(<span class="a-str">"Madrid"</span>, <span class="a-str">"Lima"</span>, <span class="a-str">"Bogotá"</span>);<br>
+        <span class="a-kw">for</span> (<span class="a-type">String</span> c : ciudades) &#123; <span class="a-comment">// usa Iterable internamente</span><br>
+        &nbsp;&nbsp;System.out.println(c);<br>
+        &#125;
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Interfaz Collection&lt;E&gt;</h3>
+      <ul class="lesson-intro-list">
+        <li>Objeto que contiene una <strong>agrupación de datos</strong>.</li>
+        <li>La interfaz <code>java.util.Collection</code> representa la <strong>interfaz raíz</strong> de las colecciones Java.</li>
+        <li>Hereda <code>Iterable</code> y es heredada por listas y conjuntos, proporcionando gran parte de sus métodos:
+          <code>add</code>, <code>contains</code>, <code>remove</code>, <code>removeIf</code>, <code>size</code>, <code>stream</code>.
+        </li>
+      </ul>
+
+
+      <h3 class="var-h3" style="margin-top:18px">Interfaz Iterator&lt;E&gt;</h3>
+      <ul class="lesson-intro-list">
+        <li>Objeto tipo <strong>cursor</strong> que permite recorrer el contenido de un <code>Iterable</code>.</li>
+        <li>Entre sus métodos destacan:
+          <ul style="padding-left:1.2rem; margin-top:6px">
+            <li><code>boolean hasNext()</code> — indica si hay más elementos que recorrer.</li>
+            <li><code>T next()</code> — se desplaza al siguiente elemento y devuelve una referencia al mismo.</li>
+          </ul>
+        </li>
+      </ul>
+      <div class="compare-code compare-code--light" style="margin-bottom:14px">
+        <span class="a-type">Iterator</span>&lt;<span class="a-type">String</span>&gt; it = nombres.<span class="a-fn">iterator</span>();<br>
+        <span class="a-kw">while</span> (it.<span class="a-fn">hasNext</span>()) {{ '{' }}<br>
+        &nbsp;&nbsp;System.out.println(it.<span class="a-fn">next</span>());<br>
+        {{ '}' }}
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Iterable vs Collection vs Iterator — diferencias y cuándo usar cada uno</h3>
+      <table class="ref-table">
+        <tr><th></th><th>Iterable</th><th>Collection</th><th>Iterator</th></tr>
+        <tr><td><strong>Paquete</strong></td><td><code>java.lang</code></td><td><code>java.util</code></td><td><code>java.util</code></td></tr>
+        <tr><td><strong>Propósito</strong></td><td>Marcar un objeto como recorrible</td><td>Almacenar y gestionar grupos de elementos</td><td>Recorrer una colección elemento a elemento</td></tr>
+        <tr><td><strong>Jerarquía</strong></td><td>Raíz de toda la jerarquía</td><td>Extiende <code>Iterable</code></td><td>Objeto cursor obtenido con <code>iterator()</code></td></tr>
+        <tr><td><strong>Método clave</strong></td><td><code>iterator()</code></td><td><code>add</code>, <code>remove</code>, <code>size</code>, <code>contains</code>…</td><td><code>hasNext()</code>, <code>next()</code>, <code>remove()</code></td></tr>
+        <tr><td><strong>Enhanced for</strong></td><td><i class="ico ico-check" aria-hidden="true"></i> Habilita el uso</td><td><i class="ico ico-check" aria-hidden="true"></i> Hereda de <code>Iterable</code></td><td><i class="ico ico-x" aria-hidden="true"></i> No directamente</td></tr>
+        <tr><td><strong>Eliminar al iterar</strong></td><td><i class="ico ico-x" aria-hidden="true"></i> No aplica</td><td><i class="ico ico-x" aria-hidden="true"></i> Lanza <code>ConcurrentModificationException</code></td><td><i class="ico ico-check" aria-hidden="true"></i> Seguro con <code>iterator.remove()</code></td></tr>
+        <tr><td><strong>Cuándo usar</strong></td><td>Crear clases propias recorribles</td><td>Gestión general de datos (añadir, buscar, filtrar)</td><td>Recorrido con posibilidad de eliminar durante la iteración</td></tr>
+      </table>
+      <div class="info-box"><i class="ico ico-bulb" aria-hidden="true"></i> El <em>enhanced for</em> (<code>for (T x : coleccion)</code>) usa internamente <code>Iterator</code>; úsalo cuando solo necesites leer. Si necesitas eliminar durante el recorrido, usa explícitamente el <code>Iterator</code>.</div>
+
+      <h3 class="var-h3" style="margin-top:18px">Formas de iterar</h3>
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">Iterator — permite remove seguro</div>
+          <div class="compare-code compare-code--light">
+            Iterator&lt;<span class="a-type">String</span>&gt; it = lista.<span class="a-fn">iterator</span>();<br>
+            <span class="a-kw">while</span> (it.<span class="a-fn">hasNext</span>()) {{ '{' }}<br>
+            &nbsp;&nbsp;<span class="a-type">String</span> s = it.<span class="a-fn">next</span>();<br>
+            &nbsp;&nbsp;<span class="a-kw">if</span> (s.<span class="a-fn">startsWith</span>(<span class="a-str">"A"</span>)) it.<span class="a-fn">remove</span>(); <span class="a-comment">// seguro</span><br>
+            {{ '}' }}
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">forEach con lambda</div>
+          <div class="compare-code compare-code--light">
+            lista.<span class="a-fn">forEach</span>(s -&gt; System.out.println(s));<br>
+            <span class="a-comment">// o con method reference:</span><br>
+            lista.<span class="a-fn">forEach</span>(System.out::<span class="a-fn">println</span>);
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Stream API — procesamiento funcional</h3>
+      <ul class="var-desc" style="padding-left:1.4rem; margin-bottom:12px">
+        <li><strong>Operaciones intermedias</strong> (lazy, devuelven Stream): <code>filter()</code>, <code>map()</code>, <code>flatMap()</code>, <code>sorted()</code>, <code>distinct()</code>, <code>limit()</code>, <code>skip()</code>.</li>
+        <li><strong>Operaciones terminales</strong> (desencadenan ejecución): <code>collect()</code>, <code>forEach()</code>, <code>reduce()</code>, <code>count()</code>, <code>min()</code>, <code>max()</code>, <code>anyMatch()</code>, <code>allMatch()</code>, <code>findFirst()</code>.</li>
+        <li>Los streams son <strong>perezosos</strong>: las operaciones intermedias no se ejecutan hasta que hay una terminal.</li>
+        <li>Un stream <strong>no puede reutilizarse</strong> una vez terminado.</li>
+      </ul>
+
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Pipeline de Stream — filtrar, transformar, recopilar</div>
+          <div class="compare-code compare-code--light">
+            List&lt;<span class="a-type">String</span>&gt; nombres = List.<span class="a-fn">of</span>(<span class="a-str">"Ana"</span>, <span class="a-str">"Bob"</span>, <span class="a-str">"Carlos"</span>, <span class="a-str">"Diana"</span>, <span class="a-str">"Eve"</span>);<br>
+            <br>
+            List&lt;<span class="a-type">String</span>&gt; resultado = nombres.<span class="a-fn">stream</span>()<br>
+            &nbsp;&nbsp;.<span class="a-fn">filter</span>(s -&gt; s.<span class="a-fn">length</span>() &gt; <span class="a-body">3</span>)<br>
+            &nbsp;&nbsp;.<span class="a-fn">map</span>(String::<span class="a-fn">toUpperCase</span>)<br>
+            &nbsp;&nbsp;.<span class="a-fn">sorted</span>()<br>
+            &nbsp;&nbsp;.<span class="a-fn">collect</span>(Collectors.<span class="a-fn">toList</span>());<br>
+            <br>
+            System.out.println(resultado); <span class="a-comment">// [CARLOS, DIANA]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <div class="compare-label good">reduce — acumular valores</div>
+          <div class="compare-code compare-code--light">
+            <span class="a-kw">int</span> suma = List.<span class="a-fn">of</span>(<span class="a-body">1</span>,<span class="a-body">2</span>,<span class="a-body">3</span>,<span class="a-body">4</span>,<span class="a-body">5</span>).<span class="a-fn">stream</span>()<br>
+            &nbsp;&nbsp;.<span class="a-fn">reduce</span>(<span class="a-body">0</span>, Integer::<span class="a-fn">sum</span>);<br>
+            System.out.println(suma); <span class="a-comment">// 15</span>
+          </div>
+        </div>
+        <div class="compare-col">
+          <div class="compare-label good">Collectors.groupingBy</div>
+          <div class="compare-code compare-code--light">
+            Map&lt;<span class="a-type">Integer</span>, List&lt;<span class="a-type">String</span>&gt;&gt; porLong =<br>
+            &nbsp;&nbsp;nombres.<span class="a-fn">stream</span>()<br>
+            &nbsp;&nbsp;.<span class="a-fn">collect</span>(Collectors.<span class="a-fn">groupingBy</span>(String::<span class="a-fn">length</span>));<br>
+            porLong.<span class="a-fn">forEach</span>((k,v) -&gt;<br>
+            &nbsp;&nbsp;System.out.println(k + <span class="a-str">": "</span> + v));
+          </div>
+        </div>
+      </div>
+
+      <h3 class="var-h3" style="margin-top:18px">Colecciones inmutables (Java 9+)</h3>
+      <div class="compare-grid" style="grid-template-columns:1fr">
+        <div class="compare-col">
+          <div class="compare-label good">Fábricas de colecciones inmutables</div>
+          <div class="compare-code compare-code--light">
+            List&lt;<span class="a-type">String</span>&gt; lista  = List.<span class="a-fn">of</span>(<span class="a-str">"a"</span>, <span class="a-str">"b"</span>, <span class="a-str">"c"</span>); <span class="a-comment">// inmutable, sin null</span><br>
+            Set&lt;<span class="a-type">Integer</span>&gt; set   = Set.<span class="a-fn">of</span>(<span class="a-body">1</span>, <span class="a-body">2</span>, <span class="a-body">3</span>);<br>
+            Map&lt;<span class="a-type">String</span>,<span class="a-type">Integer</span>&gt; map = Map.<span class="a-fn">of</span>(<span class="a-str">"k1"</span>,<span class="a-body">1</span>, <span class="a-str">"k2"</span>,<span class="a-body">2</span>);<br>
+            <span class="a-comment">// List.copyOf / Set.copyOf / Map.copyOf (Java 10)</span><br>
+            List&lt;<span class="a-type">String</span>&gt; copia = List.<span class="a-fn">copyOf</span>(lista);
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box"><i class="ico ico-alert" aria-hidden="true"></i> <code>ConcurrentModificationException</code>: si modificas estructuralmente una colección (add/remove) durante un for-each, se lanzará esta excepción. Solución: usa <code>Iterator.remove()</code>, <code>removeIf()</code> o <code>CopyOnWriteArrayList</code>.</div>
+
+      <ng-container *ngTemplateOutlet="playground; context:{id:23, file:'IteracionDemo.java', hint:'Usa groupingBy para agrupar nombres por su primera letra'}"></ng-container>
+    </div>
+    <div class="quiz-section" id="eval-m3" *ngIf="isEval">
+        <div class="quiz-title"><i class="ico ico-check" aria-hidden="true"></i> Evaluación Módulo 3 — Arrays &amp; Colecciones</div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 1 de 25</div>
+          <div class="quiz-q">¿Cuál es el índice del primer elemento en un array de Java?</div>
+          <div class="quiz-options" id="em3q01">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">A</div> 1</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">B</div> -1</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q01',true)"><div class="quiz-letter">C</div> 0</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q01',false)"><div class="quiz-letter">D</div> Depende del tipo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q01-ok">✓ Los arrays en Java siempre comienzan en el índice 0 y van hasta <code>length - 1</code>.</div>
+          <div class="quiz-feedback fail" id="em3q01-fail">✗ Los arrays de Java son base-0: el primer elemento está en el índice 0.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 2 de 25</div>
+          <div class="quiz-q">¿Qué excepción lanza acceder a un índice fuera del rango de un array?</div>
+          <div class="quiz-options" id="em3q02">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">A</div> NullPointerException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">B</div> IllegalArgumentException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q02',true)"><div class="quiz-letter">C</div> ArrayIndexOutOfBoundsException</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q02',false)"><div class="quiz-letter">D</div> IndexOutOfRangeException</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q02-ok">✓ <code>ArrayIndexOutOfBoundsException</code> se lanza cuando el índice &lt; 0 o ≥ length.</div>
+          <div class="quiz-feedback fail" id="em3q02-fail">✗ Java lanza <code>ArrayIndexOutOfBoundsException</code> al acceder fuera de los límites.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 3 de 25</div>
+          <div class="quiz-q">¿Qué estructura de datos ofrece acceso O(1) por índice?</div>
+          <div class="quiz-options" id="em3q03">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">A</div> LinkedList</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">B</div> HashSet</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q03',false)"><div class="quiz-letter">C</div> TreeMap</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q03',true)"><div class="quiz-letter">D</div> ArrayList</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q03-ok">✓ <code>ArrayList</code> está basado en array, acceso O(1) por índice. <code>LinkedList</code> es O(n).</div>
+          <div class="quiz-feedback fail" id="em3q03-fail">✗ <code>ArrayList</code> tiene backing array con acceso O(1). <code>LinkedList</code> requiere recorrer la lista.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 4 de 25</div>
+          <div class="quiz-q">¿Qué método de <code>Collections</code> ordena una lista?</div>
+          <div class="quiz-options" id="em3q04">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">A</div> Collections.order()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q04',true)"><div class="quiz-letter">B</div> Collections.sort()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">C</div> Collections.arrange()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q04',false)"><div class="quiz-letter">D</div> Collections.reorder()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q04-ok">✓ <code>Collections.sort(lista)</code> ordena in-place usando el orden natural o un <code>Comparator</code>.</div>
+          <div class="quiz-feedback fail" id="em3q04-fail">✗ El método correcto es <code>Collections.sort()</code>. También puedes usar <code>lista.sort(null)</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 5 de 25</div>
+          <div class="quiz-q">Si añades una clave ya existente en un <code>HashMap</code>, ¿qué ocurre?</div>
+          <div class="quiz-options" id="em3q05">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">A</div> Lanza una excepción</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">B</div> El nuevo valor se ignora</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q05',false)"><div class="quiz-letter">C</div> Se almacenan ambos valores</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q05',true)"><div class="quiz-letter">D</div> Sobreescribe el valor anterior</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q05-ok">✓ <code>put(clave, nuevoValor)</code> reemplaza el valor si la clave ya existe. <code>put</code> retorna el valor anterior.</div>
+          <div class="quiz-feedback fail" id="em3q05-fail">✗ <code>HashMap</code> sobreescribe el valor cuando la clave ya existe. Usa <code>putIfAbsent</code> para evitarlo.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 6 de 25</div>
+          <div class="quiz-q">¿<code>HashSet</code> permite añadir valores duplicados?</div>
+          <div class="quiz-options" id="em3q06">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">A</div> Sí, siempre</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">B</div> Sí, si son de distinto tipo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q06',true)"><div class="quiz-letter">C</div> No</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q06',false)"><div class="quiz-letter">D</div> Solo con <code>add()</code> explícito</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q06-ok">✓ <code>HashSet</code> no almacena duplicados. <code>add()</code> retorna <code>false</code> si el elemento ya existe.</div>
+          <div class="quiz-feedback fail" id="em3q06-fail">✗ Los conjuntos (<code>Set</code>) nunca almacenan duplicados. Si el elemento ya existe, se ignora.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 7 de 25</div>
+          <div class="quiz-q">¿Qué colección mantiene las claves ordenadas de forma natural?</div>
+          <div class="quiz-options" id="em3q07">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">A</div> HashMap</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">B</div> LinkedHashMap</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q07',true)"><div class="quiz-letter">C</div> TreeMap</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q07',false)"><div class="quiz-letter">D</div> WeakHashMap</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q07-ok">✓ <code>TreeMap</code> ordena las claves por orden natural o por un <code>Comparator</code> dado. Operaciones O(log n).</div>
+          <div class="quiz-feedback fail" id="em3q07-fail">✗ <code>TreeMap</code> mantiene las claves ordenadas. <code>LinkedHashMap</code> conserva orden de inserción.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 8 de 25</div>
+          <div class="quiz-q">¿Qué método retorna el número de elementos de una <code>ArrayList</code>?</div>
+          <div class="quiz-options" id="em3q08">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">A</div> length()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">B</div> count()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q08',false)"><div class="quiz-letter">C</div> capacity()</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q08',true)"><div class="quiz-letter">D</div> size()</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q08-ok">✓ <code>size()</code> retorna el número de elementos. Para arrays se usa la propiedad <code>.length</code>.</div>
+          <div class="quiz-feedback fail" id="em3q08-fail">✗ Las colecciones usan <code>size()</code>. Los arrays (no colecciones) usan la propiedad <code>.length</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 9 de 25</div>
+          <div class="quiz-q">¿Qué hace <code>Arrays.toString(arr)</code>?</div>
+          <div class="quiz-options" id="em3q09">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">A</div> Ordena el array</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q09',true)"><div class="quiz-letter">B</div> Retorna una representación String del array</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">C</div> Copia el array en uno nuevo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q09',false)"><div class="quiz-letter">D</div> Elimina duplicados del array</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q09-ok">✓ <code>Arrays.toString([1,2,3])</code> retorna <code>"[1, 2, 3]"</code>, útil para imprimir arrays.</div>
+          <div class="quiz-feedback fail" id="em3q09-fail">✗ <code>Arrays.toString()</code> genera la representación textual. Para ordenar usa <code>Arrays.sort()</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 10 de 25</div>
+          <div class="quiz-q">¿Cómo se declara correctamente un array bidimensional de 3×3 en Java?</div>
+          <div class="quiz-options" id="em3q10">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">A</div> int[2][2] arr</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">B</div> int[][] arr = new int[3,3]</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q10',true)"><div class="quiz-letter">C</div> int[][] arr = new int[3][3]</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q10',false)"><div class="quiz-letter">D</div> array&lt;int, 2&gt; arr</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q10-ok">✓ La sintaxis es <code>int[][] arr = new int[filas][columnas]</code>.</div>
+          <div class="quiz-feedback fail" id="em3q10-fail">✗ Usa <code>int[][] arr = new int[3][3]</code>. Java no acepta comas dentro de los corchetes.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 11 de 25</div>
+          <div class="quiz-q">¿Qué hace <code>List.of(1, 2, 3)</code> en Java 9+?</div>
+          <div class="quiz-options" id="em3q11">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">A</div> Crea un <code>ArrayList</code> modificable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">B</div> Crea un array primitivo</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q11',true)"><div class="quiz-letter">C</div> Crea una lista inmutable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q11',false)"><div class="quiz-letter">D</div> Crea un <code>HashSet</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q11-ok">✓ <code>List.of()</code> retorna una lista inmutable. Intentar <code>add()</code> o <code>set()</code> lanza <code>UnsupportedOperationException</code>.</div>
+          <div class="quiz-feedback fail" id="em3q11-fail">✗ <code>List.of()</code> crea una lista inmutable. Para lista modificable usa <code>new ArrayList&lt;&gt;(List.of(...))</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 12 de 25</div>
+          <div class="quiz-q">¿Cuál colección mantiene el orden de inserción y no permite duplicados?</div>
+          <div class="quiz-options" id="em3q12">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">A</div> TreeSet</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">B</div> HashSet</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q12',true)"><div class="quiz-letter">C</div> LinkedHashSet</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q12',false)"><div class="quiz-letter">D</div> ArrayList</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q12-ok">✓ <code>LinkedHashSet</code> combina tabla hash con lista enlazada para mantener el orden de inserción sin duplicados.</div>
+          <div class="quiz-feedback fail" id="em3q12-fail">✗ <code>LinkedHashSet</code> mantiene orden de inserción y sin duplicados. <code>TreeSet</code> ordena naturalmente.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 13 de 25</div>
+          <div class="quiz-q">¿Puede <code>HashMap</code> tener la clave <code>null</code>?</div>
+          <div class="quiz-options" id="em3q13">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">A</div> No, nunca</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q13',true)"><div class="quiz-letter">B</div> Sí, permite exactamente una clave null</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">C</div> Sí, múltiples claves null</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q13',false)"><div class="quiz-letter">D</div> Solo si el valor también es null</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q13-ok">✓ <code>HashMap</code> permite exactamente una clave <code>null</code>. <code>TreeMap</code> y <code>Hashtable</code> no la permiten.</div>
+          <div class="quiz-feedback fail" id="em3q13-fail">✗ <code>HashMap</code> acepta una (solo una) clave <code>null</code>. <code>TreeMap</code> no la permite porque no puede comparar null.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 14 de 25</div>
+          <div class="quiz-q">¿Cuál es la complejidad temporal de <code>get()</code> en <code>HashMap</code>?</div>
+          <div class="quiz-options" id="em3q14">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">A</div> O(n)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">B</div> O(log n)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q14',false)"><div class="quiz-letter">C</div> O(n²)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q14',true)"><div class="quiz-letter">D</div> O(1) amortizado</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q14-ok">✓ <code>HashMap</code> usa tabla hash, O(1) amortizado. En el peor caso (muchas colisiones) puede ser O(n).</div>
+          <div class="quiz-feedback fail" id="em3q14-fail">✗ <code>HashMap</code> tiene O(1) amortizado. <code>TreeMap</code> es O(log n) porque mantiene orden con árbol balanceado.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 15 de 25</div>
+          <div class="quiz-q">¿Cuál es la diferencia de rendimiento entre <code>LinkedList</code> y <code>ArrayList</code> para insertar al inicio?</div>
+          <div class="quiz-options" id="em3q15">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">A</div> Son equivalentes en rendimiento</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">B</div> <code>ArrayList</code> es más rápido al inicio</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q15',true)"><div class="quiz-letter">C</div> <code>LinkedList</code> es O(1); <code>ArrayList</code> es O(n)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q15',false)"><div class="quiz-letter">D</div> <code>LinkedList</code> no tiene método <code>addFirst()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q15-ok">✓ <code>LinkedList.addFirst()</code> es O(1) al solo actualizar punteros. <code>ArrayList</code> debe desplazar todos los elementos.</div>
+          <div class="quiz-feedback fail" id="em3q15-fail">✗ <code>LinkedList</code> inserta al inicio en O(1) (solo actualiza punteros). <code>ArrayList</code> requiere desplazar O(n) elementos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 16 de 25</div>
+          <div class="quiz-q">¿Cuál es la causa de una <code>ConcurrentModificationException</code>?</div>
+          <div class="quiz-options" id="em3q16">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">A</div> Usar un iterador en lugar de for-each</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q16',true)"><div class="quiz-letter">B</div> Modificar estructuralmente la colección durante iteración con for-each</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">C</div> Acceder a la colección desde dos hilos distintos</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q16',false)"><div class="quiz-letter">D</div> Llamar a <code>iterator.next()</code> sin <code>hasNext()</code> previo</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q16-ok">✓ La <code>ConcurrentModificationException</code> ocurre cuando se modifica estructuralmente (add/remove) una colección mientras se itera con for-each o iteradores fail-fast. Usa <code>Iterator.remove()</code> o <code>CopyOnWriteArrayList</code> para evitarla.</div>
+          <div class="quiz-feedback fail" id="em3q16-fail">✗ La causa es una modificación estructural (add/remove) durante la iteración for-each. La colección detecta el cambio vía <code>modCount</code> y lanza la excepción.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 17 de 25</div>
+          <div class="quiz-q">¿Cuál es la diferencia clave entre <code>List.of()</code> y <code>Arrays.asList()</code>?</div>
+          <div class="quiz-options" id="em3q17">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">A</div> <code>List.of()</code> permite <code>null</code>, <code>Arrays.asList()</code> no</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">B</div> Ambas son completamente inmutables</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q17',true)"><div class="quiz-letter">C</div> <code>List.of()</code> es totalmente inmutable; <code>Arrays.asList()</code> permite <code>set()</code> pero no <code>add()</code>/<code>remove()</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q17',false)"><div class="quiz-letter">D</div> Solo <code>Arrays.asList()</code> está respaldado por un array</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q17-ok">✓ <code>List.of()</code> (Java 9+) es completamente inmutable — ni <code>set()</code>, <code>add()</code> ni <code>null</code>. <code>Arrays.asList()</code> permite <code>set()</code> (modifica el array subyacente) pero <code>add()</code>/<code>remove()</code> lanza <code>UnsupportedOperationException</code>.</div>
+          <div class="quiz-feedback fail" id="em3q17-fail">✗ La diferencia: <code>List.of()</code> no permite ninguna mutación ni <code>null</code>; <code>Arrays.asList()</code> permite <code>set()</code> porque es una vista del array original.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 18 de 25</div>
+          <div class="quiz-q">¿Qué ocurre si insertas <code>null</code> como clave en un <code>TreeMap</code>?</div>
+          <div class="quiz-options" id="em3q18">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">A</div> Se inserta como la clave mínima</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q18',true)"><div class="quiz-letter">B</div> Lanza <code>NullPointerException</code> en tiempo de ejecución</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">C</div> Error de compilación por tipo no nulable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q18',false)"><div class="quiz-letter">D</div> Se ignora la inserción silenciosamente</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q18-ok">✓ <code>TreeMap</code> lanza <code>NullPointerException</code> al insertar clave <code>null</code> porque necesita comparar claves con <code>compareTo()</code> o un <code>Comparator</code>, y <code>null</code> no es comparable. <code>HashMap</code> sí permite una clave <code>null</code>.</div>
+          <div class="quiz-feedback fail" id="em3q18-fail">✗ <code>TreeMap</code> no acepta clave <code>null</code> → <code>NullPointerException</code>. Necesita ordenar las claves, incompatible con <code>null</code>. <code>HashMap</code> sí acepta un <code>null</code> como clave.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 19 de 25</div>
+          <div class="quiz-q">¿Qué interfaz extiende tanto <code>Queue</code> como <code>Stack</code> semántica en Java?</div>
+          <div class="quiz-options" id="em3q19">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">A</div> <code>BlockingQueue</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q19',true)"><div class="quiz-letter">B</div> <code>Deque</code> (Double Ended Queue)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">C</div> <code>PriorityQueue</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q19',false)"><div class="quiz-letter">D</div> <code>LinkedList</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q19-ok">✓ <code>Deque</code> (Double Ended Queue) permite insertar/eliminar en ambos extremos. Implementaciones: <code>ArrayDeque</code> (preferida sobre Stack) y <code>LinkedList</code>. Javadoc recomienda <code>ArrayDeque</code> en lugar de la clase <code>Stack</code> legada.</div>
+          <div class="quiz-feedback fail" id="em3q19-fail">✗ <code>Deque</code> es la interfaz cola doble: <code>addFirst/addLast/removeFirst/removeLast</code>. <code>ArrayDeque</code> implementa Deque y es el reemplazo moderno de <code>Stack</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 20 de 25</div>
+          <div class="quiz-q">¿Qué hace <code>Collections.unmodifiableList(list)</code>?</div>
+          <div class="quiz-options" id="em3q20">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">A</div> Crea una copia inmutable profunda de la lista</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">B</div> Ordena la lista y la bloquea</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q20',true)"><div class="quiz-letter">C</div> Devuelve una vista no modificable; la lista original sigue siendo mutable</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q20',false)"><div class="quiz-letter">D</div> Serializa la lista en formato binario</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q20-ok">✓ <code>Collections.unmodifiableList()</code> devuelve una <strong>vista</strong> que lanza <code>UnsupportedOperationException</code> ante cualquier mutación. Pero si alguien sigue teniendo referencia a la lista original, puede modificarla y los cambios se reflejan en la vista. Para inmutabilidad real usa <code>List.copyOf()</code> (Java 10+).</div>
+          <div class="quiz-feedback fail" id="em3q20-fail">✗ Es solo una vista no modificable, no una copia. La lista subyacente sigue siendo mutable si alguien tiene referencia directa. Usa <code>List.copyOf()</code> para una copia realmente inmutable.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 21 de 25 </div>
+          <div class="quiz-q">¿Cuál es el resultado de <code>Arrays.binarySearch(new int[]{{ '{' }}10,20,30,40{{ '}' }}, 25)</code>?</div>
+          <div class="quiz-options" id="em3q21">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q21',false)"><div class="quiz-letter">A</div> 2</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q21',false)"><div class="quiz-letter">B</div> -1</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q21',true)"><div class="quiz-letter">C</div> Un valor negativo (−(punto de inserción)−1)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q21',false)"><div class="quiz-letter">D</div> Lanza <code>ArrayIndexOutOfBoundsException</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q21-ok">✓ Cuando el elemento no existe, <code>binarySearch</code> retorna <code>-(puntoInserción + 1)</code>. Para 25 entre 20 y 30, el punto de inserción sería el índice 2, por lo que retorna <code>-(2+1) = -3</code>. No lanza ninguna excepción.</div>
+          <div class="quiz-feedback fail" id="em3q21-fail">✗ Cuando el elemento no se encuentra, <code>binarySearch</code> retorna un valor negativo: <code>-(puntoDeInserción + 1)</code>. No lanza ninguna excepción.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 22 de 25 </div>
+          <div class="quiz-q"><code>List&lt;String&gt; lista = Arrays.asList("A","B","C")</code>. ¿Qué operación lanzará <code>UnsupportedOperationException</code>?</div>
+          <div class="quiz-options" id="em3q22">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q22',false)"><div class="quiz-letter">A</div> <code>lista.get(1)</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q22',false)"><div class="quiz-letter">B</div> <code>lista.set(0, "Z")</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q22',true)"><div class="quiz-letter">C</div> <code>lista.add("D")</code></div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q22',false)"><div class="quiz-letter">D</div> <code>lista.size()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q22-ok">✓ <code>Arrays.asList()</code> retorna una lista de tamaño fijo. <code>set()</code> funciona (modifica el array), pero <code>add()</code> y <code>remove()</code> lanzan <code>UnsupportedOperationException</code> porque no pueden cambiar el tamaño.</div>
+          <div class="quiz-feedback fail" id="em3q22-fail">✗ <code>Arrays.asList()</code> es de tamaño fijo: <code>get()</code>, <code>set()</code> y <code>size()</code> funcionan, pero <code>add()</code> lanza <code>UnsupportedOperationException</code>.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 23 de 25 </div>
+          <div class="quiz-q">¿Qué garantiza que dos objetos iguales según <code>equals()</code> tengan el mismo resultado en <code>hashCode()</code>?</div>
+          <div class="quiz-options" id="em3q23">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q23',false)"><div class="quiz-letter">A</div> El compilador de Java lo verifica automáticamente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q23',false)"><div class="quiz-letter">B</div> La JVM normaliza los hash codes antes de insertar en HashMap</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q23',true)"><div class="quiz-letter">C</div> Es un contrato del programador: si sobreescribe <code>equals()</code>, debe sobreescribir <code>hashCode()</code> de forma consistente</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q23',false)"><div class="quiz-letter">D</div> <code>HashMap</code> compara los objetos con <code>==</code>, no con <code>equals()</code></div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q23-ok">✓ El <strong>contrato equals/hashCode</strong>: si <code>a.equals(b)</code>, entonces <code>a.hashCode() == b.hashCode()</code>. Si no se cumple, <code>HashMap</code> y <code>HashSet</code> tendrán comportamiento incorrecto. Usa <code>Objects.hash(campo1, campo2)</code> para implementarlo fácilmente.</div>
+          <div class="quiz-feedback fail" id="em3q23-fail">✗ Es responsabilidad del programador. La JVM no verifica este contrato. Romperlo provoca que <code>HashMap</code>/<code>HashSet</code> no encuentren los objetos al buscarlos.</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 24 de 25 </div>
+          <div class="quiz-q">¿Cuál es el comportamiento de <code>PriorityQueue</code> en Java?</div>
+          <div class="quiz-options" id="em3q24">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q24',false)"><div class="quiz-letter">A</div> Mantiene el orden de inserción (FIFO)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q24',true)"><div class="quiz-letter">B</div> <code>poll()</code> siempre extrae el elemento de <strong>menor</strong> prioridad (min-heap por defecto)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q24',false)"><div class="quiz-letter">C</div> Almacena en orden de inserción y extrae en orden inverso (LIFO)</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q24',false)"><div class="quiz-letter">D</div> No permite elementos duplicados</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q24-ok">✓ <code>PriorityQueue</code> es un <strong>min-heap</strong> por defecto: <code>poll()</code> extrae el elemento más pequeño según el orden natural o el <code>Comparator</code> dado. Para max-heap: <code>new PriorityQueue&lt;&gt;(Comparator.reverseOrder())</code>. La iteración <strong>no</strong> garantiza orden.</div>
+          <div class="quiz-feedback fail" id="em3q24-fail">✗ <code>PriorityQueue</code> es un min-heap: extrae siempre el menor. Permite duplicados. La iteración no está en orden de prioridad (solo <code>poll()</code> garantiza el orden).</div>
+        </div>
+        <div class="quiz-box">
+          <div class="quiz-label">Pregunta 25 de 25 </div>
+          <div class="quiz-q">¿Cuántos buckets (capacidad inicial) crea por defecto <code>new HashMap&lt;&gt;()</code> y a qué factor de carga hace <em>rehashing</em>?</div>
+          <div class="quiz-options" id="em3q25">
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q25',false)"><div class="quiz-letter">A</div> 8 buckets, load factor 0.5</div>
+            <div class="quiz-opt"  role="button" tabindex="0" data-correct="true" (click)="answer($event.currentTarget,'em3q25',true)"><div class="quiz-letter">B</div> 16 buckets, load factor 0.75</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q25',false)"><div class="quiz-letter">C</div> 32 buckets, load factor 1.0</div>
+            <div class="quiz-opt"  role="button" tabindex="0" (click)="answer($event.currentTarget,'em3q25',false)"><div class="quiz-letter">D</div> 10 buckets, load factor 0.75</div>
+          </div>
+          <div class="quiz-feedback ok" id="em3q25-ok">✓ Por defecto, <code>HashMap</code> arranca con <strong>16 buckets</strong> y hace <em>rehashing</em> (duplica capacidad) cuando supera el <strong>75% de ocupación</strong>. Si conoces el tamaño esperado, inicializa con <code>new HashMap&lt;&gt;(capacidadInicial)</code> para evitar rehashings costosos.</div>
+          <div class="quiz-feedback fail" id="em3q25-fail">✗ La configuración por defecto es 16 buckets y load factor 0.75. El rehashing duplica los buckets y recalcula todos los hash codes, lo cual es O(n). Por eso es importante dimensionar bien el HashMap inicial.</div>
+        </div>
+      </div>
+
+</ng-container>
