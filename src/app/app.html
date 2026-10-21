@@ -1,19 +1,12 @@
-<app-header></app-header>
-<app-social-sidebar></app-social-sidebar>
-
-<section id="inicio">
-  <app-home></app-home>
-</section>
-
-<section id="sobre-mi">
-  <app-about></app-about>
-</section>
-
-<section id="proyectos">
-  <app-projects></app-projects>
-</section>
-
-<section id="contacto">
-  <app-footer></app-footer>
-</section>
-
+<a class="pf-skip" href="#contenido">Saltar al contenido</a>
+<app-header />
+<div class="route-bar" [class.on]="loading()" role="progressbar" aria-label="Cargando página" [attr.aria-hidden]="!loading()"></div>
+@if (!isCourse()) {
+  <app-social-sidebar />
+}
+<main id="contenido" tabindex="-1">
+  <router-outlet />
+</main>
+@if (!isCourse()) {
+  <app-footer [compact]="isContact()" />
+}

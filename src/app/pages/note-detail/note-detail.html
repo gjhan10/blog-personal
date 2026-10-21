@@ -1,0 +1,74 @@
+@if (note(); as n) {
+  <article class="pf-container pf-page">
+    <div class="pf-split">
+      <aside class="pf-side" aria-label="Datos de la nota">
+        <a class="pf-back" routerLink="/notas"><app-icon name="arrow-left" /> Notas</a>
+        <dl class="pf-facts first">
+          <div><dt>Categoría</dt><dd>{{ n.category }}</dd></div>
+          <div><dt>Publicada</dt><dd><time [attr.datetime]="n.date">{{ date() }}</time></dd></div>
+          <div><dt>Lectura</dt><dd>{{ minutes() }} min</dd></div>
+          <div><dt>Etiquetas</dt><dd>{{ n.tags.join(', ') }}</dd></div>
+        </dl>
+        @if (toc().length) {
+          <nav class="toc" aria-labelledby="h-toc">
+            <p id="h-toc" class="toc-title">En esta nota</p>
+            <ul class="pf-textlinks">
+              @for (t of toc(); track t.id) {
+                <li><a [routerLink]="[]" [fragment]="t.id">{{ t.text }}</a></li>
+              }
+            </ul>
+          </nav>
+        }
+      </aside>
+
+      <div>
+        <h1 class="pf-statement title">{{ n.title }}</h1>
+        <p class="pf-lead summary">{{ n.summary }}</p>
+
+        <div class="pf-prose body">
+          @for (b of n.body; track $index) {
+            @switch (b.type) {
+              @case ('h2') {
+                <h2 [id]="anchor(b.text)">{{ b.text }}</h2>
+              }
+              @case ('p') {
+                <p><app-rich-text [text]="b.text" /></p>
+              }
+              @case ('quote') {
+                <blockquote><app-rich-text [text]="b.text" /></blockquote>
+              }
+              @case ('ul') {
+                <ul>
+                  @for (i of b.items; track $index) {
+                    <li><app-rich-text [text]="i" /></li>
+                  }
+                </ul>
+              }
+              @case ('ol') {
+                <ol>
+                  @for (i of b.items; track $index) {
+                    <li><app-rich-text [text]="i" /></li>
+                  }
+                </ol>
+              }
+              @case ('code') {
+                <pre class="code"><code>{{ b.code }}</code></pre>
+              }
+            }
+          }
+        </div>
+
+        <nav class="pager" aria-label="Más notas">
+          @if (neighbours().newer; as p) {
+            <a [routerLink]="['/notas', p.slug]"><small>Más reciente</small><span>{{ p.title }}</span></a>
+          } @else { <span></span> }
+          @if (neighbours().older; as p) {
+            <a class="next" [routerLink]="['/notas', p.slug]"><small>Anterior</small><span>{{ p.title }}</span></a>
+          }
+        </nav>
+      </div>
+    </div>
+  </article>
+} @else {
+  <app-not-found />
+}

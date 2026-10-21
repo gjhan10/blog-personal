@@ -1,0 +1,59 @@
+:host { display: inline-flex; }
+
+.toggle {
+  display: grid; place-items: center; min-width: 76px; height: 48px; padding: 0; border: 0; background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.track {
+  --w: 68px; --h: 36px; --pad: 4px; --d: 28px;
+  position: relative; display: block; width: var(--w); height: var(--h); border-radius: 999px;
+  background: #dfe3e9; color: #f2f1ed; overflow: hidden;
+  transition: background-color 0.5s var(--ease-out);
+}
+
+.toggle[aria-checked='true'] .track { background: #232a3a; }
+
+.stars {
+  position: absolute; left: 6px; top: 4px; width: 40px; height: 28px; color: #c9d4f2;
+  opacity: 0; transform: translateY(6px) scale(0.8);
+  transition: opacity 0.4s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.toggle[aria-checked='true'] .stars { opacity: 1; transform: none; transition-delay: 0.12s; }
+
+.thumb {
+  position: absolute; left: var(--pad); top: var(--pad); width: var(--d); height: var(--d);
+  display: grid; place-items: center;
+  transform: translateX(0);
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.toggle[aria-checked='true'] .thumb { transform: translateX(calc(var(--w) - var(--d) - var(--pad) * 2)); }
+
+.puck {
+  position: absolute; inset: 0; border-radius: 999px; background: #ffffff;
+  box-shadow: 0 1px 3px rgb(15 17 20 / 28%);
+  transform-origin: left center;
+  transition: transform 0.2s var(--ease-out), background-color 0.5s var(--ease-out), box-shadow 0.5s;
+}
+.toggle[aria-checked='true'] .puck { background: #f2f1ed; transform-origin: right center; }
+.toggle:active .puck { transform: scaleX(1.22); }
+
+.glyph { position: relative; width: 20px; height: 20px; color: #eab308; transition: color 0.5s var(--ease-out); }
+.toggle[aria-checked='true'] .glyph { color: #232a3a; }
+
+.core { transform: scale(0.5556); transform-origin: 12px 12px; transition: transform 0.5s var(--ease-out); }
+.toggle[aria-checked='true'] .core { transform: none; }
+
+.cut { transform: translate(14px, -6px); transition: transform 0.5s var(--ease-out); }
+.toggle[aria-checked='true'] .cut { transform: none; }
+
+.rays { transform-origin: 12px 12px; transition: transform 0.5s var(--ease-out), opacity 0.35s var(--ease-out); }
+.toggle[aria-checked='true'] .rays { transform: rotate(80deg) scale(0.3); opacity: 0; }
+
+.toggle:focus-visible { outline: none; }
+.toggle:focus-visible .track { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb, .puck, .core, .cut, .rays, .stars { transition-duration: 0.01ms; transition-delay: 0s; }
+  .track, .glyph { transition-duration: 0.2s; }
+}

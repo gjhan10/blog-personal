@@ -1,23 +1,16 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideZonelessChangeDetection } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { SITE } from '../../core/site.config';
 import { Footer } from './footer';
 
 describe('Footer', () => {
-  let component: Footer;
-  let fixture: ComponentFixture<Footer>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Footer]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(Footer);
-    component = fixture.componentInstance;
+  it('enlaza el correo real, expone el ancla de contacto y no deja placeholders', async () => {
+    await TestBed.configureTestingModule({ imports: [Footer], providers: [provideZonelessChangeDetection()] }).compileComponents();
+    const fixture = TestBed.createComponent(Footer);
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.innerHTML).toContain(`mailto:${SITE.email}`);
+    expect(el.innerHTML).not.toContain('ejemplo.com');
+    expect(el.querySelector('footer#contacto')).toBeTruthy();
   });
 });

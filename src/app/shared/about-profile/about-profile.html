@@ -1,0 +1,83 @@
+<ng-template #statementText>
+  Soy un Desarrollador Backend especializado en Java y Spring Boot, con experiencia construyendo APIs REST robustas y soluciones
+  empresariales escalables.
+</ng-template>
+
+<div class="layout">
+  <aside class="id" aria-label="Ficha de perfil">
+    <div class="head">
+      <span class="disc"><img src="assets/avatar.jpg" alt="Ilustración de Jhan Gutierrez" width="120" height="120" /></span>
+      <p class="who"><strong>{{ site.name }}</strong><span>Desarrollador Backend</span></p>
+    </div>
+    <dl class="facts">
+      <div><dt>Especialidad</dt><dd>Java y Spring Boot: APIs REST y soluciones empresariales</dd></div>
+      <div><dt>También</dt><dd>Angular, en aplicaciones full-stack</dd></div>
+      <div><dt>Me interesa</dt><dd>Backend, microservicios, arquitectura limpia y buenas prácticas</dd></div>
+      <div><dt>Ubicación</dt><dd>{{ site.location }}</dd></div>
+      <div><dt>Disponibilidad</dt><dd>Abierto a oportunidades</dd></div>
+    </dl>
+  </aside>
+
+  <div class="main">
+    @if (page()) {
+      <h1 class="statement"><ng-container *ngTemplateOutlet="statementText" /></h1>
+    } @else {
+      <p class="statement"><ng-container *ngTemplateOutlet="statementText" /></p>
+    }
+
+    <div class="story">
+      <p>
+        También tengo experiencia desarrollando interfaces usando Angular, lo que me permite trabajar en aplicaciones fullstack.
+      </p>
+      <p>
+        Me apasiona compartir lo que aprendo, especialmente sobre desarrollo backend, microservicios, arquitectura limpia y buenas
+        prácticas.
+      </p>
+      <p>
+        Estoy abierto a oportunidades donde pueda aportar, seguir aprendiendo y crecer profesionalmente. Si tienes alguna oferta
+        interesante, ¡no dudes en contactarme!
+      </p>
+    </div>
+
+    <section class="stack" aria-labelledby="h-stack">
+      <div class="h" id="h-stack" role="heading" [attr.aria-level]="page() ? 2 : 3">Mis habilidades</div>
+      <p class="lead">Así se conectan las piezas con las que trabajo. El servicio es el centro.</p>
+      <app-flow [steps]="layers" label="Capas del stack, de la interfaz a la entrega" />
+    </section>
+
+    @if (page()) {
+      <section class="more" aria-labelledby="h-more">
+        <h2 id="h-more" class="h">Mi trabajo en este sitio</h2>
+        <div class="cols">
+          <div>
+            <h3>Estudio</h3>
+            <ul>
+              @for (c of courses; track c.route) {
+                <li><a [routerLink]="c.route">{{ c.title }}</a></li>
+              }
+            </ul>
+          </div>
+          <div>
+            <h3>Proyectos</h3>
+            <ul>
+              @for (p of projects; track p.slug) {
+                <li>
+                  <a [routerLink]="['/proyectos', p.slug]">{{ p.title }}</a>
+                  <span class="pf-status" [attr.data-s]="p.status">{{ p.status }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+          <div>
+            <h3>Notas</h3>
+            <ul>
+              @for (n of notes; track n.slug) {
+                <li><a [routerLink]="['/notas', n.slug]">{{ n.title }}</a></li>
+              }
+            </ul>
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+</div>

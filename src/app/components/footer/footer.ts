@@ -1,40 +1,28 @@
-import { Component, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { SITE } from '../../core/site.config';
+import { SocialTiles } from '../../shared/social-tiles/social-tiles';
 
 @Component({
   selector: 'app-footer',
+  imports: [SocialTiles],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
-  standalone: true
 })
-export class Footer implements OnInit, OnDestroy {
-  currentYear = new Date().getFullYear();
-  localTime: string = '';
-  private intervalId: any;
+export class Footer {
+  readonly compact = input(false);
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  protected readonly site = SITE;
+  protected readonly year = new Date().getFullYear();
+  protected readonly localTime = signal('');
 
-  ngOnInit(): void {
-    this.updateTime();
-    this.intervalId = setInterval(() => {
-      this.updateTime();
-      this.cdr.detectChanges(); // 👈 Forzar Angular a actualizar la vista
-    }, 1000);
-  }
-
-updateTime(): void {
-  const options: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'America/Lima' 
-  };
-  this.localTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
-}
-
-  ngOnDestroy(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+    const fmt = new Intl.DateTimeFormat('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: SITE.timeZone });
+    afterNextRender(() => {
+      const tick = () => this.localTime.set(fmt.format(new Date()));
+      tick();
+      const id = window.setInterval(tick, 15_000);
+      destroyRef.onDestroy(() => clearInterval(id));
+    });
   }
 }

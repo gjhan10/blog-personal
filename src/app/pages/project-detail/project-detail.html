@@ -1,0 +1,91 @@
+@if (project(); as p) {
+  <article class="pf-container pf-page">
+    <div class="pf-split">
+      <aside class="pf-side" aria-label="Ficha del proyecto">
+        <a class="pf-back" routerLink="/proyectos"><app-icon name="arrow-left" /> Proyectos</a>
+        <h1 class="pf-side-title">{{ p.title }}</h1>
+        <dl class="pf-facts">
+          <div><dt>Estado</dt><dd><span class="pf-status" [attr.data-s]="p.status">{{ p.status }}</span></dd></div>
+          <div><dt>Tipo</dt><dd>{{ p.kind }}</dd></div>
+          <div><dt>Año</dt><dd>{{ p.year }}</dd></div>
+          <div><dt>Stack</dt><dd>{{ p.stack.join(', ') }}</dd></div>
+        </dl>
+        <div class="actions">
+          @for (l of p.links; track l.href; let first = $first) {
+            @if (isExternal(l.href)) {
+              <a class="pf-btn" [class.pf-btn--solid]="first" [class.pf-btn--quiet]="!first" [href]="l.href" target="_blank" rel="noopener noreferrer">
+                {{ l.label }} <app-icon name="arrow-up-right" /><span class="pf-sr">(se abre en una pestaña nueva)</span>
+              </a>
+            } @else {
+              <a class="pf-btn" [class.pf-btn--solid]="first" [class.pf-btn--quiet]="!first" [routerLink]="l.href">{{ l.label }}</a>
+            }
+          }
+        </div>
+      </aside>
+
+      <div>
+        <p class="pf-statement">{{ p.summary }}</p>
+
+        <div class="media">
+          <img [src]="p.media" [alt]="p.mediaAlt" />
+        </div>
+
+        <div class="duo">
+          <section aria-labelledby="h-problema">
+            <h2 id="h-problema" class="label">Problema</h2>
+            <p>{{ p.problem }}</p>
+          </section>
+          <section aria-labelledby="h-solucion">
+            <h2 id="h-solucion" class="label">Solución</h2>
+            <p>{{ p.solution }}</p>
+          </section>
+        </div>
+
+        <div class="duo lists">
+          <section aria-labelledby="h-ok">
+            <h2 id="h-ok" class="pf-h">Qué funciona hoy</h2>
+            <ul class="check ok">
+              @for (w of p.works; track w) {
+                <li>{{ w }}</li>
+              }
+            </ul>
+          </section>
+          <section aria-labelledby="h-todo">
+            <h2 id="h-todo" class="pf-h">Qué falta</h2>
+            <ul class="check todo">
+              @for (w of p.pending; track w) {
+                <li>{{ w }}</li>
+              }
+            </ul>
+          </section>
+        </div>
+
+        @if (gateway(); as g) {
+          <section class="pf-section" aria-labelledby="h-arch">
+            <h2 id="h-arch" class="pf-h">Arquitectura prevista</h2>
+            <p class="pf-lead">Diseño propuesto. Ningún servicio está implementado todavía.</p>
+            <div class="arch">
+              <div class="node core">
+                <code>{{ g.name }}</code>
+                <p>{{ g.role }}</p>
+                <small>{{ g.stack }}</small>
+              </div>
+              <div class="fan" aria-hidden="true"><span></span><span></span><span></span></div>
+              <ul class="nodes">
+                @for (s of services(); track s.name) {
+                  <li class="node">
+                    <code>{{ s.name }}</code>
+                    <p>{{ s.role }}</p>
+                    <small>{{ s.stack }}</small>
+                  </li>
+                }
+              </ul>
+            </div>
+          </section>
+        }
+      </div>
+    </div>
+  </article>
+} @else {
+  <app-not-found />
+}

@@ -1,41 +1,9 @@
-/* app.component.css */
+main:focus { outline: none; }
 
-.social-sidebar {
-  position: fixed;
-  bottom: 0;
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1000;
+.route-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 2000;
+  background: var(--signal); transform: scaleX(0); transform-origin: left; opacity: 0;
+  transition: opacity 0.2s;
+  &.on { opacity: 1; animation: route-load 1.4s var(--ease-out) forwards; }
 }
-
-.social-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.social-sidebar li {
-  margin: 10px 0;
-}
-
-.social-sidebar a {
-  color: #8892b0;
-  font-size: 20px;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.social-sidebar a:hover {
-  color: #64ffda;
-}
-
-.social-sidebar::after {
-  content: "";
-  display: block;
-  width: 1px;
-  height: 100px;
-  background-color: #8892b0;
-  margin-top: 10px;
-}
+@keyframes route-load { to { transform: scaleX(0.9); } }

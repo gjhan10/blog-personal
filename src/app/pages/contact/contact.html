@@ -1,0 +1,39 @@
+<div class="pf-container pf-page">
+  <div class="pf-split">
+    <aside class="pf-side" aria-label="Datos de contacto">
+      <h1 class="pf-side-title">Contacto</h1>
+      <dl class="pf-facts">
+        <div><dt>Ubicación</dt><dd>{{ site.location }}</dd></div>
+        @if (localTime()) {
+          <div><dt>Hora local</dt><dd>{{ localTime() }} h</dd></div>
+        }
+        <div><dt>Disponibilidad</dt><dd>Abierto a oportunidades</dd></div>
+      </dl>
+    </aside>
+
+    <div>
+      <p class="pf-statement">¿Tienes una oportunidad o una idea? Escríbeme por correo o por cualquiera de estos canales.</p>
+
+      <div class="mail">
+        <a class="address" [href]="mailto">{{ site.email }}</a>
+        <div class="actions">
+          <a class="pf-btn pf-btn--solid" [href]="mailto">Escribir un correo</a>
+          <button type="button" class="pf-btn pf-btn--quiet" (click)="copy()">
+            <app-icon [name]="copied() ? 'check' : 'copy'" />
+            {{ copied() ? 'Copiado' : 'Copiar dirección' }}
+          </button>
+          <span class="pf-sr" role="status" aria-live="polite">{{ copied() ? 'Correo copiado al portapapeles' : '' }}</span>
+        </div>
+      </div>
+
+      <section class="pf-section" aria-labelledby="h-perfiles">
+        <h2 id="h-perfiles" class="pf-h">Perfiles</h2>
+        <app-social-tiles class="on-canvas tiles" />
+      </section>
+
+      <p class="note">
+        No hay formulario de contacto: necesitaría un servicio que reciba los mensajes y prefiero no mostrar uno que no entregue nada.
+      </p>
+    </div>
+  </div>
+</div>

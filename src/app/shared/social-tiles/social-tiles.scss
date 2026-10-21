@@ -1,0 +1,48 @@
+:host { display: block; }
+
+.social { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+.net {
+  --brand: var(--ink);
+  position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px;
+  padding: 22px 24px; border-radius: 22px; background: var(--canvas); color: var(--ink); text-decoration: none; overflow: hidden;
+  isolation: isolate; -webkit-tap-highlight-color: transparent;
+  transition: color 0.35s var(--ease-out), transform 0.2s var(--ease-out);
+  &::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; background: var(--brand);
+    transform: scaleY(0); transform-origin: bottom; transition: transform 0.45s var(--ease-out);
+  }
+  &:active { transform: scale(0.98); }
+}
+:host(.on-raised) .net { background: var(--canvas); }
+:host(.on-canvas) .net { background: var(--raised); }
+
+.badge {
+  display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px;
+  background: var(--raised-2); color: var(--ink); font-size: 26px;
+  transition: background-color 0.35s var(--ease-out), color 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+.text { display: grid; gap: 2px; min-width: 0; }
+.name { font: 600 clamp(1.35rem, 1.9vw, 1.65rem)/1.1 var(--font-display); letter-spacing: -0.02em; }
+.detail { font-size: 14px; color: var(--ink-dim); transition: color 0.35s var(--ease-out); }
+
+.go {
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-size: 20px;
+  background: var(--raised-2); transition: background-color 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .net:hover { color: #fff; }
+  .net:hover::before { transform: scaleY(1); }
+  .net:hover .badge { background: #fff; color: var(--brand); transform: rotate(-8deg) scale(1.06); }
+  .net:hover .detail { color: rgb(255 255 255 / 80%); }
+  .net:hover .go { background: rgb(255 255 255 / 20%); transform: translate(2px, -2px); }
+}
+.net:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+@media (max-width: 860px) { .social { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .net::before { transition-duration: 0.01ms; }
+  .badge, .go { transition-property: background-color, color; }
+}
