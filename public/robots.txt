@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gjhan10.github.io/blog-personal/sitemap.xml
