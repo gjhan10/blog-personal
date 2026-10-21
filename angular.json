@@ -18,38 +18,36 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputMode": "static",
+            "outputPath": "dist/blog-personal",
+            "index": "src/index.html",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-               {
-                 "glob": "**/*",
-                 "input": "public"
-               },
-               "src/assets",
-               "src/favicon.ico"
-             ],
-            "styles": [
-              "src/styles.scss",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              "src/assets"
             ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "styles": [
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {
+              "baseHref": "/blog-personal/",
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "700kB",
+                  "maximumError": "1.2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "30kB",
+                  "maximumError": "40kB"
                 }
               ],
               "outputHashing": "all"
@@ -87,16 +85,17 @@
                 "glob": "**/*",
                 "input": "public"
               },
-              "src/assets",
-              "src/favicon.ico"
+              "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+              "src/styles.scss"
             ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
