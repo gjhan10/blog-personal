@@ -9,10 +9,11 @@ import { AboutProfile } from '../../shared/about-profile/about-profile';
 import { CourseList } from '../../shared/course-list/course-list';
 import { NoteList } from '../../shared/note-list/note-list';
 import { ProjectTile } from '../../shared/project-tile/project-tile';
+import { SoftsparkBand } from '../../shared/softspark-band/softspark-band';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, CursoJavaComponent, ProjectTile, CourseList, AboutProfile, NoteList],
+  imports: [RouterLink, CursoJavaComponent, ProjectTile, CourseList, AboutProfile, NoteList, SoftsparkBand],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

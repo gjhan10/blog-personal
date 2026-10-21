@@ -8,7 +8,7 @@
 
     <div class="base">
       <p>{{ site.location }}@if (localTime()) {, {{ localTime() }} h}</p>
-      <p>© {{ year }} {{ site.name }}. <a [href]="site.repo" target="_blank" rel="noopener noreferrer">Código fuente</a></p>
+      <p>© {{ year }} {{ site.name }}. <a [href]="site.repo" target="_blank" rel="noopener noreferrer">Código fuente</a>@if (site.softsparkUrl) { · <a [href]="site.softsparkUrl" target="_blank" rel="noopener">SoftSpark</a>}</p>
     </div>
   </div>
 </footer>

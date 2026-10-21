@@ -14,6 +14,7 @@
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .block { padding-block: clamp(56px, 8vw, 112px); }
+.softspark { padding-block: 0; }
 .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: clamp(28px, 4vw, 56px); }
 
 .duo { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(28px, 4vw, 64px); align-items: start; margin-top: clamp(40px, 6vw, 88px); }

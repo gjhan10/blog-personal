@@ -10,4 +10,5 @@ export const SITE = {
   linkedin: 'https://linkedin.com/in/jhan-jeyson-gutierrez-flores-18196a209',
   whatsapp: 'https://wa.me/51922402398',
   cvPath: null as string | null,
+  softsparkUrl: 'https://gjhan10.github.io/softspark/' as string | null,
 };
