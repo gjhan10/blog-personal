@@ -1,10 +1,5 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
 import { SITE } from '../../core/site.config';
-import { COURSES } from '../../data/courses.data';
-import { NOTES } from '../../data/notes.data';
-import { PROJECTS } from '../../data/projects.data';
 import { SKILL_GROUPS } from '../../data/skills.data';
 import { Flow, FlowStep } from '../flow/flow';
 
@@ -17,17 +12,12 @@ const LAYERS: { group: string; name: string; core?: boolean; via?: string }[] = 
 
 @Component({
   selector: 'app-about-profile',
-  imports: [NgTemplateOutlet, RouterLink, Flow],
+  imports: [Flow],
   templateUrl: './about-profile.html',
   styleUrl: './about-profile.scss',
 })
 export class AboutProfile {
-  readonly page = input(false);
-
   protected readonly site = SITE;
-  protected readonly courses = COURSES;
-  protected readonly projects = PROJECTS;
-  protected readonly notes = NOTES;
 
   protected readonly layers: FlowStep[] = LAYERS.flatMap(({ group, name, core, via }) => {
     const found = SKILL_GROUPS.find((g) => g.title === group);

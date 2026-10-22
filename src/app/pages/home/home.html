@@ -20,49 +20,8 @@
   </div>
 </section>
 
-<section class="block" id="proyectos" aria-labelledby="h-proy">
-  <div class="pf-container">
-    <header class="head">
-      <h2 class="pf-title" id="h-proy">Proyectos</h2>
-      <a class="pf-link" routerLink="/proyectos">Ver todos</a>
-    </header>
-    <app-curso-java [project]="featured" [index]="0" />
-    <div class="duo">
-      <app-project-tile class="wide" [project]="portfolio" ratio="16 / 11" />
-      <app-project-tile class="narrow" [project]="orders" ratio="800 / 520" />
-    </div>
-  </div>
-</section>
-
-<section class="block softspark">
+<section class="softspark">
   <div class="pf-container">
     <app-softspark-band />
-  </div>
-</section>
-
-<section class="block" id="aprendizaje" aria-labelledby="h-apr">
-  <div class="pf-container">
-    <header class="head">
-      <h2 class="pf-title" id="h-apr">Aprendizaje</h2>
-      <a class="pf-link" routerLink="/aprendizaje">Ver el detalle</a>
-    </header>
-    <app-course-list />
-  </div>
-</section>
-
-<section class="block" id="sobre-mi" aria-labelledby="h-sobre">
-  <div class="pf-container">
-    <header class="head"><h2 class="pf-title" id="h-sobre">Sobre mí</h2></header>
-    <app-about-profile />
-  </div>
-</section>
-
-<section class="block" aria-labelledby="h-notas">
-  <div class="pf-container">
-    <header class="head">
-      <h2 class="pf-title" id="h-notas">Notas técnicas</h2>
-      <a class="pf-link" routerLink="/notas">Todas las notas</a>
-    </header>
-    <app-note-list [notes]="notes" />
   </div>
 </section>

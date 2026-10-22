@@ -1,6 +1,12 @@
 :host { display: block; }
 
-.hero { padding-top: calc(var(--header-h) + clamp(40px, 6vw, 88px)); padding-bottom: clamp(24px, 4vw, 48px); }
+.hero {
+  min-height: calc(100svh - 160px);
+  display: flex;
+  align-items: center;
+  padding-top: calc(var(--header-h) + clamp(40px, 6vw, 88px));
+  padding-bottom: clamp(32px, 5vw, 64px);
+}
 
 .name { font-size: clamp(2.6rem, 8.6vw, 6rem); line-height: 1.02; }
 .line { display: block; overflow: hidden; padding-bottom: 0.1em; margin-bottom: -0.1em; }
@@ -13,13 +19,8 @@
 .intro { flex: 1 1 380px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-.block { padding-block: clamp(56px, 8vw, 112px); }
-.softspark { padding-block: 0; }
-.head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: clamp(28px, 4vw, 56px); }
-
-.duo { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(28px, 4vw, 64px); align-items: start; margin-top: clamp(40px, 6vw, 88px); }
+.softspark { padding-bottom: clamp(56px, 8vw, 112px); }
 
 @media (max-width: 860px) {
-  .duo { grid-template-columns: 1fr; }
   .actions .pf-btn { flex: 1 1 auto; }
 }

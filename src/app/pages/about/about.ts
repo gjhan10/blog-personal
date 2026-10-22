@@ -7,7 +7,7 @@ import { AboutProfile } from '../../shared/about-profile/about-profile';
   imports: [AboutProfile],
   template: `
     <div class="pf-container pf-page">
-      <app-about-profile [page]="true" />
+      <app-about-profile />
     </div>
   `,
 })

@@ -1,8 +1,3 @@
-<ng-template #statementText>
-  Soy un Desarrollador Backend especializado en Java y Spring Boot, con experiencia construyendo APIs REST robustas y soluciones
-  empresariales escalables.
-</ng-template>
-
 <div class="layout">
   <aside class="id" aria-label="Ficha de perfil">
     <div class="head">
@@ -19,11 +14,10 @@
   </aside>
 
   <div class="main">
-    @if (page()) {
-      <h1 class="statement"><ng-container *ngTemplateOutlet="statementText" /></h1>
-    } @else {
-      <p class="statement"><ng-container *ngTemplateOutlet="statementText" /></p>
-    }
+    <h1 class="statement">
+      Soy un Desarrollador Backend especializado en Java y Spring Boot, con experiencia construyendo APIs REST robustas y soluciones
+      empresariales escalables.
+    </h1>
 
     <div class="story">
       <p>
@@ -40,44 +34,10 @@
     </div>
 
     <section class="stack" aria-labelledby="h-stack">
-      <div class="h" id="h-stack" role="heading" [attr.aria-level]="page() ? 2 : 3">Mis habilidades</div>
+      <h2 class="h" id="h-stack">Mis habilidades</h2>
       <p class="lead">Así se conectan las piezas con las que trabajo. El servicio es el centro.</p>
       <app-flow [steps]="layers" label="Capas del stack, de la interfaz a la entrega" />
     </section>
 
-    @if (page()) {
-      <section class="more" aria-labelledby="h-more">
-        <h2 id="h-more" class="h">Mi trabajo en este sitio</h2>
-        <div class="cols">
-          <div>
-            <h3>Estudio</h3>
-            <ul>
-              @for (c of courses; track c.route) {
-                <li><a [routerLink]="c.route">{{ c.title }}</a></li>
-              }
-            </ul>
-          </div>
-          <div>
-            <h3>Proyectos</h3>
-            <ul>
-              @for (p of projects; track p.slug) {
-                <li>
-                  <a [routerLink]="['/proyectos', p.slug]">{{ p.title }}</a>
-                  <span class="pf-status" [attr.data-s]="p.status">{{ p.status }}</span>
-                </li>
-              }
-            </ul>
-          </div>
-          <div>
-            <h3>Notas</h3>
-            <ul>
-              @for (n of notes; track n.slug) {
-                <li><a [routerLink]="['/notas', n.slug]">{{ n.title }}</a></li>
-              }
-            </ul>
-          </div>
-        </div>
-      </section>
-    }
   </div>
 </div>
